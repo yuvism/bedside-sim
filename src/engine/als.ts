@@ -16,9 +16,11 @@ export const PADS_DEVICE = 'defib_pads';
 
 /** Teaching parameters for the ROSC model (listed in docs/clinical-review.md). */
 export const ROSC = {
-  baseShock: 0.45,
+  baseShock: 0.6,
   baseCheck: 0.35,
   minCheckCprSec: 90,
+  /** Arrest shorter than this counts as full-quality (a monitored arrest shocked at once). */
+  graceSec: 60,
   timeTauMin: 10,
   causeUnfixedShockable: 0.55,
   causeUnfixedNonShockable: 0.12,
@@ -66,7 +68,7 @@ export function roscChance(m: Model, via: 'shock' | 'check'): number {
   const a = s.als;
   if (!a) return 0;
   const elapsed = Math.max(1, s.t - a.t0);
-  const quality = 0.3 + 0.7 * clamp(a.cprSec / elapsed, 0, 1);
+  const quality = elapsed <= ROSC.graceSec ? 1 : 0.3 + 0.7 * clamp(a.cprSec / elapsed, 0, 1);
   const timeF = Math.exp(-elapsed / 60 / ROSC.timeTauMin);
   const shockable = SHOCKABLE.includes(s.rhythm);
   const fixed = causeFixed(m);

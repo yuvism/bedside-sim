@@ -6,7 +6,7 @@ Each item below is a teaching parameter or an uncertain value marked `"reviewNee
 A clinician should check it against its source, then either confirm it (cite the guideline
 and remove the flag) or correct it.
 
-**84 flagged items.**
+**113 flagged items.**
 
 ## src/content/formulary.json
 
@@ -59,6 +59,7 @@ and remove the flag) or correct it.
 | `drugs[glucagon].effects[glucose]` | target glucose; emax 6; ec50 0.5 | Teaching parameter. |
 | `drugs[glucagon].effects[process:hypoglycaemia]` | target process:hypoglycaemia; emax -8; ec50 0.5 | Teaching parameter. |
 | `drugs[insulin]` | id insulin; name Soluble insulin; drugClass Insulin; unit units; halfLifeMin 25; 1 routes (see file); 4 effects (see file) | Effect duration, not plasma half-life. Teaching parameter. |
+| `drugs[insulin].routes[IV]` | route IV; label IV bolus (hyperkalaemia, with glucose); standardDose 10; bioavailability 1; absorptionHalfLifeMin 5; maxDose 10 | 10 units soluble insulin with 25 g glucose IV for hyperkalaemia (UK Kidney Association, 2020). The 5-minute "absorption" models the delay before the K⁺-lowering effect builds (teaching parameter). |
 | `drugs[insulin].effects[glucose]` | target glucose; emax -9; ec50 6 | Teaching parameter. |
 | `drugs[insulin].effects[lab:k]` | target lab:k; emax -1.3; ec50 5 | Teaching parameter. |
 | `drugs[insulin].effects[process:hyperkalaemia]` | target process:hyperkalaemia; emax -3; ec50 5 | Teaching parameter. |
@@ -76,7 +77,7 @@ and remove the flag) or correct it.
 | `drugs[magnesium_sulfate].effects[process:asthma]` | target process:asthma; emax -2; ec50 1.5 | Teaching parameter. |
 | `drugs[piperacillin_tazobactam]` | id piperacillin_tazobactam; name Piperacillin–tazobactam; drugClass Broad-spectrum antibiotic; unit g; halfLifeMin 90; 1 routes (see file); 1 effects (see file) | Antibiotic choice follows local policy. Effect size and onset are teaching parameters. |
 | `drugs[piperacillin_tazobactam].routes[IV]` | route IV; label IV; standardDose 4.5; bioavailability 1; absorptionHalfLifeMin 0; maxDose 4.5 | 4.5 g IV is a common adult dose; follow local sepsis policy. Surviving Sepsis Campaign (2021): antimicrobials within 1 hour when shock is present. |
-| `drugs[piperacillin_tazobactam].effects[process:sepsis]` | target process:sepsis; emax -1.6; ec50 1.5 | Teaching parameter. |
+| `drugs[piperacillin_tazobactam].effects[process:sepsis]` | target process:sepsis; emax -2.6; ec50 1.5 | Teaching parameter. |
 | `drugs[noradrenaline].infusion` | unit mcg/kg/min; standardRate 0.1; minRate 0.02; maxRate 1; perKg true; amountPerMinPerRate 0.001 | First-line vasopressor to a MAP of 65 mmHg; may be started peripherally (Surviving Sepsis Campaign, 2021). Rate range is a teaching estimate. |
 | `drugs[noradrenaline].effects[sbp]` | target sbp; emax 55; ec50 0.03 | Teaching parameter. |
 | `drugs[noradrenaline].effects[hr]` | target hr; emax 6; ec50 0.05 | Teaching parameter. |
@@ -105,12 +106,85 @@ and remove the flag) or correct it.
 | `investigations[ue]` | id ue; label Urea and electrolytes; sub Lab; category lab; turnaroundMin 60 | Typical urgent laboratory turnaround; varies by hospital. Teaching estimate. |
 | `investigations[tryp]` | id tryp; label Mast cell tryptase; sub Lab sample; category lab; turnaroundMin 240 | Resuscitation Council UK (2021) recommends timed mast cell tryptase samples. Turnaround varies by laboratory; teaching estimate. |
 | `investigations[cxr]` | id cxr; label Chest X-ray; sub Portable; category imaging; turnaroundMin 20 | Typical portable chest X-ray turnaround. Teaching estimate. |
+| `investigations[vbg]` | id vbg; label Venous blood gas; category bedside; turnaroundMin 2 | Typical point-of-care analyser time. Teaching estimate. |
+| `investigations[troponin]` | id troponin; label High-sensitivity troponin; sub Lab; category lab; turnaroundMin 60 | Typical urgent laboratory turnaround; varies by hospital. Teaching estimate. |
+| `investigations[crp]` | id crp; label CRP; sub Lab; category lab; turnaroundMin 60 | Typical urgent laboratory turnaround; varies by hospital. Teaching estimate. |
+| `investigations[coag]` | id coag; label Clotting screen; sub Lab: PT, APTT, fibrinogen; category lab; turnaroundMin 45 | Typical urgent laboratory turnaround; varies by hospital. Teaching estimate. |
+| `investigations[xmatch]` | id xmatch; label Group and crossmatch; sub Blood bank; category lab; turnaroundMin 45 | Typical crossmatch time; O-negative and group-specific blood are faster. Teaching estimate. |
+| `investigations[cultures]` | id cultures; label Blood cultures; sub Two sets, before antibiotics; category lab; turnaroundMin 1440 | Cultures take 24–48 hours to grow. Teaching estimate. |
+| `investigations[tox]` | id tox; label Paracetamol and salicylate levels; sub Lab; category lab; turnaroundMin 60 | Typical urgent laboratory turnaround. Teaching estimate. |
+| `investigations[fast]` | id fast; label eFAST scan; sub Bedside ultrasound; category imaging; turnaroundMin 3 | Typical time for an extended FAST scan. Teaching estimate. |
+| `investigations[xray_pelvis]` | id xray_pelvis; label Pelvic X-ray; sub Portable; category imaging; turnaroundMin 20 | Typical portable X-ray turnaround. Teaching estimate. |
 
 ## src/content/cases/anaphylaxis-01.json
 
 | Item | Values | Source |
 | --- | --- | --- |
 | `processes[anaphylaxis]` | id anaphylaxis; type anaphylaxis; label Anaphylaxis; initial 40; initialJitter 4; ratePerMin 6; rateJitterPct 8; decayTauMin 20; sensitivityJitterPct 15; arrestAt 100; arrestRhythm pea; 15 effects (see file) | Teaching model ported from the prototype (reference/bedside-sim.html); effect sizes are not taken from a guideline. Arrest rhythm is PEA because anaphylactic arrest is usually non-shockable (the prototype showed VF). |
+
+## src/content/cases/asthma-01.json
+
+| Item | Values | Source |
+| --- | --- | --- |
+| `processes[asthma]` | id asthma; type asthma; label Acute asthma; initial 55; initialJitter 4; ratePerMin 2.2; rateJitterPct 10; decayTauMin 40; sensitivityJitterPct 15; arrestAt 100; arrestRhythm pea; 13 effects (see file) | Teaching model. Severity bands follow BTS/SIGN 158 (2019): acute severe = PEF 33–50% predicted, RR ≥ 25, HR ≥ 110, can't complete sentences; life-threatening = PEF < 33%, SpO₂ < 92%, silent chest, exhaustion, normal or rising PaCO₂. Effect sizes are teaching parameters. |
+
+## src/content/cases/dka-01.json
+
+| Item | Values | Source |
+| --- | --- | --- |
+| `processes[dka]` | id dka; type dka; label Diabetic ketoacidosis; initial 60; initialJitter 4; ratePerMin 0.5; rateJitterPct 10; sensitivityJitterPct 15; arrestAt 100; arrestRhythm pea; 12 effects (see file) | Teaching model of DKA, compressed in time so treatment response fits a teaching session (real resolution takes 12–24 hours). Diagnostic thresholds from JBDS DKA guideline (2021): ketones ≥ 3 mmol/L, glucose > 11 mmol/L, pH < 7.3 or HCO₃⁻ < 15 mmol/L. Effect sizes are teaching parameters. |
+| `rhythmRules[hypokalaemic-vf]` | id hypokalaemic-vf; to vf; probPerMin 0.3 | Teaching parameter: arrhythmia risk with severe hypokalaemia during insulin treatment. |
+
+## src/content/cases/haemorrhage-01.json
+
+| Item | Values | Source |
+| --- | --- | --- |
+| `processes[haemorrhage]` | id haemorrhage; type hypovolaemia; label Pelvic haemorrhage; initial 45; initialJitter 4; ratePerMin 2.5; rateJitterPct 10; sensitivityJitterPct 10; arrestAt 100; arrestRhythm pea; 10 effects (see file); 2 treatments (see file) | Teaching model of ongoing haemorrhage from a pelvic fracture. Volume replacement with blood products and definitive haemorrhage control reverse it. Effect sizes are teaching parameters. |
+| `processes[haemorrhage].treatments[binder]` | id binder; ratePerMin -1.5 | A pelvic binder reduces pelvic volume and venous bleeding but doesn't stop arterial bleeding (ATLS 10th edition, 2018). Rate is a teaching parameter. |
+| `processes[haemorrhage].treatments[definitive]` | id definitive; ratePerMin -3.5 | Definitive control (angioembolisation or surgery), about 20 minutes after referral in this case. Rate is a teaching parameter. |
+
+## src/content/cases/hyperk-01.json
+
+| Item | Values | Source |
+| --- | --- | --- |
+| `processes[hyperk]` | id hyperk; type hyperkalaemia; label Hyperkalaemia; initial 60; initialJitter 3; ratePerMin 0.5; rateJitterPct 10; sensitivityJitterPct 15; arrestAt 100; arrestRhythm asystole; 6 effects (see file); 1 treatments (see file) | Teaching model: K⁺ about 7.2 mmol/L at presentation, rising after missed dialysis. ECG changes worsen with K⁺. Effect sizes and timing are teaching parameters. |
+| `processes[hyperk].treatments[dialysis]` | id dialysis; ratePerMin -3 | Emergency dialysis removes potassium; started about 30 minutes after referral in this case. Rate is a teaching parameter. |
+| `rhythmRules[hyperk-vf]` | id hyperk-vf; to vf; probPerMin 0.5 | Teaching parameter: arrhythmia risk at K⁺ ≥ 8 mmol/L without membrane stabilisation. |
+| `rhythmRules[hyperk-vf-protected]` | id hyperk-vf-protected; to vf; probPerMin 0.03 | Teaching parameter: calcium reduces but doesn't remove arrhythmia risk. |
+
+## src/content/cases/hypo-01.json
+
+| Item | Values | Source |
+| --- | --- | --- |
+| `processes[hypoglycaemia]` | id hypoglycaemia; type hypoglycaemia; label Sulfonylurea-induced hypoglycaemia; initial 75; initialJitter 4; ratePerMin 0.6; rateJitterPct 10; sensitivityJitterPct 15; arrestAt 100; arrestRhythm pea; 6 effects (see file) | Teaching model: gliclazide keeps driving glucose down for many hours, so hypoglycaemia recurs after a single glucose dose. The arrest threshold makes prolonged untreated neuroglycopenia a bad outcome within the session; effect sizes and timing are teaching parameters. |
+
+## src/content/cases/opioid-01.json
+
+| Item | Values | Source |
+| --- | --- | --- |
+| `processes[opioid]` | id opioid; type opioid_toxicity; label Opioid toxicity; initial 75; initialJitter 3; ratePerMin 2; rateJitterPct 10; decayTauMin 20; sensitivityJitterPct 15; arrestAt 100; arrestRhythm pea; 6 effects (see file) | Teaching model of heroin toxicity. Naloxone blocks the opioid effects without clearing the drug, so effects can return as naloxone wears off. Effect sizes are teaching parameters. |
+
+## src/content/cases/sepsis-01.json
+
+| Item | Values | Source |
+| --- | --- | --- |
+| `processes[sepsis]` | id sepsis; type sepsis; label Septic shock (pneumonia); initial 58; initialJitter 3; ratePerMin 1; rateJitterPct 10; sensitivityJitterPct 15; arrestAt 100; arrestRhythm pea; 14 effects (see file) | Teaching model of pneumonia progressing to septic shock (Surviving Sepsis Campaign 2021 definitions: vasopressors needed for MAP ≥ 65 and lactate > 2 mmol/L despite fluids). Effect sizes and time course are teaching parameters. |
+
+## src/content/cases/stemi-01.json
+
+| Item | Values | Source |
+| --- | --- | --- |
+| `processes[ischaemia]` | id ischaemia; type myocardial_ischaemia; label Acute myocardial infarction; initial 45; initialJitter 4; ratePerMin 1; rateJitterPct 10; sensitivityJitterPct 15; arrestAt 100; arrestRhythm vf; 10 effects (see file); 1 treatments (see file) | Teaching model of an evolving anterior STEMI. Effect sizes are teaching parameters. |
+| `processes[ischaemia].treatments[reperfusion]` | id reperfusion; ratePerMin -6 | Primary PCI reperfuses the artery; the cath lab takes about 20 minutes to be ready in this case. Rate is a teaching parameter. |
+| `rhythmRules[ischaemic-vf]` | id ischaemic-vf; to vf; probPerMin 0.04 | Teaching parameter: risk of ischaemic VF while the artery stays occluded. |
+
+## src/content/cases/tension-01.json
+
+| Item | Values | Source |
+| --- | --- | --- |
+| `processes[ptx]` | id ptx; type tension_ptx; label Left tension pneumothorax; initial 45; initialJitter 4; ratePerMin 3; rateJitterPct 10; sensitivityJitterPct 10; arrestAt 100; arrestRhythm pea; 8 effects (see file); 2 treatments (see file) | Teaching model of a traumatic tension pneumothorax: obstructive shock with hypoxaemia, arresting within about 20 minutes untreated. Effect sizes are teaching parameters. |
+| `processes[ptx].treatments[needle]` | id needle; ratePerMin -25 | Needle decompression releases the tension but the cannula can kink or block; here it stops working after 15 minutes. Teaching parameters. |
+| `processes[ptx].treatments[drain]` | id drain; ratePerMin -25 | Chest drain is definitive treatment (ATLS 10th edition, 2018). Rate is a teaching parameter. |
 
 ## Engine coupling constants
 
@@ -141,9 +215,10 @@ Shock and pulse-check odds rise with CPR fraction, early action, fixing the caus
 
 | Constant | Value |
 | --- | --- |
-| `baseShock` | 0.45 |
+| `baseShock` | 0.6 |
 | `baseCheck` | 0.35 |
 | `minCheckCprSec` | 90 |
+| `graceSec` | 60 |
 | `timeTauMin` | 10 |
 | `causeUnfixedShockable` | 0.55 |
 | `causeUnfixedNonShockable` | 0.12 |

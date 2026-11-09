@@ -527,7 +527,16 @@
           "source": "Teaching parameter.",
           "reviewNeeded": true
         }
-      ]
+      ],
+      "infusion": {
+        "unit": "ml/h",
+        "standardRate": 125,
+        "minRate": 50,
+        "maxRate": 250,
+        "perKg": false,
+        "amountPerMinPerRate": 0.016667,
+        "source": "Glucose 10% at 125 ml/h alongside the insulin infusion once glucose is below 14 mmol/L (JBDS DKA guideline, 2021); also used to prevent recurrent sulfonylurea hypoglycaemia."
+      }
     },
     {
       "id": "glucose_20",
@@ -648,9 +657,10 @@
           "label": "IV bolus (hyperkalaemia, with glucose)",
           "standardDose": 10,
           "bioavailability": 1,
-          "absorptionHalfLifeMin": 0,
+          "absorptionHalfLifeMin": 5,
           "maxDose": 10,
-          "source": "10 units soluble insulin with 25 g glucose IV for hyperkalaemia (UK Kidney Association, 2020)."
+          "source": "10 units soluble insulin with 25 g glucose IV for hyperkalaemia (UK Kidney Association, 2020). The 5-minute \"absorption\" models the delay before the K⁺-lowering effect builds (teaching parameter).",
+          "reviewNeeded": true
         }
       ],
       "infusion": {
@@ -915,7 +925,7 @@
       "effects": [
         {
           "target": "process:sepsis",
-          "emax": -1.6,
+          "emax": -2.6,
           "ec50": 1.5,
           "source": "Teaching parameter.",
           "reviewNeeded": true

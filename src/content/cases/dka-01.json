@@ -1,0 +1,445 @@
+{
+  "schemaVersion": 1,
+  "id": "dka-01",
+  "version": 1,
+  "title": "Vomiting and breathing fast",
+  "summary": "A 19-year-old with type 1 diabetes, two days of vomiting, deep sighing breaths and abdominal pain.",
+  "specialty": "Endocrinology",
+  "difficulty": "core",
+  "estMinutes": 25,
+  "tags": ["DKA", "diabetes", "insulin", "potassium"],
+  "patient": {
+    "name": "Liam O'Connor",
+    "age": 19,
+    "sex": "male",
+    "weightKg": 64,
+    "occupation": "first-year university student",
+    "persona": "Embarrassed, tired and nauseated. Admits he stopped his insulin when he couldn't eat."
+  },
+  "brief": [
+    "Liam, 19, has type 1 diabetes. He has been vomiting for two days with a stomach bug and stopped taking his insulin because he wasn't eating. His flatmate brought him in because he is breathing strangely and is very drowsy.",
+    "Confirm the diagnosis and start treatment in line with the Joint British Diabetes Societies (JBDS) DKA pathway. Watch the potassium and the glucose as he improves."
+  ],
+  "openingLine": "I feel so sick… and my stomach really hurts.",
+  "baseline": {
+    "hr": 80,
+    "sbp": 120,
+    "dbp": 70,
+    "rr": 14,
+    "temp": 37.1,
+    "glucose": 6,
+    "hrJitter": 4,
+    "sbpJitter": 4
+  },
+  "labs": {
+    "lactate": 1.4,
+    "hco3": 24,
+    "k": 3.6,
+    "ketones": 0.2,
+    "na": 138,
+    "urea": 5,
+    "creatinine": 80,
+    "hb": 150,
+    "wcc": 13,
+    "plt": 300
+  },
+  "processes": [
+    {
+      "id": "dka",
+      "type": "dka",
+      "label": "Diabetic ketoacidosis",
+      "initial": 60,
+      "initialJitter": 4,
+      "ratePerMin": 0.5,
+      "rateJitterPct": 10,
+      "sensitivityJitterPct": 15,
+      "arrestAt": 100,
+      "arrestRhythm": "pea",
+      "effects": [
+        { "target": "glucose", "perPoint": 0.4 },
+        { "target": "lab:ketones", "perPoint": 0.09 },
+        { "target": "lab:hco3", "perPoint": -0.25 },
+        { "target": "lab:k", "perPoint": 0.03 },
+        { "target": "lab:urea", "perPoint": 0.1 },
+        { "target": "lab:creatinine", "perPoint": 1.2 },
+        { "target": "rr", "perPoint": 0.25 },
+        { "target": "hr", "perPoint": 0.5 },
+        { "target": "sbp", "perPoint": -0.45 },
+        { "target": "gcs", "perPoint": -0.08, "above": 55 },
+        { "target": "sign:effort", "perPoint": 0.008 },
+        { "target": "sign:anxiety", "perPoint": 0.006 }
+      ],
+      "source": "Teaching model of DKA, compressed in time so treatment response fits a teaching session (real resolution takes 12–24 hours). Diagnostic thresholds from JBDS DKA guideline (2021): ketones ≥ 3 mmol/L, glucose > 11 mmol/L, pH < 7.3 or HCO₃⁻ < 15 mmol/L. Effect sizes are teaching parameters.",
+      "reviewNeeded": true
+    }
+  ],
+  "rhythmRules": [
+    {
+      "id": "hypokalaemic-vf",
+      "from": ["sinus", "sinus_tachy", "sinus_brady"],
+      "to": "vf",
+      "when": { "lab": "k", "lt": 2.5 },
+      "probPerMin": 0.3,
+      "source": "Teaching parameter: arrhythmia risk with severe hypokalaemia during insulin treatment.",
+      "reviewNeeded": true
+    }
+  ],
+  "bands": { "process": "dka", "cutoffs": [25, 70] },
+  "dialogue": [
+    {
+      "id": "what",
+      "category": "presenting",
+      "q": "What's been happening?",
+      "a": [
+        "I feel loads better. Still a bit sick.",
+        "Two days of being sick. Now I can't stop breathing like this.",
+        "(sighs deeply, eyes closing)"
+      ],
+      "keywords": ["happening", "wrong", "feel"]
+    },
+    {
+      "id": "insulin",
+      "category": "meds",
+      "q": "Have you been taking your insulin?",
+      "a": [
+        "I stopped when I couldn't eat. I didn't know you shouldn't.",
+        "Stopped it… wasn't eating.",
+        "(shakes his head)"
+      ],
+      "keywords": ["insulin", "injections", "novorapid", "lantus", "pen", "doses"]
+    },
+    {
+      "id": "pain",
+      "category": "presenting",
+      "q": "Where's the pain?",
+      "a": [
+        "It's nearly gone.",
+        "All over my stomach. Comes in waves.",
+        "(points vaguely at his abdomen)"
+      ],
+      "keywords": ["pain", "stomach", "abdomen", "tummy", "hurt"]
+    },
+    {
+      "id": "drink",
+      "category": "history",
+      "q": "Have you been very thirsty or weeing a lot?",
+      "a": ["Yeah, for about three days.", "So thirsty… weeing all the time.", "(nods)"],
+      "keywords": ["thirsty", "thirst", "drink", "urine", "wee"]
+    },
+    {
+      "id": "pmh",
+      "category": "pmh",
+      "q": "Any other medical problems?",
+      "a": ["Type 1 since I was 11. Nothing else.", "Type 1.", "(no answer)"],
+      "keywords": ["medical", "history", "conditions"]
+    },
+    {
+      "id": "allergy",
+      "category": "allergies",
+      "q": "Any allergies?",
+      "a": ["None.", "No.", "(shakes his head)"],
+      "keywords": ["allergy", "allergies", "allergic"]
+    },
+    {
+      "id": "social",
+      "category": "social",
+      "q": "Do you drink alcohol or take any drugs?",
+      "a": ["A few drinks at the weekend. Nothing else.", "Bit of drinking.", "(no answer)"],
+      "keywords": ["alcohol", "drink", "drugs", "smoke"]
+    },
+    {
+      "id": "sick-day",
+      "category": "ice",
+      "q": "Has anyone talked to you about sick day rules?",
+      "a": ["No… what are they?", "No.", "(no answer)"],
+      "keywords": ["sick day", "rules", "education", "know"]
+    }
+  ],
+  "exam": [
+    {
+      "id": "A",
+      "label": "Airway",
+      "kind": "abcde",
+      "findings": [
+        { "when": { "arrest": true }, "text": "No airway noises." },
+        { "text": "Airway patent. Sweet, fruity smell of ketones on his breath." }
+      ]
+    },
+    {
+      "id": "B",
+      "label": "Breathing",
+      "kind": "abcde",
+      "findings": [
+        { "when": { "arrest": true }, "text": "No respiratory effort." },
+        {
+          "when": { "severity": "dka", "gte": 40 },
+          "text": "RR {rr}/min, SpO₂ {spo2}% on {o2}. Deep, sighing (Kussmaul) breathing. Chest clear."
+        },
+        { "text": "RR {rr}/min, SpO₂ {spo2}% on {o2}. Breathing settling. Chest clear." }
+      ]
+    },
+    {
+      "id": "C",
+      "label": "Circulation",
+      "kind": "abcde",
+      "findings": [
+        { "when": { "arrest": true }, "text": "No central pulse." },
+        {
+          "when": { "severity": "dka", "gte": 45 },
+          "text": "HR {hr}, BP {sbp}/{dbp}. Dry mucous membranes, reduced skin turgor. Capillary refill 3 seconds."
+        },
+        { "text": "HR {hr}, BP {sbp}/{dbp}. Better hydrated. Capillary refill under 2 seconds." }
+      ]
+    },
+    {
+      "id": "D",
+      "label": "Disability",
+      "kind": "abcde",
+      "findings": [
+        { "when": { "arrest": true }, "text": "Unresponsive. GCS 3/15." },
+        { "text": "GCS {gcs}/15. Capillary glucose {glucose:1} mmol/L." }
+      ]
+    },
+    {
+      "id": "E",
+      "label": "Exposure",
+      "kind": "abcde",
+      "findings": [
+        {
+          "text": "Temperature {temp:1} °C. Injection sites on abdomen look healthy. No obvious infection source."
+        }
+      ]
+    },
+    {
+      "id": "abdomen",
+      "label": "Abdomen",
+      "kind": "region",
+      "region": "abdomen",
+      "findings": [
+        {
+          "when": { "severity": "dka", "gte": 40 },
+          "text": "Diffusely tender, no guarding or rebound. Bowel sounds present. Abdominal pain is common in DKA and usually settles with treatment."
+        },
+        { "text": "Soft, minimal tenderness." }
+      ]
+    }
+  ],
+  "investigations": [
+    {
+      "id": "glu",
+      "results": [
+        {
+          "when": { "vital": "glucose", "gte": 33 },
+          "text": "Capillary glucose: HI (above 33 mmol/L)."
+        },
+        { "text": "Capillary glucose {glucose:1} mmol/L." }
+      ]
+    },
+    { "id": "ketones", "results": [{ "text": "Capillary ketones {ketones:1} mmol/L." }] },
+    {
+      "id": "vbg",
+      "results": [
+        {
+          "text": "pH {ph:2}, HCO₃⁻ {hco3:1} mmol/L, PCO₂ {paco2:1} kPa, K⁺ {k:1} mmol/L, glucose {glucose:1} mmol/L, lactate {lactate:1} mmol/L."
+        }
+      ]
+    },
+    {
+      "id": "abg",
+      "results": [
+        { "text": "pH {ph:2}, PaO₂ {pao2:1} kPa, PaCO₂ {paco2:1} kPa, HCO₃⁻ {hco3:1} mmol/L." }
+      ]
+    },
+    {
+      "id": "ue",
+      "results": [
+        {
+          "text": "Na {na} mmol/L, K {k:1} mmol/L, urea {urea:1} mmol/L, creatinine {creatinine} µmol/L."
+        }
+      ]
+    },
+    {
+      "id": "fbc",
+      "results": [{ "text": "Hb {hb} g/L, WCC {wcc:1} ×10⁹/L, platelets {plt} ×10⁹/L." }]
+    },
+    {
+      "id": "ecg",
+      "results": [
+        {
+          "when": { "lab": "k", "lt": 3 },
+          "text": "Sinus rhythm {hr}/min. Flattened T waves and U waves: hypokalaemia."
+        },
+        { "text": "Sinus tachycardia, rate {hr}. No ischaemic changes." }
+      ]
+    },
+    { "id": "urine", "results": [{ "text": "Urine: glucose ++++, ketones +++." }] }
+  ],
+  "patientLines": [
+    { "id": "sleepy", "when": { "severity": "dka", "gte": 75 }, "text": "So… sleepy…" },
+    {
+      "id": "hypo",
+      "when": { "vital": "glucose", "lt": 4 },
+      "text": "I feel shaky and weird… like when I go low."
+    },
+    {
+      "id": "better",
+      "when": { "severity": "dka", "lt": 25 },
+      "text": "I feel a lot better. Can I have some toast?"
+    }
+  ],
+  "outcomes": {
+    "stabilised": {
+      "when": {
+        "all": [
+          { "lab": "ketones", "lt": 1.5 },
+          { "lab": "ph", "gte": 7.3 },
+          { "vital": "glucose", "gte": 4 },
+          { "lab": "k", "gte": 3.5 },
+          { "infusing": "insulin" }
+        ]
+      },
+      "forSec": 120,
+      "text": "Ketones and pH recovering, glucose and potassium in range on the insulin infusion."
+    }
+  },
+  "diagnosis": {
+    "correct": ["dka"],
+    "options": [
+      { "id": "dka", "label": "Diabetic ketoacidosis" },
+      { "id": "hhs", "label": "Hyperosmolar hyperglycaemic state" },
+      { "id": "gastroenteritis", "label": "Gastroenteritis" },
+      { "id": "appendicitis", "label": "Appendicitis" },
+      { "id": "sepsis", "label": "Sepsis" }
+    ]
+  },
+  "scoring": [
+    {
+      "id": "stabilised",
+      "label": "DKA resolving safely",
+      "weight": 20,
+      "kind": "credit",
+      "test": { "type": "outcomeIs", "outcomes": ["stabilised"] }
+    },
+    {
+      "id": "ketones",
+      "label": "Ketones measured",
+      "weight": 6,
+      "kind": "credit",
+      "test": { "type": "actionDone", "codes": ["order:ketones"] }
+    },
+    {
+      "id": "gas",
+      "label": "Venous gas for pH, bicarbonate and potassium",
+      "weight": 8,
+      "kind": "credit",
+      "test": { "type": "actionDone", "codes": ["order:vbg", "order:abg"] }
+    },
+    {
+      "id": "fluids",
+      "label": "IV fluids within 30 minutes",
+      "weight": 12,
+      "kind": "credit",
+      "test": { "type": "actionWithin", "codes": ["fluid:crystalloid"], "withinSec": 1800 }
+    },
+    {
+      "id": "friii",
+      "label": "Fixed-rate IV insulin infusion started",
+      "weight": 18,
+      "kind": "credit",
+      "critical": true,
+      "test": { "type": "actionDone", "codes": ["infusion:insulin"] }
+    },
+    {
+      "id": "potassium",
+      "label": "Potassium replaced in fluids",
+      "weight": 10,
+      "kind": "credit",
+      "test": { "type": "actionDone", "codes": ["drug:potassium_chloride:*"] }
+    },
+    {
+      "id": "k-checked",
+      "label": "Potassium checked before replacing it",
+      "weight": 6,
+      "kind": "credit",
+      "test": {
+        "type": "actionBefore",
+        "codes": ["order:vbg", "order:ue", "order:abg"],
+        "before": ["drug:potassium_chloride:*"]
+      }
+    },
+    {
+      "id": "glucose",
+      "label": "Glucose 10% added as glucose fell",
+      "weight": 8,
+      "kind": "credit",
+      "test": { "type": "actionDone", "codes": ["infusion:glucose_10", "drug:glucose_10:*"] }
+    },
+    {
+      "id": "monitoring",
+      "label": "Repeat glucose or ketone checks",
+      "weight": 4,
+      "kind": "credit",
+      "test": {
+        "type": "actionCount",
+        "codes": ["order:glu", "order:ketones", "order:vbg"],
+        "min": 3
+      }
+    },
+    {
+      "id": "cause",
+      "label": "Asked about insulin and the trigger",
+      "weight": 4,
+      "kind": "credit",
+      "test": { "type": "asked", "ids": ["insulin"] }
+    },
+    {
+      "id": "dx",
+      "label": "Working diagnosis: DKA",
+      "weight": 4,
+      "kind": "credit",
+      "test": { "type": "diagnosisIs", "ids": ["dka"] }
+    },
+    {
+      "id": "no-bolus",
+      "label": "No IV insulin bolus",
+      "weight": 8,
+      "kind": "penalty",
+      "test": { "type": "actionNever", "codes": ["drug:insulin:IV"] }
+    },
+    {
+      "id": "no-k-overdose",
+      "label": "No potassium overdose",
+      "weight": 15,
+      "kind": "penalty",
+      "critical": true,
+      "test": { "type": "actionNever", "codes": ["adverse:potassium_overdose"] }
+    }
+  ],
+  "teaching": [
+    {
+      "id": "friii",
+      "text": "DKA is treated with a fixed-rate IV insulin infusion at 0.1 units/kg/h, without a bolus, plus IV fluids (JBDS 2021). Continue his long-acting insulin too.",
+      "showIf": { "type": "ruleFailed", "id": "friii" }
+    },
+    {
+      "id": "k",
+      "text": "Insulin drives potassium into cells. Once K⁺ is 5.5 mmol/L or below, add 40 mmol/L to the fluids. If it is under 3.5, get senior help.",
+      "showIf": { "type": "ruleFailed", "id": "potassium" }
+    },
+    {
+      "id": "glucose",
+      "text": "When glucose falls below 14 mmol/L, add glucose 10% at 125 ml/h. Keep the insulin running to clear the ketones; that is the target, not the glucose.",
+      "showIf": { "type": "ruleFailed", "id": "glucose" }
+    },
+    {
+      "id": "sick-day",
+      "text": "Before discharge: sick-day rules. Never stop basal insulin, check ketones when unwell, and get help early."
+    }
+  ],
+  "references": [
+    {
+      "id": "jbds-dka",
+      "label": "Joint British Diabetes Societies for Inpatient Care. The management of diabetic ketoacidosis in adults. 2021."
+    }
+  ]
+}

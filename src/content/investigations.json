@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "investigations": [
     {
       "id": "glu",
@@ -67,6 +67,101 @@
       "category": "imaging",
       "turnaroundMin": 20,
       "source": "Typical portable chest X-ray turnaround. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "vbg",
+      "label": "Venous blood gas",
+      "sub": "Point-of-care: pH, HCO₃⁻, K⁺, lactate, glucose",
+      "category": "bedside",
+      "turnaroundMin": 2,
+      "source": "Typical point-of-care analyser time. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "ketones",
+      "label": "Capillary ketones",
+      "sub": "Bedside meter",
+      "category": "bedside",
+      "turnaroundMin": 0
+    },
+    {
+      "id": "urine",
+      "label": "Urine dipstick",
+      "sub": "Bedside",
+      "category": "bedside",
+      "turnaroundMin": 0
+    },
+    {
+      "id": "troponin",
+      "label": "High-sensitivity troponin",
+      "sub": "Lab",
+      "category": "lab",
+      "turnaroundMin": 60,
+      "source": "Typical urgent laboratory turnaround; varies by hospital. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "crp",
+      "label": "CRP",
+      "sub": "Lab",
+      "category": "lab",
+      "turnaroundMin": 60,
+      "source": "Typical urgent laboratory turnaround; varies by hospital. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "coag",
+      "label": "Clotting screen",
+      "sub": "Lab: PT, APTT, fibrinogen",
+      "category": "lab",
+      "turnaroundMin": 45,
+      "source": "Typical urgent laboratory turnaround; varies by hospital. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "xmatch",
+      "label": "Group and crossmatch",
+      "sub": "Blood bank",
+      "category": "lab",
+      "turnaroundMin": 45,
+      "source": "Typical crossmatch time; O-negative and group-specific blood are faster. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "cultures",
+      "label": "Blood cultures",
+      "sub": "Two sets, before antibiotics",
+      "category": "lab",
+      "turnaroundMin": 1440,
+      "source": "Cultures take 24–48 hours to grow. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "tox",
+      "label": "Paracetamol and salicylate levels",
+      "sub": "Lab",
+      "category": "lab",
+      "turnaroundMin": 60,
+      "source": "Typical urgent laboratory turnaround. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "fast",
+      "label": "eFAST scan",
+      "sub": "Bedside ultrasound",
+      "category": "imaging",
+      "turnaroundMin": 3,
+      "source": "Typical time for an extended FAST scan. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "xray_pelvis",
+      "label": "Pelvic X-ray",
+      "sub": "Portable",
+      "category": "imaging",
+      "turnaroundMin": 20,
+      "source": "Typical portable X-ray turnaround. Teaching estimate.",
       "reviewNeeded": true
     }
   ]

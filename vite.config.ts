@@ -12,5 +12,7 @@ export default defineConfig({
   test: {
     include: ['tests/unit/**/*.test.{ts,tsx}'],
     environment: 'node',
+    // Case tests run hundreds of simulated minutes across many seeds.
+    testTimeout: 60_000,
   },
 });

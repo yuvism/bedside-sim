@@ -1,0 +1,577 @@
+{
+  "schemaVersion": 1,
+  "id": "opioid-01",
+  "version": 1,
+  "title": "Unresponsive in the toilets",
+  "summary": "A 34-year-old found slumped in a toilet cubicle with a needle beside him, barely breathing.",
+  "specialty": "Toxicology",
+  "difficulty": "foundation",
+  "estMinutes": 15,
+  "tags": ["opioid overdose", "naloxone", "airway", "hypoventilation"],
+  "patient": {
+    "name": "Jamie Reid",
+    "age": 34,
+    "sex": "male",
+    "weightKg": 70,
+    "occupation": "unemployed chef",
+    "persona": "Unresponsive at first. Once breathing returns, drowsy and embarrassed. If woken too abruptly, agitated and sick from withdrawal."
+  },
+  "brief": [
+    "Security found a man slumped in the department's public toilets with a needle and spoon beside him. He's been dragged onto a trolley and brought straight into resus. He's blue around the lips and his breathing is slow and snoring.",
+    "Airway and breathing first, then reverse the cause, without overshooting."
+  ],
+  "openingLine": "(snores, then a long pause before the next breath)",
+  "baseline": {
+    "hr": 76,
+    "sbp": 122,
+    "dbp": 74,
+    "rr": 14,
+    "temp": 36.4,
+    "glucose": 5.5,
+    "hrJitter": 4,
+    "sbpJitter": 4
+  },
+  "labs": {
+    "lactate": 1.2,
+    "hco3": 24,
+    "k": 4.2,
+    "na": 140,
+    "urea": 4.5,
+    "creatinine": 75,
+    "hb": 141,
+    "wcc": 7.2,
+    "plt": 210
+  },
+  "processes": [
+    {
+      "id": "opioid",
+      "type": "opioid_toxicity",
+      "label": "Opioid toxicity",
+      "initial": 75,
+      "initialJitter": 3,
+      "ratePerMin": 2,
+      "rateJitterPct": 10,
+      "decayTauMin": 20,
+      "sensitivityJitterPct": 15,
+      "arrestAt": 100,
+      "arrestRhythm": "pea",
+      "effects": [
+        {
+          "target": "rr",
+          "perPoint": -0.13,
+          "group": "opioid"
+        },
+        {
+          "target": "gcs",
+          "perPoint": -0.12,
+          "above": 20,
+          "group": "opioid"
+        },
+        {
+          "target": "ventLoss",
+          "perPoint": 0.004,
+          "above": 40,
+          "group": "opioid"
+        },
+        {
+          "target": "hr",
+          "perPoint": -0.12,
+          "group": "opioid"
+        },
+        {
+          "target": "sbp",
+          "perPoint": -0.2,
+          "group": "opioid"
+        },
+        {
+          "target": "sign:pinpoint",
+          "perPoint": 0.013,
+          "group": "opioid"
+        }
+      ],
+      "source": "Teaching model of heroin toxicity. Naloxone blocks the opioid effects without clearing the drug, so effects can return as naloxone wears off. Effect sizes are teaching parameters.",
+      "reviewNeeded": true
+    }
+  ],
+  "bands": {
+    "process": "opioid",
+    "cutoffs": [30, 55]
+  },
+  "dialogue": [
+    {
+      "id": "what",
+      "category": "presenting",
+      "q": "Can you hear me? What happened?",
+      "a": ["I… had a bit too much. Sorry.", "(mumbles, eyes rolling)", "(no response)"],
+      "keywords": ["hear", "happened", "what", "wake"]
+    },
+    {
+      "id": "used",
+      "category": "history",
+      "q": "What did you take?",
+      "a": ["Heroin. Same as usual, but it was a new dealer.", "(mumbles) …gear…", "(no response)"],
+      "keywords": ["take", "took", "used", "drugs", "heroin", "inject"]
+    },
+    {
+      "id": "other",
+      "category": "history",
+      "q": "Did you take anything else? Tablets, alcohol?",
+      "a": ["A few cans. No tablets.", "(no clear answer)", "(no response)"],
+      "keywords": ["else", "tablets", "pills", "alcohol", "benzos"]
+    },
+    {
+      "id": "pmh",
+      "category": "pmh",
+      "q": "Any medical problems?",
+      "a": ["Hepatitis C. Nothing else.", "(no clear answer)", "(no response)"],
+      "keywords": ["medical", "history", "conditions"]
+    },
+    {
+      "id": "methadone",
+      "category": "meds",
+      "q": "Are you on methadone or any medicines?",
+      "a": ["I was on methadone last year. Not now.", "(no clear answer)", "(no response)"],
+      "keywords": ["methadone", "medicines", "buprenorphine", "subutex", "script"]
+    },
+    {
+      "id": "allergy",
+      "category": "allergies",
+      "q": "Any allergies?",
+      "a": ["Don't think so.", "(no clear answer)", "(no response)"],
+      "keywords": ["allergy", "allergies", "allergic"]
+    },
+    {
+      "id": "support",
+      "category": "ice",
+      "q": "Would you like help with your drug use?",
+      "a": ["Maybe… yeah. I nearly died, didn't I?", "(no clear answer)", "(no response)"],
+      "keywords": ["help", "support", "service", "stop", "naloxone kit"]
+    }
+  ],
+  "exam": [
+    {
+      "id": "A",
+      "label": "Airway",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "No airway noises. Not breathing."
+        },
+        {
+          "when": {
+            "all": [
+              {
+                "vital": "gcs",
+                "lt": 9
+              },
+              {
+                "not": {
+                  "any": [
+                    {
+                      "device": "airway_manoeuvres"
+                    },
+                    {
+                      "device": "bvm"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "text": "Snoring respiration: partial obstruction from the tongue. Needs an airway manoeuvre now."
+        },
+        {
+          "when": {
+            "vital": "gcs",
+            "lt": 9
+          },
+          "text": "Airway held open. Still unable to protect it himself."
+        },
+        {
+          "text": "Airway patent, talking."
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "label": "Breathing",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "No respiratory effort."
+        },
+        {
+          "when": {
+            "vital": "rr",
+            "lt": 8
+          },
+          "text": "RR {rr}/min, shallow. SpO₂ {spo2}% on {o2}. EtCO₂ {etco2} mmHg. Chest clear but barely moving."
+        },
+        {
+          "text": "RR {rr}/min, SpO₂ {spo2}% on {o2}. Good air entry, chest clear."
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "label": "Circulation",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "No central pulse."
+        },
+        {
+          "text": "HR {hr}, BP {sbp}/{dbp}. Capillary refill 2 seconds. Track marks on both forearms."
+        }
+      ]
+    },
+    {
+      "id": "D",
+      "label": "Disability",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "Unresponsive. GCS 3/15. Pupils fixed."
+        },
+        {
+          "when": {
+            "vital": "gcs",
+            "lt": 13
+          },
+          "text": "GCS {gcs}/15. Pinpoint pupils, both sides. Glucose {glucose:1} mmol/L."
+        },
+        {
+          "text": "GCS {gcs}/15. Pupils 3 mm, reactive. Glucose {glucose:1} mmol/L."
+        }
+      ]
+    },
+    {
+      "id": "E",
+      "label": "Exposure",
+      "kind": "abcde",
+      "findings": [
+        {
+          "text": "Temperature {temp:1} °C. Injection sites in both antecubital fossae. No head injury. No other injuries."
+        }
+      ]
+    },
+    {
+      "id": "head",
+      "label": "Head and pupils",
+      "kind": "region",
+      "region": "head",
+      "findings": [
+        {
+          "when": {
+            "vital": "gcs",
+            "lt": 13
+          },
+          "text": "Pinpoint pupils. No head injury."
+        },
+        {
+          "text": "Pupils 3 mm, equal and reactive. No head injury."
+        }
+      ]
+    },
+    {
+      "id": "arms",
+      "label": "Arms",
+      "kind": "region",
+      "region": "arms",
+      "findings": [
+        {
+          "text": "Fresh puncture mark in the left antecubital fossa, old track marks. No abscess."
+        }
+      ]
+    }
+  ],
+  "investigations": [
+    {
+      "id": "glu",
+      "results": [
+        {
+          "text": "Capillary glucose {glucose:1} mmol/L."
+        }
+      ]
+    },
+    {
+      "id": "vbg",
+      "results": [
+        {
+          "text": "pH {ph:2}, PCO₂ {paco2:1} kPa, HCO₃⁻ {hco3:1} mmol/L, lactate {lactate:1} mmol/L: respiratory acidosis."
+        }
+      ]
+    },
+    {
+      "id": "abg",
+      "results": [
+        {
+          "text": "pH {ph:2}, PaO₂ {pao2:1} kPa, PaCO₂ {paco2:1} kPa, HCO₃⁻ {hco3:1} mmol/L (on {o2})."
+        }
+      ]
+    },
+    {
+      "id": "tox",
+      "results": [
+        {
+          "text": "Paracetamol and salicylate not detected."
+        }
+      ]
+    },
+    {
+      "id": "ecg",
+      "results": [
+        {
+          "text": "Sinus rhythm, rate {hr}. QTc normal."
+        }
+      ]
+    },
+    {
+      "id": "ue",
+      "results": [
+        {
+          "text": "Na {na} mmol/L, K {k:1} mmol/L, creatinine {creatinine} µmol/L."
+        }
+      ]
+    }
+  ],
+  "patientLines": [
+    {
+      "id": "awake",
+      "when": {
+        "all": [
+          {
+            "vital": "gcs",
+            "gte": 13
+          },
+          {
+            "drugGiven": "naloxone"
+          }
+        ]
+      },
+      "text": "Wha…? Where am I?"
+    }
+  ],
+  "outcomes": {
+    "stabilised": {
+      "when": {
+        "all": [
+          {
+            "vital": "rr",
+            "gte": 10
+          },
+          {
+            "vital": "spo2",
+            "gte": 94
+          },
+          {
+            "vital": "gcs",
+            "gte": 13
+          },
+          {
+            "not": {
+              "device": "bvm"
+            }
+          }
+        ]
+      },
+      "forSec": 120,
+      "text": "Breathing on his own at a safe rate, SpO₂ on target and awake for 2 minutes."
+    }
+  },
+  "diagnosis": {
+    "correct": ["opioid"],
+    "options": [
+      {
+        "id": "opioid",
+        "label": "Opioid toxicity"
+      },
+      {
+        "id": "hypoglycaemia",
+        "label": "Hypoglycaemia"
+      },
+      {
+        "id": "head-injury",
+        "label": "Head injury"
+      },
+      {
+        "id": "benzodiazepine",
+        "label": "Benzodiazepine overdose"
+      },
+      {
+        "id": "stroke",
+        "label": "Brainstem stroke"
+      }
+    ]
+  },
+  "scoring": [
+    {
+      "id": "stabilised",
+      "label": "Breathing and awake",
+      "weight": 20,
+      "kind": "credit",
+      "test": {
+        "type": "outcomeIs",
+        "outcomes": ["stabilised"]
+      }
+    },
+    {
+      "id": "airway",
+      "label": "Airway opened within 2 minutes",
+      "weight": 12,
+      "kind": "credit",
+      "critical": true,
+      "test": {
+        "type": "actionWithin",
+        "codes": ["device:airway_manoeuvres:on", "device:bvm:on"],
+        "withinSec": 120
+      }
+    },
+    {
+      "id": "ventilate",
+      "label": "Oxygen and ventilation support",
+      "weight": 12,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["device:bvm:on", "device:o2_*:on"]
+      }
+    },
+    {
+      "id": "naloxone",
+      "label": "Naloxone given",
+      "weight": 15,
+      "kind": "credit",
+      "critical": true,
+      "test": {
+        "type": "actionDone",
+        "codes": ["drug:naloxone:*"]
+      }
+    },
+    {
+      "id": "glucose",
+      "label": "Glucose checked",
+      "weight": 6,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["order:glu"]
+      }
+    },
+    {
+      "id": "pupils",
+      "label": "Pupils and GCS assessed",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "examined",
+        "ids": ["D", "head"],
+        "min": 1
+      }
+    },
+    {
+      "id": "help",
+      "label": "Called for help",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["help"]
+      }
+    },
+    {
+      "id": "co-ingest",
+      "label": "Asked about other substances",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "asked",
+        "ids": ["other"]
+      }
+    },
+    {
+      "id": "dx",
+      "label": "Working diagnosis: opioid toxicity",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "diagnosisIs",
+        "ids": ["opioid"]
+      }
+    },
+    {
+      "id": "harm-reduction",
+      "label": "Offered support (drug services, naloxone kit)",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "asked",
+        "ids": ["support"]
+      }
+    },
+    {
+      "id": "titrated",
+      "label": "Naloxone titrated, without precipitating withdrawal",
+      "weight": 10,
+      "kind": "penalty",
+      "test": {
+        "type": "actionNever",
+        "codes": ["adverse:naloxone_withdrawal"]
+      }
+    }
+  ],
+  "teaching": [
+    {
+      "id": "airway-first",
+      "text": "Airway and breathing come before the antidote: open the airway and ventilate with a bag-valve-mask while someone draws up the naloxone.",
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "airway"
+      }
+    },
+    {
+      "id": "titrate",
+      "text": "Titrate naloxone to adequate breathing, not to full alertness. Large boluses in someone dependent on opioids cause acute withdrawal and agitation.",
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "titrated"
+      }
+    },
+    {
+      "id": "rebound",
+      "text": "Naloxone wears off sooner than many opioids. Observe for re-sedation, for at least several hours with long-acting opioids such as methadone."
+    },
+    {
+      "id": "glucose",
+      "text": "Check glucose in anyone with reduced consciousness. Hypoglycaemia mimics many overdoses.",
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "glucose"
+      }
+    }
+  ],
+  "references": [
+    {
+      "id": "bnf-naloxone",
+      "label": "British National Formulary. Naloxone hydrochloride: opioid overdose.",
+      "url": "https://bnf.nice.org.uk/"
+    },
+    {
+      "id": "rcuk-als-2021",
+      "label": "Resuscitation Council UK. Adult advanced life support guidelines. 2021.",
+      "url": "https://www.resus.org.uk/"
+    }
+  ]
+}

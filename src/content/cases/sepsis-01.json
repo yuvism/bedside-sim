@@ -1,0 +1,626 @@
+{
+  "schemaVersion": 1,
+  "id": "sepsis-01",
+  "version": 1,
+  "title": "Feverish and muddled",
+  "summary": "A 74-year-old with three days of cough, now confused, hot and hypotensive.",
+  "specialty": "Acute medicine",
+  "difficulty": "core",
+  "estMinutes": 25,
+  "tags": ["sepsis", "septic shock", "pneumonia", "vasopressors"],
+  "patient": {
+    "name": "Margaret Hughes",
+    "age": 74,
+    "sex": "female",
+    "weightKg": 62,
+    "occupation": "retired teacher",
+    "persona": "Usually sharp and independent. Today muddled and repetitive, keeps asking where her handbag is."
+  },
+  "brief": [
+    "Margaret, 74, was brought in by her daughter. She has had a cough with green sputum for three days and today she is confused, hot and wobbly on her feet. Her daughter says she is \"not herself at all\".",
+    "Recognise sepsis early and deliver the bundle in the first hour."
+  ],
+  "openingLine": "Where's my handbag? I need to get home for the cat.",
+  "baseline": {
+    "hr": 80,
+    "sbp": 130,
+    "dbp": 75,
+    "rr": 16,
+    "temp": 37,
+    "glucose": 6.5,
+    "hrJitter": 4,
+    "sbpJitter": 5
+  },
+  "labs": {
+    "lactate": 1.2,
+    "hco3": 24,
+    "k": 4.3,
+    "na": 136,
+    "urea": 7,
+    "creatinine": 80,
+    "hb": 118,
+    "wcc": 8,
+    "plt": 240,
+    "crp": 20
+  },
+  "processes": [
+    {
+      "id": "sepsis",
+      "type": "sepsis",
+      "label": "Septic shock (pneumonia)",
+      "initial": 58,
+      "initialJitter": 3,
+      "ratePerMin": 1,
+      "rateJitterPct": 10,
+      "sensitivityJitterPct": 15,
+      "arrestAt": 100,
+      "arrestRhythm": "pea",
+      "effects": [
+        {
+          "target": "sbp",
+          "perPoint": -1,
+          "group": "vasodilation"
+        },
+        {
+          "target": "hr",
+          "perPoint": 0.6
+        },
+        {
+          "target": "temp",
+          "perPoint": 0.035
+        },
+        {
+          "target": "rr",
+          "perPoint": 0.22
+        },
+        {
+          "target": "shunt",
+          "perPoint": 0.0025,
+          "above": 20
+        },
+        {
+          "target": "vq",
+          "perPoint": 0.05,
+          "above": 20
+        },
+        {
+          "target": "lab:lactate",
+          "perPoint": 0.06,
+          "above": 20
+        },
+        {
+          "target": "lab:wcc",
+          "perPoint": 0.3
+        },
+        {
+          "target": "lab:crp",
+          "perPoint": 4
+        },
+        {
+          "target": "lab:urea",
+          "perPoint": 0.12
+        },
+        {
+          "target": "lab:creatinine",
+          "perPoint": 1.6
+        },
+        {
+          "target": "gcs",
+          "perPoint": -0.06,
+          "above": 30
+        },
+        {
+          "target": "sign:flush",
+          "perPoint": 0.004
+        },
+        {
+          "target": "sign:sweating",
+          "perPoint": 0.008,
+          "above": 30
+        }
+      ],
+      "source": "Teaching model of pneumonia progressing to septic shock (Surviving Sepsis Campaign 2021 definitions: vasopressors needed for MAP ≥ 65 and lactate > 2 mmol/L despite fluids). Effect sizes and time course are teaching parameters.",
+      "reviewNeeded": true
+    }
+  ],
+  "bands": {
+    "process": "sepsis",
+    "cutoffs": [35, 70]
+  },
+  "dialogue": [
+    {
+      "id": "what",
+      "category": "presenting",
+      "q": "How are you feeling?",
+      "a": [
+        "Tired, but my head's clearer now.",
+        "Hot. Shivery. Where am I?",
+        "(mumbles, doesn't answer)"
+      ],
+      "keywords": ["feel", "feeling", "happening", "wrong"]
+    },
+    {
+      "id": "cough",
+      "category": "presenting",
+      "q": "Tell me about the cough.",
+      "a": [
+        "Three days. Green phlegm. It hurts on the right when I breathe in.",
+        "Cough… green… hurts here.",
+        "(coughs weakly)"
+      ],
+      "keywords": ["cough", "phlegm", "sputum", "chest"]
+    },
+    {
+      "id": "urine",
+      "category": "history",
+      "q": "Any burning when you pass water?",
+      "a": ["No, that's all fine.", "No.", "(no answer)"],
+      "keywords": ["urine", "water", "wee", "burning", "pass"]
+    },
+    {
+      "id": "pmh",
+      "category": "pmh",
+      "q": "Any medical problems?",
+      "a": ["Just my blood pressure and a bit of arthritis.", "Blood pressure.", "(no answer)"],
+      "keywords": ["medical", "history", "conditions", "problems"]
+    },
+    {
+      "id": "meds",
+      "category": "meds",
+      "q": "What medicines do you take?",
+      "a": ["Ramipril and paracetamol for my knees.", "Ramipril.", "(no answer)"],
+      "keywords": ["medicine", "medicines", "tablets", "medication"]
+    },
+    {
+      "id": "allergy",
+      "category": "allergies",
+      "q": "Any allergies to medicines?",
+      "a": ["No, none that I know of.", "No.", "(no answer)"],
+      "keywords": ["allergy", "allergies", "allergic", "penicillin"]
+    },
+    {
+      "id": "social",
+      "category": "social",
+      "q": "Who's at home with you?",
+      "a": [
+        "I live on my own with the cat. My daughter pops in.",
+        "Cat… on my own.",
+        "(no answer)"
+      ],
+      "keywords": ["home", "live", "alone", "social"]
+    },
+    {
+      "id": "wishes",
+      "category": "ice",
+      "q": "If you became very unwell, what would matter most to you?",
+      "a": [
+        "I'd want everything done, I've a lot to live for.",
+        "Everything… done.",
+        "(her daughter says she has always said she wants everything done)"
+      ],
+      "keywords": ["wishes", "matter", "resuscitation", "dnacpr", "ceiling"]
+    }
+  ],
+  "exam": [
+    {
+      "id": "A",
+      "label": "Airway",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "No airway noises."
+        },
+        {
+          "text": "Airway patent, talking."
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "label": "Breathing",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "No respiratory effort."
+        },
+        {
+          "text": "RR {rr}/min, SpO₂ {spo2}% on {o2}. Bronchial breathing and coarse crackles at the right base. Dull to percussion on the right."
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "label": "Circulation",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "No central pulse."
+        },
+        {
+          "when": {
+            "vital": "map",
+            "lt": 65
+          },
+          "text": "HR {hr}, BP {sbp}/{dbp} (MAP {map}). Warm hands but mottled knees. Capillary refill 4 seconds."
+        },
+        {
+          "text": "HR {hr}, BP {sbp}/{dbp} (MAP {map}). Warm, capillary refill 2 seconds."
+        }
+      ]
+    },
+    {
+      "id": "D",
+      "label": "Disability",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "Unresponsive. GCS 3/15."
+        },
+        {
+          "when": {
+            "vital": "gcs",
+            "lt": 15
+          },
+          "text": "GCS {gcs}/15. Confused: thinks it is 1990. Glucose {glucose:1} mmol/L. No focal weakness."
+        },
+        {
+          "text": "GCS 15/15, orientated. Glucose {glucose:1} mmol/L."
+        }
+      ]
+    },
+    {
+      "id": "E",
+      "label": "Exposure",
+      "kind": "abcde",
+      "findings": [
+        {
+          "text": "Temperature {temp:1} °C. No rash. No cellulitis. Abdomen soft. Calves soft."
+        }
+      ]
+    },
+    {
+      "id": "chest",
+      "label": "Chest",
+      "kind": "region",
+      "region": "chest",
+      "findings": [
+        {
+          "text": "Right lower zone: dull, bronchial breathing, crackles, increased vocal resonance."
+        }
+      ]
+    },
+    {
+      "id": "abdomen",
+      "label": "Abdomen",
+      "kind": "region",
+      "region": "abdomen",
+      "findings": [
+        {
+          "text": "Soft, non-tender. No suprapubic tenderness."
+        }
+      ]
+    }
+  ],
+  "investigations": [
+    {
+      "id": "vbg",
+      "results": [
+        {
+          "text": "pH {ph:2}, HCO₃⁻ {hco3:1} mmol/L, lactate {lactate:1} mmol/L, K⁺ {k:1} mmol/L, glucose {glucose:1} mmol/L."
+        }
+      ]
+    },
+    {
+      "id": "abg",
+      "results": [
+        {
+          "text": "pH {ph:2}, PaO₂ {pao2:1} kPa, PaCO₂ {paco2:1} kPa, HCO₃⁻ {hco3:1} mmol/L, lactate {lactate:1} mmol/L (on {o2})."
+        }
+      ]
+    },
+    {
+      "id": "cultures",
+      "orderNote": "Two sets taken. Results take 24–48 hours: don't wait for them to start antibiotics.",
+      "results": [
+        {
+          "text": "Streptococcus pneumoniae in both sets."
+        }
+      ]
+    },
+    {
+      "id": "fbc",
+      "results": [
+        {
+          "text": "Hb {hb} g/L, WCC {wcc:1} ×10⁹/L (neutrophilia), platelets {plt} ×10⁹/L."
+        }
+      ]
+    },
+    {
+      "id": "crp",
+      "results": [
+        {
+          "text": "CRP {crp} mg/L."
+        }
+      ]
+    },
+    {
+      "id": "ue",
+      "results": [
+        {
+          "text": "Na {na} mmol/L, K {k:1} mmol/L, urea {urea:1} mmol/L, creatinine {creatinine} µmol/L (acute kidney injury)."
+        }
+      ]
+    },
+    {
+      "id": "cxr",
+      "results": [
+        {
+          "text": "Right lower lobe consolidation. No effusion."
+        }
+      ]
+    },
+    {
+      "id": "urine",
+      "results": [
+        {
+          "text": "Urine dip: no leucocytes or nitrites."
+        }
+      ]
+    },
+    {
+      "id": "glu",
+      "results": [
+        {
+          "text": "Glucose {glucose:1} mmol/L."
+        }
+      ]
+    },
+    {
+      "id": "ecg",
+      "results": [
+        {
+          "text": "Sinus tachycardia, rate {hr}. No ischaemic changes."
+        }
+      ]
+    }
+  ],
+  "patientLines": [
+    {
+      "id": "cold",
+      "when": {
+        "severity": "sepsis",
+        "gte": 65
+      },
+      "text": "I'm so cold…"
+    },
+    {
+      "id": "clearer",
+      "when": {
+        "severity": "sepsis",
+        "lt": 35
+      },
+      "text": "Oh… I'm in hospital, aren't I?"
+    }
+  ],
+  "outcomes": {
+    "stabilised": {
+      "when": {
+        "all": [
+          {
+            "vital": "map",
+            "gte": 65
+          },
+          {
+            "drugGiven": "piperacillin_tazobactam"
+          },
+          {
+            "severity": "sepsis",
+            "lt": 45
+          }
+        ]
+      },
+      "forSec": 120,
+      "text": "MAP held above 65 for 2 minutes, antibiotics in, lactate starting to clear."
+    }
+  },
+  "diagnosis": {
+    "correct": ["sepsis"],
+    "options": [
+      {
+        "id": "sepsis",
+        "label": "Septic shock from pneumonia"
+      },
+      {
+        "id": "urosepsis",
+        "label": "Urosepsis"
+      },
+      {
+        "id": "stroke",
+        "label": "Stroke"
+      },
+      {
+        "id": "pe",
+        "label": "Pulmonary embolism"
+      },
+      {
+        "id": "delirium",
+        "label": "Delirium from medication"
+      }
+    ]
+  },
+  "scoring": [
+    {
+      "id": "stabilised",
+      "label": "Shock reversed and stable",
+      "weight": 20,
+      "kind": "credit",
+      "test": {
+        "type": "outcomeIs",
+        "outcomes": ["stabilised"]
+      }
+    },
+    {
+      "id": "antibiotics",
+      "label": "IV antibiotics within 1 hour",
+      "weight": 20,
+      "kind": "credit",
+      "critical": true,
+      "test": {
+        "type": "actionWithin",
+        "codes": ["drug:piperacillin_tazobactam:*"],
+        "withinSec": 3600
+      }
+    },
+    {
+      "id": "cultures-first",
+      "label": "Blood cultures before antibiotics",
+      "weight": 6,
+      "kind": "credit",
+      "test": {
+        "type": "actionBefore",
+        "codes": ["order:cultures"],
+        "before": ["drug:piperacillin_tazobactam:*"]
+      }
+    },
+    {
+      "id": "lactate",
+      "label": "Lactate measured",
+      "weight": 6,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["order:vbg", "order:abg"]
+      }
+    },
+    {
+      "id": "fluids",
+      "label": "IV fluid resuscitation",
+      "weight": 10,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["fluid:crystalloid"]
+      }
+    },
+    {
+      "id": "oxygen",
+      "label": "Oxygen for hypoxaemia",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["device:o2_*:on"]
+      }
+    },
+    {
+      "id": "pressor",
+      "label": "Noradrenaline for persistent hypotension",
+      "weight": 8,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["infusion:noradrenaline"]
+      }
+    },
+    {
+      "id": "urine-output",
+      "label": "Urine output monitored",
+      "weight": 4,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["procedure:urinary_catheter"]
+      }
+    },
+    {
+      "id": "escalate",
+      "label": "Critical care involved",
+      "weight": 8,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["procedure:critical_care"]
+      }
+    },
+    {
+      "id": "source",
+      "label": "Source identified (chest X-ray)",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["order:cxr"]
+      }
+    },
+    {
+      "id": "allergy",
+      "label": "Checked allergies before antibiotics",
+      "weight": 4,
+      "kind": "credit",
+      "test": {
+        "type": "actionBefore",
+        "codes": ["talk:allergy"],
+        "before": ["drug:piperacillin_tazobactam:*"]
+      }
+    },
+    {
+      "id": "dx",
+      "label": "Working diagnosis: septic shock",
+      "weight": 4,
+      "kind": "credit",
+      "test": {
+        "type": "diagnosisIs",
+        "ids": ["sepsis"]
+      }
+    }
+  ],
+  "teaching": [
+    {
+      "id": "abx-late",
+      "text": "With septic shock, give IV antimicrobials within 1 hour (Surviving Sepsis Campaign 2021). Each hour of delay increases mortality.",
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "antibiotics"
+      }
+    },
+    {
+      "id": "pressor",
+      "text": "If MAP stays below 65 mmHg after fluid boluses, start noradrenaline. It can be started peripherally while central access is arranged.",
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "pressor"
+      }
+    },
+    {
+      "id": "cultures",
+      "text": "Take blood cultures before antibiotics where you can, but never delay antibiotics to get them.",
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "cultures-first"
+      }
+    },
+    {
+      "id": "lactate",
+      "text": "Lactate measures tissue hypoperfusion. Repeat it to check whether resuscitation is working."
+    }
+  ],
+  "references": [
+    {
+      "id": "ssc-2021",
+      "label": "Evans L, et al. Surviving Sepsis Campaign: international guidelines for management of sepsis and septic shock 2021. Critical Care Medicine. 2021.",
+      "url": "https://www.sccm.org/"
+    }
+  ]
+}
