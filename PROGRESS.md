@@ -48,7 +48,7 @@ The build brief is in [PROMPT.md](PROMPT.md). The single-file prototype is in `r
 
 ### Phase 3 — Debrief and scoring
 
-- **** (pure TS): evaluates case rules , , , , , , , , , , and , with wildcards on event codes. Credits add weight and penalties subtract it. A failed critical rule caps the score at 40. Teaching points are shown by the same tests.
+- **`src/engine/scoring.ts`** (pure TS): evaluates case rules `actionDone`, `actionWithin`, `actionBefore`, `actionNever`, `actionCount`, `examined`, `asked`, `diagnosisIs`, `outcomeIs`, `vitalNeverBelow`/`vitalNeverAbove`, `rulePassed`/`ruleFailed` and `all`/`any`/`not`, with `*` wildcards on event codes. Credits add weight and penalties subtract it. A failed critical rule caps the score at 40. Teaching points are shown by the same tests.
 - **Debrief** (lazy-loaded with Recharts, so it isn't in the main bundle): outcome, score, best score and attempt count, diagnosis vs expected, a checklist marked done/missed/harmful/avoided with timings, and a vitals chart as small multiples (HR, SBP, SpO₂, RR on one shared time axis, alarm limits dashed). Numbered action markers run through every panel, with a matching list underneath; harmful actions are marked in red. There's also a vitals table view, teaching points and references.
 - **Export:** copy or download JSON (the full run), the vitals CSV (with an event-code column) and the events CSV
 - **Replay from minute X:** the session checkpoints the engine every sim minute, and replay resumes paused with the earlier log and trace kept. Replaying without new actions retraces the original run exactly (tested).
@@ -65,10 +65,11 @@ The build brief is in [PROMPT.md](PROMPT.md). The single-file prototype is in `r
 - **Arrest rhythm for anaphylaxis is PEA**, not VF as in the prototype, because anaphylactic arrest is usually non-shockable. This is flagged for clinical review.
 - **IM adrenaline is absorbed from a depot** (absorption half-life 1 min) rather than acting instantly, so improvement starts within a minute and peaks at about 3 minutes.
 - **The ALS loop** (CPR cycles, shocks, ROSC) is deferred to Phase 4 with the STEMI/VF case. Until then, arrest ends the case.
-- **The scoring rules** are stored in the case file now and evaluated from Phase 3.
+- **Critical-fail cap:** a failed critical rule caps the score at 40/100 (`CRITICAL_CAP` in `scoring.ts`).
+- **Debrief chart as small multiples** rather than one chart with several y-axes, so each vital keeps its own honest scale.
 
 ## Known issues
 
 - TypeScript is pinned to 6.0.x because typescript-eslint 8 supports only `<6.1`. Move to TS 7 once typescript-eslint supports it.
 - **Not pushed yet.** The repo github.com/yuvism/bedside-sim exists but is empty, because GitHub rejects workflow files from a token without the `workflow` scope. Commits are kept locally until the gh login has that scope (`gh auth refresh -h github.com -s workflow`), then `git push -u origin main`.
-- The bundle is about 103 kB gzipped, mostly React and Zod. That's well under the 200 kB limit.
+- Bundle sizes are well under the 200 kB gzipped limit: the main bundle is about 105 kB (mostly React and Zod), and the lazy debrief chunk is about 109 kB (mostly Recharts).
