@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "investigations": [
+    {
+      "id": "glu",
+      "label": "Capillary glucose",
+      "sub": "Bedside",
+      "category": "bedside",
+      "turnaroundMin": 0
+    },
+    {
+      "id": "pef",
+      "label": "Peak flow",
+      "sub": "Bedside",
+      "category": "bedside",
+      "turnaroundMin": 0
+    },
+    {
+      "id": "ecg",
+      "label": "12-lead ECG",
+      "sub": "Bedside",
+      "category": "bedside",
+      "turnaroundMin": 1,
+      "source": "Typical time to record a 12-lead ECG. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "abg",
+      "label": "Arterial blood gas",
+      "sub": "Point-of-care analyser",
+      "category": "bedside",
+      "turnaroundMin": 2,
+      "source": "Typical point-of-care blood gas analyser time. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "fbc",
+      "label": "Full blood count",
+      "sub": "Lab",
+      "category": "lab",
+      "turnaroundMin": 45,
+      "source": "Typical urgent laboratory turnaround; varies by hospital. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "ue",
+      "label": "Urea and electrolytes",
+      "sub": "Lab",
+      "category": "lab",
+      "turnaroundMin": 60,
+      "source": "Typical urgent laboratory turnaround; varies by hospital. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "tryp",
+      "label": "Mast cell tryptase",
+      "sub": "Lab sample",
+      "category": "lab",
+      "turnaroundMin": 240,
+      "source": "Resuscitation Council UK (2021) recommends timed mast cell tryptase samples. Turnaround varies by laboratory; teaching estimate.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "cxr",
+      "label": "Chest X-ray",
+      "sub": "Portable",
+      "category": "imaging",
+      "turnaroundMin": 20,
+      "source": "Typical portable chest X-ray turnaround. Teaching estimate.",
+      "reviewNeeded": true
+    }
+  ]
+}

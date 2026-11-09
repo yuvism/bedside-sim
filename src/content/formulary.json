@@ -1,0 +1,219 @@
+{
+  "version": 1,
+  "drugs": [
+    {
+      "id": "adrenaline",
+      "name": "Adrenaline",
+      "aliases": ["epinephrine"],
+      "drugClass": "Sympathomimetic",
+      "unit": "mg",
+      "halfLifeMin": 3,
+      "source": "Teaching parameter. Adrenaline is cleared within minutes; the half-life is tuned so one IM dose wears off over 10–15 minutes, as in the prototype.",
+      "reviewNeeded": true,
+      "routes": [
+        {
+          "route": "IM",
+          "label": "IM, 1 mg/ml (1:1000), anterolateral thigh",
+          "standardDose": 0.5,
+          "maxDose": 0.5,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 1,
+          "source": "Dose: Resuscitation Council UK, Emergency treatment of anaphylaxis (2021) — adult IM adrenaline 500 micrograms, repeat after 5 minutes if no improvement. Absorption half-life is a teaching parameter.",
+          "reviewNeeded": true
+        },
+        {
+          "route": "IV",
+          "label": "IV bolus, undiluted",
+          "standardDose": 1,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 0,
+          "source": "1 mg IV is the cardiac arrest dose (Resuscitation Council UK, Adult advanced life support, 2021)."
+        }
+      ],
+      "effects": [
+        {
+          "target": "process:anaphylaxis",
+          "emax": -18,
+          "ec50": 0.35,
+          "source": "Teaching parameter tuned so a single IM dose improves the patient within 3 minutes but usually needs repeating.",
+          "reviewNeeded": true
+        },
+        {
+          "target": "hr",
+          "emax": 40,
+          "ec50": 0.5,
+          "source": "Teaching parameter (prototype: about +22/min per IM dose).",
+          "reviewNeeded": true
+        },
+        {
+          "target": "sbp",
+          "emax": 16,
+          "ec50": 0.5,
+          "source": "Teaching parameter (prototype: about +8 mmHg per IM dose).",
+          "reviewNeeded": true
+        }
+      ],
+      "adverse": [
+        {
+          "id": "iv_bolus_outside_arrest",
+          "routes": ["IV", "IO"],
+          "whenNotArrest": true,
+          "level": "danger",
+          "message": "Severe hypertension and ventricular ectopics. Bolus IV adrenaline is for cardiac arrest only.",
+          "say": "My chest… my heart’s pounding…",
+          "transient": {
+            "tauMin": 1.5,
+            "amplitude": 1,
+            "effects": [
+              { "target": "hr", "value": 45 },
+              { "target": "sbp", "value": 70 }
+            ],
+            "ectopy": true
+          },
+          "harm": true,
+          "source": "Resuscitation Council UK, Emergency treatment of anaphylaxis (2021): IV adrenaline outside cardiac arrest only as a titrated infusion by experienced specialists. Size and duration of the surge are teaching parameters.",
+          "reviewNeeded": true
+        },
+        {
+          "id": "im_repeat_early",
+          "routes": ["IM"],
+          "repeatWithinSec": 180,
+          "level": "warn",
+          "message": "Repeat IM doses are usually given 5 minutes apart.",
+          "transient": {
+            "tauMin": 1.5,
+            "amplitude": 0.3,
+            "effects": [
+              { "target": "hr", "value": 35 },
+              { "target": "sbp", "value": 30 }
+            ]
+          },
+          "source": "Resuscitation Council UK (2021): repeat IM adrenaline after 5 minutes if no improvement. The 3-minute warning threshold comes from the prototype.",
+          "reviewNeeded": true
+        }
+      ]
+    },
+    {
+      "id": "chlorphenamine",
+      "name": "Chlorphenamine",
+      "drugClass": "Antihistamine (H1)",
+      "unit": "mg",
+      "halfLifeMin": 120,
+      "feedback": "Eases itch and rash only. No effect on airway or blood pressure.",
+      "source": "Resuscitation Council UK (2021) no longer recommends antihistamines in the initial emergency treatment of anaphylaxis; they may help skin symptoms once stable. Effect duration is a teaching parameter.",
+      "reviewNeeded": true,
+      "routes": [
+        {
+          "route": "IV",
+          "label": "Slow IV",
+          "standardDose": 10,
+          "maxDose": 10,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 0,
+          "source": "10 mg adult dose as listed in the Resuscitation Council UK 2008 anaphylaxis algorithm.",
+          "reviewNeeded": true
+        },
+        {
+          "route": "IM",
+          "label": "IM",
+          "standardDose": 10,
+          "maxDose": 10,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 10,
+          "source": "10 mg adult dose as listed in the Resuscitation Council UK 2008 anaphylaxis algorithm.",
+          "reviewNeeded": true
+        }
+      ],
+      "effects": [
+        {
+          "target": "block:skin",
+          "emax": 0.8,
+          "ec50": 3,
+          "source": "Teaching parameter: reduces itch, flushing and hives only.",
+          "reviewNeeded": true
+        }
+      ]
+    },
+    {
+      "id": "hydrocortisone",
+      "name": "Hydrocortisone",
+      "drugClass": "Corticosteroid",
+      "unit": "mg",
+      "halfLifeMin": 90,
+      "feedback": "No immediate effect.",
+      "source": "Resuscitation Council UK (2021) advises against routine corticosteroids in the emergency treatment of anaphylaxis. No acute effect is modelled.",
+      "routes": [
+        {
+          "route": "IV",
+          "label": "Slow IV",
+          "standardDose": 200,
+          "maxDose": 200,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 0,
+          "source": "200 mg adult dose as listed in the Resuscitation Council UK 2008 anaphylaxis algorithm.",
+          "reviewNeeded": true
+        },
+        {
+          "route": "IM",
+          "label": "IM",
+          "standardDose": 200,
+          "maxDose": 200,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 15,
+          "source": "200 mg adult dose as listed in the Resuscitation Council UK 2008 anaphylaxis algorithm.",
+          "reviewNeeded": true
+        }
+      ],
+      "effects": []
+    },
+    {
+      "id": "salbutamol",
+      "name": "Salbutamol",
+      "drugClass": "Short-acting β2 agonist",
+      "unit": "mg",
+      "halfLifeMin": 20,
+      "source": "Effect duration is a teaching parameter for the acute bronchodilator effect, not the plasma half-life.",
+      "reviewNeeded": true,
+      "routes": [
+        {
+          "route": "NEB",
+          "label": "Nebulised, oxygen-driven",
+          "standardDose": 5,
+          "maxDose": 5,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 1.5,
+          "source": "5 mg nebulised for acute severe asthma in adults: BTS/SIGN British guideline on the management of asthma (SIGN 158, 2019). Absorption half-life is a teaching parameter.",
+          "reviewNeeded": true
+        }
+      ],
+      "effects": [
+        {
+          "target": "block:bronchospasm",
+          "emax": 0.7,
+          "ec50": 2,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        },
+        {
+          "target": "hr",
+          "emax": 15,
+          "ec50": 4,
+          "source": "Teaching parameter (β2-agonist tachycardia).",
+          "reviewNeeded": true
+        }
+      ]
+    }
+  ],
+  "fluids": [
+    {
+      "id": "crystalloid",
+      "name": "Crystalloid",
+      "standardVolumeMl": 500,
+      "maxRateMlPerMin": 100,
+      "redistributionTauMin": 25,
+      "effects": [{ "target": "sbp", "perLitre": 28, "maxLitres": 0.75 }],
+      "source": "Bolus volume: Resuscitation Council UK (2021) anaphylaxis — adult IV fluid bolus 500–1000 ml crystalloid. Infusion rate, redistribution and BP effect are teaching parameters from the prototype.",
+      "reviewNeeded": true
+    }
+  ]
+}

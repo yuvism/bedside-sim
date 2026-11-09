@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "devices": [
+    {
+      "id": "o2_nrb",
+      "label": "High-flow oxygen",
+      "sub": "15 L/min, non-rebreather mask",
+      "category": "oxygen",
+      "short": "15 L O₂",
+      "fio2": 0.6,
+      "onText": "High-flow oxygen started, 15 L/min.",
+      "offText": "Oxygen stopped.",
+      "source": "Teaching estimate. The FiO₂ delivered by a reservoir mask at 15 L/min varies with fit and breathing pattern.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "o2_venturi",
+      "label": "Venturi mask",
+      "sub": "40%, 10 L/min",
+      "category": "oxygen",
+      "short": "40% O₂",
+      "fio2": 0.4,
+      "onText": "Venturi mask on, 40% oxygen.",
+      "offText": "Oxygen stopped.",
+      "source": "Fixed-performance device: FiO₂ set by the Venturi valve."
+    },
+    {
+      "id": "o2_nasal",
+      "label": "Nasal cannula",
+      "sub": "2–4 L/min",
+      "category": "oxygen",
+      "short": "nasal O₂",
+      "fio2": 0.3,
+      "onText": "Nasal cannula oxygen started, 3 L/min.",
+      "offText": "Oxygen stopped.",
+      "source": "Teaching estimate. Variable-performance device; FiO₂ depends on flow and breathing pattern.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "legs_raised",
+      "label": "Lie flat, raise legs",
+      "sub": "Supports blood pressure",
+      "category": "position",
+      "effects": [{ "target": "sbp", "value": 6 }],
+      "onText": "Laid flat with legs raised.",
+      "offText": "Sat back up.",
+      "source": "Resuscitation Council UK (2021) anaphylaxis: lie flat, with or without legs raised, if hypotensive; sit up if breathing is difficult. Size of the BP effect is a teaching parameter.",
+      "reviewNeeded": true
+    }
+  ],
+  "procedures": [
+    {
+      "id": "iv_access",
+      "label": "IV cannula",
+      "sub": "Large bore, bloods sent",
+      "grants": "iv",
+      "doneText": "IV cannula inserted, bloods sent.",
+      "alreadyText": "IV access already in."
+    },
+    {
+      "id": "io_access",
+      "label": "IO access",
+      "sub": "Humeral or tibial needle",
+      "grants": "io",
+      "doneText": "Intraosseous needle inserted.",
+      "alreadyText": "IO access already in."
+    }
+  ]
+}
