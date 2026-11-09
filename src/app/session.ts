@@ -7,7 +7,7 @@
 import { LIBRARY } from '../content/library.ts';
 import { SimpleEngine } from '../engine/engine.ts';
 import { Recorder } from '../engine/recorder.ts';
-import type { Action, CaseDef, EngineLibrary, SimEvent } from '../engine/types.ts';
+import type { Action, CaseDef, EngineLibrary, EngineState, SimEvent } from '../engine/types.ts';
 
 export const NIBP_CYCLE_SEC = 180;
 
@@ -32,6 +32,16 @@ export interface Bubble {
   t: number;
 }
 
+interface Checkpoint {
+  engine: EngineState;
+  eventCount: number;
+  traceCount: number;
+  results: ResultItem[];
+  nibp: NibpReading | null;
+  bubble: Bubble | null;
+  nextNibp: number;
+}
+
 export class Session {
   readonly engine: SimpleEngine;
   readonly recorder: Recorder;
@@ -41,7 +51,44 @@ export class Session {
   nibp: NibpReading | null = null;
   results: ResultItem[] = [];
   bubble: Bubble | null = null;
+  /** Saved at the start of every sim minute, for "replay from minute X". */
+  readonly snapshots = new Map<number, Checkpoint>();
   private nextNibp = 0;
+
+  /** A new session that resumes `prev` from the start of `minute`. */
+  static replay(prev: Session, minute: number): Session {
+    const keys = [...prev.snapshots.keys()].filter((m) => m <= minute);
+    const m = keys.length ? Math.max(...keys) : 0;
+    const cp = prev.snapshots.get(m);
+    if (!cp) throw new Error('No checkpoint to replay from.');
+    const s = new Session(prev.caseDef, prev.seed, prev.lib);
+    s.engine.restore(cp.engine);
+    s.recorder.add(prev.events.slice(0, cp.eventCount));
+    s.recorder.trace.push(...prev.recorder.trace.slice(0, cp.traceCount));
+    s.results = cp.results.map((r) => ({ ...r }));
+    s.nibp = cp.nibp;
+    s.bubble = cp.bubble;
+    s.nextNibp = cp.nextNibp;
+    for (const [k, v] of prev.snapshots) if (k <= m) s.snapshots.set(k, v);
+    s.recorder.add([
+      { t: s.t, type: 'system', code: 'replay', text: `Replaying from minute ${m}.` },
+    ]);
+    return s;
+  }
+
+  private checkpoint(): void {
+    const minute = Math.floor(this.t / 60);
+    if (this.snapshots.has(minute)) return;
+    this.snapshots.set(minute, {
+      engine: this.engine.snapshot(),
+      eventCount: this.events.length,
+      traceCount: this.recorder.trace.length,
+      results: this.results.map((r) => ({ ...r })),
+      nibp: this.nibp,
+      bubble: this.bubble,
+      nextNibp: this.nextNibp,
+    });
+  }
 
   constructor(caseDef: CaseDef, seed: number, lib: EngineLibrary = LIBRARY) {
     this.caseDef = caseDef;
@@ -73,6 +120,7 @@ export class Session {
     this.absorb(evs);
     this.recorder.sample(this.t, this.engine.vitals(), true);
     this.measureNibp(false);
+    this.checkpoint();
     return evs;
   }
 
@@ -82,6 +130,8 @@ export class Session {
     this.absorb(evs);
     this.recorder.sample(this.t, this.engine.vitals());
     if (this.t >= this.nextNibp) this.measureNibp(false);
+    // Taken on the first tick of each new minute (within one loop step of it).
+    this.checkpoint();
     return evs;
   }
 

@@ -5,6 +5,8 @@
 import { create } from 'zustand';
 import type { EngineStatus } from '../engine/engine.ts';
 import type { Action, CaseDef, SimEvent, Signs, Vitals } from '../engine/types.ts';
+import { lastDiagnosis, scoreRun, type ScoreResult } from '../engine/scoring.ts';
+import { recordAttempt, type CaseProgress } from './progress.ts';
 import { Session, type Bubble, type NibpReading, type ResultItem } from './session.ts';
 
 export const SPEEDS = [1, 2, 4, 8] as const;
@@ -37,6 +39,8 @@ interface SimState {
   endReason: EndReason | null;
   endScheduled: boolean;
   view: SimView | null;
+  score: ScoreResult | null;
+  progress: CaseProgress | null;
   load(caseDef: CaseDef, seed: number): void;
   start(): void;
   togglePause(): void;
@@ -48,6 +52,8 @@ interface SimState {
   setDiagnosis(id: string): void;
   markRead(investigationId?: string): void;
   end(reason: EndReason): void;
+  /** Resume this run from the start of a sim minute, paused. */
+  replayFrom(minute: number): void;
 }
 
 function viewOf(s: Session, prev: SimView | null): SimView {
@@ -78,7 +84,9 @@ export const useSim = create<SimState>()((set, get) => {
     const outcome = session?.engine.status().outcome;
     if (!outcome || endScheduled || phase !== 'running') return;
     set({ endScheduled: true });
-    setTimeout(() => get().end(outcome), OUTCOME_GRACE_MS);
+    setTimeout(() => {
+      if (get().session === session) get().end(outcome);
+    }, OUTCOME_GRACE_MS);
   };
 
   return {
@@ -90,6 +98,8 @@ export const useSim = create<SimState>()((set, get) => {
     endReason: null,
     endScheduled: false,
     view: null,
+    score: null,
+    progress: null,
 
     load(caseDef, seed) {
       const session = new Session(caseDef, seed);
@@ -100,6 +110,8 @@ export const useSim = create<SimState>()((set, get) => {
         diagnosis: '',
         endReason: null,
         endScheduled: false,
+        score: null,
+        progress: null,
         view: viewOf(session, null),
       });
     },
@@ -166,8 +178,32 @@ export const useSim = create<SimState>()((set, get) => {
         ]);
       }
       session.recorder.sample(session.t, session.engine.vitals(), true);
-      set({ phase: 'ended', endReason: reason, paused: false });
+      const outcome = session.engine.status().outcome ?? 'ended';
+      const score = scoreRun(session.caseDef, {
+        events: session.events,
+        trace: session.recorder.trace,
+        outcome,
+        diagnosis: lastDiagnosis(session.events),
+      });
+      const progress = recordAttempt(session.caseDef.id, score.percent, outcome);
+      set({ phase: 'ended', endReason: reason, paused: false, score, progress });
       refresh();
+    },
+
+    replayFrom(minute) {
+      const { session } = get();
+      if (!session) return;
+      const next = Session.replay(session, minute);
+      set({
+        session: next,
+        phase: 'running',
+        paused: true,
+        endReason: null,
+        endScheduled: false,
+        score: null,
+        diagnosis: lastDiagnosis(next.events) ?? '',
+        view: viewOf(next, null),
+      });
     },
   };
 });

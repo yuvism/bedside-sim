@@ -46,9 +46,19 @@ The build brief is in [PROMPT.md](PROMPT.md). The single-file prototype is in `r
 - **Content:** head-to-toe regions added to `anaphylaxis-01`, and an `art_line` procedure in `devices.json`
 - **Tests:** unit tests for alarms, waveform shapes, the router and the session. The Playwright test plays `anaphylaxis-01` to "Arjun is stable" using a fake clock, and a 375 px layout check confirms no sideways scrolling.
 
+### Phase 3 — Debrief and scoring
+
+- **** (pure TS): evaluates case rules , , , , , , , , , , and , with wildcards on event codes. Credits add weight and penalties subtract it. A failed critical rule caps the score at 40. Teaching points are shown by the same tests.
+- **Debrief** (lazy-loaded with Recharts, so it isn't in the main bundle): outcome, score, best score and attempt count, diagnosis vs expected, a checklist marked done/missed/harmful/avoided with timings, and a vitals chart as small multiples (HR, SBP, SpO₂, RR on one shared time axis, alarm limits dashed). Numbered action markers run through every panel, with a matching list underneath; harmful actions are marked in red. There's also a vitals table view, teaching points and references.
+- **Export:** copy or download JSON (the full run), the vitals CSV (with an event-code column) and the events CSV
+- **Replay from minute X:** the session checkpoints the engine every sim minute, and replay resumes paused with the earlier log and trace kept. Replaying without new actions retraces the original run exactly (tested).
+- **Progress history** in localStorage (best, last, attempts per case), shown on the case list and in the debrief
+- **Tests:** 11 scoring tests (every rule type, totals, the critical cap, teaching, an ideal anaphylaxis run scoring 100 and a do-nothing run scoring 0), chart-marker alignment, progress, and replay. The e2e test now checks the debrief and replay.
+- Bundle: main 105 kB gz; debrief chunk 109 kB gz
+
 ## Next
 
-- **Phase 3:** rule-based scoring (`src/engine/scoring.ts`), a debrief with checklist, a vitals chart with action markers, teaching points and references, "replay from minute X", JSON/CSV export (copy and download), and local progress history
+- **Phase 4:** a case library of 10 cases (with the ALS loop for the STEMI/VF case), a case-select screen with filters, and ideal-run and do-nothing tests per case
 
 ## Design decisions to review
 

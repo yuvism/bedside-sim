@@ -5,6 +5,7 @@ import { expect, test } from '@playwright/test';
  * sim loop, so ~12 sim minutes take a few seconds.
  */
 test('anaphylaxis-01 can be played to a stabilised outcome', async ({ page }) => {
+  test.setTimeout(120_000);
   await page.clock.install();
   await page.goto('./#/case/anaphylaxis-01?seed=1');
   await page.getByRole('button', { name: 'Start case' }).click();
@@ -34,6 +35,22 @@ test('anaphylaxis-01 can be played to a stabilised outcome', async ({ page }) =>
   const dialog = page.getByRole('dialog');
   await expect(dialog).toBeVisible();
   await expect(dialog.getByRole('heading', { name: 'Arjun is stable' })).toBeVisible();
+
+  // Debrief: score, checklist, chart with one marker per treatment, teaching, export.
+  await expect(dialog.getByLabel(/^Score \d+ out of 100$/)).toBeVisible();
+  await expect(dialog.getByText('Patient stabilised')).toBeVisible();
+  await expect(dialog.locator('.vc-panel')).toHaveCount(4);
+  const markers = dialog.locator('ol.markers li');
+  await expect(markers).toHaveCount(6);
+  await expect(markers.first()).toContainText('Called for help');
+  await expect(dialog.getByRole('button', { name: 'Download JSON' })).toBeVisible();
+
+  // Replay from minute 2 resumes paused, with the earlier log kept.
+  await dialog.getByLabel('Replay from minute').selectOption({ label: '02:00' });
+  await dialog.getByRole('button', { name: 'Replay from 02:00' }).click();
+  await expect(dialog).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Resume' })).toBeVisible();
+  await expect(page.getByText('Replaying from minute 2.')).toBeVisible();
 });
 
 test('bedside fits a 375 px phone without sideways scrolling', async ({ page }) => {

@@ -2,7 +2,7 @@ dialog.debrief {
   border: 0;
   border-radius: 14px;
   padding: 0;
-  max-width: 760px;
+  max-width: 780px;
   width: calc(100% - 28px);
   background: var(--surface);
   color: var(--ink);
@@ -24,14 +24,210 @@ dialog.debrief::backdrop {
   font-size: 1.35rem;
 }
 
+.dlg h3 {
+  margin: 20px 0 8px;
+  font-size: 1rem;
+}
+
 .muted {
   color: var(--muted);
   margin: 0;
+}
+
+.small {
+  font-size: 0.85rem;
+}
+
+.score-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.score {
+  font-family: var(--font-num);
+  font-size: 3.4rem;
+  font-weight: 600;
+  line-height: 1;
+  margin: 0;
+}
+
+.score small {
+  font-size: 1.2rem;
+  color: var(--muted);
+}
+
+.score-meta p {
+  margin: 0 0 4px;
+}
+
+.warn-text {
+  color: var(--warn);
+}
+
+.check {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.check li {
+  display: grid;
+  grid-template-columns: 1.6em minmax(0, 1fr) auto;
+  gap: 6px;
+  padding: 7px 0;
+  border-top: 1px solid var(--line);
+}
+
+.check small {
+  color: var(--muted);
+}
+
+.check .m {
+  font-weight: 700;
+}
+
+.check .done .m,
+.check .avoided .m {
+  color: var(--ok);
+}
+
+.check .missed .m {
+  color: var(--danger);
+}
+
+.check li.harmful {
+  background: var(--danger-soft);
+}
+
+.check .harmful .m {
+  color: var(--danger);
+}
+
+.check .pts {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.vitals-chart {
+  display: grid;
+  gap: 2px;
+}
+
+.vc-panel {
+  margin: 0;
+}
+
+.vc-panel figcaption {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.vc-panel figcaption span {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.markers {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+.markers li {
+  display: grid;
+  grid-template-columns: 1.8em 3.4em minmax(0, 1fr);
+  gap: 6px;
+  align-items: baseline;
+}
+
+.markers .mk {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 50%;
+  border: 1px solid var(--muted);
+  font-size: 0.75rem;
+}
+
+.markers li.harmful .mk {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.markers time {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.table-view {
+  margin-top: 10px;
+}
+
+.table-view summary {
+  cursor: pointer;
+}
+
+.table-view table {
+  border-collapse: collapse;
+  margin-top: 8px;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.table-view th,
+.table-view td {
+  padding: 3px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: right;
+}
+
+.notes,
+.refs {
+  margin: 0;
+  padding-left: 1.1em;
+}
+
+.notes li,
+.refs li {
+  margin-bottom: 6px;
 }
 
 .row {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  align-items: center;
   margin-top: 14px;
+}
+
+.row a.btn {
+  color: inherit;
+  text-decoration: none;
+}
+
+.row.replay label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.row.replay select {
+  padding: 7px 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.fine {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-top: 16px;
 }
