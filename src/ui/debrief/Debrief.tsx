@@ -8,7 +8,7 @@ import { VitalsChart } from './VitalsChart.tsx';
 
 const TITLES = {
   stabilised: (n: string) => `${n} is stable`,
-  arrest: (n: string) => `${n} arrested`,
+  died: (n: string) => `${n} died`,
   ended: () => 'Case ended',
 } as const;
 

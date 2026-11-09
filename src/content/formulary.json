@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "drugs": [
     {
       "id": "adrenaline",
@@ -28,6 +28,14 @@
           "bioavailability": 1,
           "absorptionHalfLifeMin": 0,
           "source": "1 mg IV is the cardiac arrest dose (Resuscitation Council UK, Adult advanced life support, 2021)."
+        },
+        {
+          "route": "IO",
+          "label": "IO bolus (cardiac arrest)",
+          "standardDose": 1,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 0,
+          "source": "1 mg IV/IO every 3–5 min in cardiac arrest (Resuscitation Council UK, Adult ALS, 2021)."
         }
       ],
       "effects": [
@@ -65,8 +73,14 @@
             "tauMin": 1.5,
             "amplitude": 1,
             "effects": [
-              { "target": "hr", "value": 45 },
-              { "target": "sbp", "value": 70 }
+              {
+                "target": "hr",
+                "value": 45
+              },
+              {
+                "target": "sbp",
+                "value": 70
+              }
             ],
             "ectopy": true
           },
@@ -84,14 +98,30 @@
             "tauMin": 1.5,
             "amplitude": 0.3,
             "effects": [
-              { "target": "hr", "value": 35 },
-              { "target": "sbp", "value": 30 }
+              {
+                "target": "hr",
+                "value": 35
+              },
+              {
+                "target": "sbp",
+                "value": 30
+              }
             ]
           },
           "source": "Resuscitation Council UK (2021): repeat IM adrenaline after 5 minutes if no improvement. The 3-minute warning threshold comes from the prototype.",
           "reviewNeeded": true
         }
-      ]
+      ],
+      "infusion": {
+        "unit": "mcg/kg/min",
+        "standardRate": 0.05,
+        "minRate": 0.01,
+        "maxRate": 0.5,
+        "perKg": true,
+        "amountPerMinPerRate": 0.001,
+        "source": "Refractory anaphylaxis: low-dose adrenaline infusion by experienced staff (Resuscitation Council UK, 2021). Rate range is a teaching estimate.",
+        "reviewNeeded": true
+      }
     },
     {
       "id": "chlorphenamine",
@@ -140,17 +170,17 @@
       "drugClass": "Corticosteroid",
       "unit": "mg",
       "halfLifeMin": 90,
-      "feedback": "No immediate effect.",
+      "feedback": "No immediate effect. Steroids take hours to work.",
       "source": "Resuscitation Council UK (2021) advises against routine corticosteroids in the emergency treatment of anaphylaxis. No acute effect is modelled.",
       "routes": [
         {
           "route": "IV",
           "label": "Slow IV",
-          "standardDose": 200,
+          "standardDose": 100,
           "maxDose": 200,
           "bioavailability": 1,
           "absorptionHalfLifeMin": 0,
-          "source": "200 mg adult dose as listed in the Resuscitation Council UK 2008 anaphylaxis algorithm.",
+          "source": "100 mg IV for acute severe asthma (BTS/SIGN 158, 2019); 200 mg was the adult anaphylaxis dose in the Resuscitation Council UK 2008 algorithm.",
           "reviewNeeded": true
         },
         {
@@ -164,7 +194,15 @@
           "reviewNeeded": true
         }
       ],
-      "effects": []
+      "effects": [
+        {
+          "target": "process:asthma",
+          "emax": -1.5,
+          "ec50": 60,
+          "source": "Teaching parameter: slow anti-inflammatory effect in asthma.",
+          "reviewNeeded": true
+        }
+      ]
     },
     {
       "id": "salbutamol",
@@ -179,10 +217,10 @@
           "route": "NEB",
           "label": "Nebulised, oxygen-driven",
           "standardDose": 5,
-          "maxDose": 5,
+          "maxDose": 20,
           "bioavailability": 1,
           "absorptionHalfLifeMin": 1.5,
-          "source": "5 mg nebulised for acute severe asthma in adults: BTS/SIGN British guideline on the management of asthma (SIGN 158, 2019). Absorption half-life is a teaching parameter.",
+          "source": "5 mg nebulised for acute asthma in adults (BTS/SIGN 158, 2019); 10–20 mg nebulised as an adjunct in hyperkalaemia (UK Kidney Association, 2020). Absorption half-life is a teaching parameter.",
           "reviewNeeded": true
         }
       ],
@@ -200,6 +238,769 @@
           "ec50": 4,
           "source": "Teaching parameter (β2-agonist tachycardia).",
           "reviewNeeded": true
+        },
+        {
+          "target": "process:asthma",
+          "emax": -2.5,
+          "ec50": 4,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        },
+        {
+          "target": "lab:k",
+          "emax": -0.9,
+          "ec50": 8,
+          "source": "Teaching parameter: K⁺ shift into cells, larger at 10–20 mg.",
+          "reviewNeeded": true
+        }
+      ]
+    },
+    {
+      "id": "amiodarone",
+      "name": "Amiodarone",
+      "drugClass": "Antiarrhythmic",
+      "unit": "mg",
+      "halfLifeMin": 240,
+      "source": "Amiodarone raises ROSC odds in the ROSC model; the size is set in src/engine/als.ts (teaching parameter).",
+      "reviewNeeded": true,
+      "routes": [
+        {
+          "route": "IV",
+          "label": "IV bolus (cardiac arrest)",
+          "standardDose": 300,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 0,
+          "source": "300 mg IV after the 3rd shock, 150 mg after the 5th (Resuscitation Council UK, Adult ALS, 2021)."
+        },
+        {
+          "route": "IO",
+          "label": "IO bolus (cardiac arrest)",
+          "standardDose": 300,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 0,
+          "source": "Resuscitation Council UK, Adult ALS (2021)."
+        }
+      ],
+      "effects": []
+    },
+    {
+      "id": "aspirin",
+      "name": "Aspirin",
+      "drugClass": "Antiplatelet",
+      "unit": "mg",
+      "halfLifeMin": 240,
+      "routes": [
+        {
+          "route": "PO",
+          "label": "Chewed, loading dose",
+          "standardDose": 300,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 10,
+          "source": "Loading dose 150–300 mg oral (ESC Guidelines for the management of acute coronary syndromes, 2023)."
+        }
+      ],
+      "effects": [
+        {
+          "target": "process:myocardial_ischaemia",
+          "emax": -0.6,
+          "ec50": 100,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        }
+      ]
+    },
+    {
+      "id": "ticagrelor",
+      "name": "Ticagrelor",
+      "drugClass": "P2Y12 inhibitor",
+      "unit": "mg",
+      "halfLifeMin": 480,
+      "routes": [
+        {
+          "route": "PO",
+          "label": "Loading dose",
+          "standardDose": 180,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 30,
+          "source": "Loading dose 180 mg (ESC ACS guidelines, 2023), given per the local primary PCI pathway."
+        }
+      ],
+      "effects": [
+        {
+          "target": "process:myocardial_ischaemia",
+          "emax": -0.4,
+          "ec50": 60,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        }
+      ]
+    },
+    {
+      "id": "gtn",
+      "name": "Glyceryl trinitrate",
+      "aliases": ["GTN", "nitroglycerin"],
+      "drugClass": "Nitrate",
+      "unit": "mg",
+      "halfLifeMin": 8,
+      "routes": [
+        {
+          "route": "SL",
+          "label": "Sublingual spray, 400 micrograms",
+          "standardDose": 0.4,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 1,
+          "maxDose": 0.8,
+          "source": "400 microgram sublingual dose for ischaemic chest pain; avoid if SBP < 90 mmHg (ESC ACS guidelines, 2023). PK is a teaching parameter.",
+          "reviewNeeded": true
+        }
+      ],
+      "effects": [
+        {
+          "target": "sbp",
+          "emax": -22,
+          "ec50": 0.3,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        },
+        {
+          "target": "block:pain",
+          "emax": 0.5,
+          "ec50": 0.2,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        },
+        {
+          "target": "process:myocardial_ischaemia",
+          "emax": -0.4,
+          "ec50": 0.3,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        }
+      ],
+      "adverse": [
+        {
+          "id": "gtn_hypotension",
+          "doseAbove": 0.8,
+          "level": "warn",
+          "message": "Large nitrate dose: watch for profound hypotension.",
+          "source": "Teaching rule.",
+          "reviewNeeded": true
+        }
+      ]
+    },
+    {
+      "id": "morphine",
+      "name": "Morphine",
+      "drugClass": "Opioid analgesic",
+      "unit": "mg",
+      "halfLifeMin": 120,
+      "routes": [
+        {
+          "route": "IV",
+          "label": "IV, titrated in small increments",
+          "standardDose": 2.5,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 0,
+          "maxDose": 5,
+          "source": "Titrated IV opioid may be considered for severe ischaemic pain (ESC ACS guidelines, 2023). Increment size is a teaching estimate.",
+          "reviewNeeded": true
+        }
+      ],
+      "effects": [
+        {
+          "target": "block:pain",
+          "emax": 0.8,
+          "ec50": 2,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        },
+        {
+          "target": "rr",
+          "emax": -3,
+          "ec50": 5,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        },
+        {
+          "target": "process:opioid_toxicity",
+          "emax": 4,
+          "ec50": 10,
+          "source": "Teaching parameter: adds to any existing opioid toxicity.",
+          "reviewNeeded": true
+        }
+      ]
+    },
+    {
+      "id": "naloxone",
+      "name": "Naloxone",
+      "drugClass": "Opioid antagonist",
+      "unit": "mg",
+      "halfLifeMin": 60,
+      "source": "Shorter-acting than most opioids, so toxicity can return as it wears off. Half-life is a teaching estimate.",
+      "reviewNeeded": true,
+      "routes": [
+        {
+          "route": "IV",
+          "label": "IV, titrate to breathing",
+          "standardDose": 0.4,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 0,
+          "maxDose": 2,
+          "source": "Adult opioid overdose: 400 micrograms IV, repeated and titrated to adequate breathing (BNF). Smaller titrated doses reduce acute withdrawal.",
+          "reviewNeeded": true
+        },
+        {
+          "route": "IM",
+          "label": "IM",
+          "standardDose": 0.4,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 4,
+          "maxDose": 2,
+          "source": "IM 400 micrograms when there is no IV access (BNF).",
+          "reviewNeeded": true
+        }
+      ],
+      "effects": [
+        {
+          "target": "block:opioid",
+          "emax": 0.97,
+          "ec50": 0.06,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        }
+      ],
+      "adverse": [
+        {
+          "id": "naloxone_withdrawal",
+          "doseAbove": 0.8,
+          "level": "warn",
+          "message": "Large naloxone bolus: acute opioid withdrawal. He wakes agitated and vomiting, and pulls off the mask.",
+          "transient": {
+            "tauMin": 4,
+            "amplitude": 1,
+            "effects": [
+              {
+                "target": "hr",
+                "value": 30
+              },
+              {
+                "target": "sbp",
+                "value": 25
+              }
+            ]
+          },
+          "source": "Teaching rule: titrate naloxone to breathing, not to full consciousness.",
+          "reviewNeeded": true
+        }
+      ]
+    },
+    {
+      "id": "glucose_10",
+      "name": "Glucose 10%",
+      "aliases": ["dextrose 10%"],
+      "drugClass": "Glucose",
+      "unit": "ml",
+      "halfLifeMin": 20,
+      "routes": [
+        {
+          "route": "IV",
+          "label": "IV over 15 minutes",
+          "standardDose": 150,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 4,
+          "maxDose": 250,
+          "source": "150–160 ml of 10% glucose IV over 15 min for severe hypoglycaemia (JBDS, The hospital management of hypoglycaemia in adults with diabetes mellitus, 2021)."
+        }
+      ],
+      "effects": [
+        {
+          "target": "glucose",
+          "emax": 12,
+          "ec50": 100,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        },
+        {
+          "target": "process:hypoglycaemia",
+          "emax": -18,
+          "ec50": 100,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        }
+      ]
+    },
+    {
+      "id": "glucose_20",
+      "name": "Glucose 20%",
+      "aliases": ["dextrose 20%"],
+      "drugClass": "Glucose",
+      "unit": "ml",
+      "halfLifeMin": 20,
+      "routes": [
+        {
+          "route": "IV",
+          "label": "IV over 15 minutes",
+          "standardDose": 75,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 4,
+          "maxDose": 100,
+          "source": "75–80 ml of 20% glucose IV over 15 min for severe hypoglycaemia (JBDS hypoglycaemia guideline, 2021)."
+        }
+      ],
+      "effects": [
+        {
+          "target": "glucose",
+          "emax": 12,
+          "ec50": 50,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        },
+        {
+          "target": "process:hypoglycaemia",
+          "emax": -18,
+          "ec50": 50,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        }
+      ]
+    },
+    {
+      "id": "glucose_50",
+      "name": "Glucose 50%",
+      "aliases": ["dextrose 50%"],
+      "drugClass": "Glucose",
+      "unit": "ml",
+      "halfLifeMin": 20,
+      "routes": [
+        {
+          "route": "IV",
+          "label": "IV with insulin, into a large vein",
+          "standardDose": 50,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 2,
+          "maxDose": 50,
+          "source": "25 g glucose (50 ml of 50%) with 10 units soluble insulin for hyperkalaemia (UK Kidney Association, 2020). 50% is irritant; 10–20% is preferred for hypoglycaemia."
+        }
+      ],
+      "effects": [
+        {
+          "target": "glucose",
+          "emax": 14,
+          "ec50": 30,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        },
+        {
+          "target": "process:hypoglycaemia",
+          "emax": -18,
+          "ec50": 30,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        }
+      ]
+    },
+    {
+      "id": "glucagon",
+      "name": "Glucagon",
+      "drugClass": "Hormone",
+      "unit": "mg",
+      "halfLifeMin": 20,
+      "routes": [
+        {
+          "route": "IM",
+          "label": "IM",
+          "standardDose": 1,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 6,
+          "maxDose": 1,
+          "source": "1 mg IM when IV access is not possible (JBDS hypoglycaemia guideline, 2021). Less effective after sulfonylureas or alcohol."
+        }
+      ],
+      "effects": [
+        {
+          "target": "glucose",
+          "emax": 6,
+          "ec50": 0.5,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        },
+        {
+          "target": "process:hypoglycaemia",
+          "emax": -8,
+          "ec50": 0.5,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        }
+      ]
+    },
+    {
+      "id": "insulin",
+      "name": "Soluble insulin",
+      "aliases": ["Actrapid"],
+      "drugClass": "Insulin",
+      "unit": "units",
+      "halfLifeMin": 25,
+      "source": "Effect duration, not plasma half-life. Teaching parameter.",
+      "reviewNeeded": true,
+      "routes": [
+        {
+          "route": "IV",
+          "label": "IV bolus (hyperkalaemia, with glucose)",
+          "standardDose": 10,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 0,
+          "maxDose": 10,
+          "source": "10 units soluble insulin with 25 g glucose IV for hyperkalaemia (UK Kidney Association, 2020)."
+        }
+      ],
+      "infusion": {
+        "unit": "units/kg/h",
+        "standardRate": 0.1,
+        "minRate": 0.05,
+        "maxRate": 0.2,
+        "perKg": true,
+        "amountPerMinPerRate": 0.016667,
+        "source": "Fixed-rate IV insulin infusion 0.1 units/kg/h (JBDS, The management of diabetic ketoacidosis in adults, 2021)."
+      },
+      "effects": [
+        {
+          "target": "glucose",
+          "emax": -9,
+          "ec50": 6,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        },
+        {
+          "target": "lab:k",
+          "emax": -1.3,
+          "ec50": 5,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        },
+        {
+          "target": "process:hyperkalaemia",
+          "emax": -3,
+          "ec50": 5,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        },
+        {
+          "target": "process:dka",
+          "emax": -3.5,
+          "ec50": 3,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        }
+      ]
+    },
+    {
+      "id": "potassium_chloride",
+      "name": "Potassium chloride",
+      "aliases": ["KCl"],
+      "drugClass": "Electrolyte",
+      "unit": "mmol",
+      "halfLifeMin": 180,
+      "routes": [
+        {
+          "route": "IV",
+          "label": "40 mmol in 1 L 0.9% saline over 1 hour",
+          "standardDose": 40,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 30,
+          "maxDose": 40,
+          "source": "Add 40 mmol/L KCl to fluids when K⁺ is 3.5–5.5 mmol/L; none if K⁺ > 5.5 (JBDS DKA guideline, 2021). Never as a bolus."
+        }
+      ],
+      "effects": [
+        {
+          "target": "lab:k",
+          "emax": 1.4,
+          "ec50": 30,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        }
+      ],
+      "adverse": [
+        {
+          "id": "potassium_overdose",
+          "doseAbove": 40,
+          "level": "danger",
+          "message": "More than 40 mmol potassium at once risks fatal arrhythmia.",
+          "harm": true,
+          "source": "JBDS DKA guideline (2021): potassium goes in maintenance fluids, never as a bolus."
+        }
+      ]
+    },
+    {
+      "id": "calcium_gluconate",
+      "name": "Calcium gluconate 10%",
+      "drugClass": "Electrolyte",
+      "unit": "ml",
+      "halfLifeMin": 40,
+      "source": "The membrane-stabilising effect lasts roughly 30–60 minutes (UK Kidney Association, 2020). Half-life is a teaching estimate.",
+      "reviewNeeded": true,
+      "routes": [
+        {
+          "route": "IV",
+          "label": "IV over 10 minutes",
+          "standardDose": 30,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 2,
+          "maxDose": 30,
+          "source": "30 ml of 10% calcium gluconate IV for hyperkalaemia with ECG changes (UK Kidney Association, 2020)."
+        }
+      ],
+      "effects": [
+        {
+          "target": "block:membrane",
+          "emax": 0.9,
+          "ec50": 10,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        },
+        {
+          "target": "block:ecg",
+          "emax": 0.7,
+          "ec50": 10,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        }
+      ]
+    },
+    {
+      "id": "calcium_chloride",
+      "name": "Calcium chloride 10%",
+      "drugClass": "Electrolyte",
+      "unit": "ml",
+      "halfLifeMin": 40,
+      "routes": [
+        {
+          "route": "IV",
+          "label": "IV slowly, large vein",
+          "standardDose": 10,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 2,
+          "maxDose": 10,
+          "source": "10 ml of 10% calcium chloride IV as an alternative to calcium gluconate (UK Kidney Association, 2020)."
+        }
+      ],
+      "effects": [
+        {
+          "target": "block:membrane",
+          "emax": 0.9,
+          "ec50": 3.4,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        },
+        {
+          "target": "block:ecg",
+          "emax": 0.7,
+          "ec50": 3.4,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        }
+      ]
+    },
+    {
+      "id": "ipratropium",
+      "name": "Ipratropium bromide",
+      "drugClass": "Antimuscarinic bronchodilator",
+      "unit": "mg",
+      "halfLifeMin": 90,
+      "routes": [
+        {
+          "route": "NEB",
+          "label": "Nebulised with salbutamol",
+          "standardDose": 0.5,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 2,
+          "maxDose": 0.5,
+          "source": "500 micrograms nebulised in acute severe or life-threatening asthma (BTS/SIGN 158, 2019)."
+        }
+      ],
+      "effects": [
+        {
+          "target": "block:bronchospasm",
+          "emax": 0.3,
+          "ec50": 0.25,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        }
+      ]
+    },
+    {
+      "id": "prednisolone",
+      "name": "Prednisolone",
+      "drugClass": "Corticosteroid",
+      "unit": "mg",
+      "halfLifeMin": 240,
+      "routes": [
+        {
+          "route": "PO",
+          "label": "Oral",
+          "standardDose": 40,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 30,
+          "maxDose": 50,
+          "source": "40–50 mg oral prednisolone in acute asthma (BTS/SIGN 158, 2019). Slow onset is a teaching parameter.",
+          "reviewNeeded": true
+        }
+      ],
+      "effects": [
+        {
+          "target": "process:asthma",
+          "emax": -1.5,
+          "ec50": 20,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        }
+      ]
+    },
+    {
+      "id": "magnesium_sulfate",
+      "name": "Magnesium sulfate",
+      "drugClass": "Electrolyte / bronchodilator",
+      "unit": "g",
+      "halfLifeMin": 120,
+      "routes": [
+        {
+          "route": "IV",
+          "label": "IV over 20 minutes",
+          "standardDose": 2,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 8,
+          "minDose": 1.2,
+          "maxDose": 2,
+          "source": "1.2–2 g IV over 20 minutes in acute severe asthma not responding to bronchodilators (BTS/SIGN 158, 2019)."
+        }
+      ],
+      "effects": [
+        {
+          "target": "block:bronchospasm",
+          "emax": 0.3,
+          "ec50": 1,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        },
+        {
+          "target": "process:asthma",
+          "emax": -2,
+          "ec50": 1.5,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        }
+      ]
+    },
+    {
+      "id": "piperacillin_tazobactam",
+      "name": "Piperacillin–tazobactam",
+      "aliases": ["Tazocin"],
+      "drugClass": "Broad-spectrum antibiotic",
+      "unit": "g",
+      "halfLifeMin": 90,
+      "source": "Antibiotic choice follows local policy. Effect size and onset are teaching parameters.",
+      "reviewNeeded": true,
+      "routes": [
+        {
+          "route": "IV",
+          "label": "IV",
+          "standardDose": 4.5,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 0,
+          "maxDose": 4.5,
+          "source": "4.5 g IV is a common adult dose; follow local sepsis policy. Surviving Sepsis Campaign (2021): antimicrobials within 1 hour when shock is present.",
+          "reviewNeeded": true
+        }
+      ],
+      "effects": [
+        {
+          "target": "process:sepsis",
+          "emax": -1.6,
+          "ec50": 1.5,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        }
+      ]
+    },
+    {
+      "id": "noradrenaline",
+      "name": "Noradrenaline",
+      "aliases": ["norepinephrine"],
+      "drugClass": "Vasopressor",
+      "unit": "mg",
+      "halfLifeMin": 2.5,
+      "routes": [
+        {
+          "route": "IV",
+          "label": "Infusion only (use the infusion control)",
+          "standardDose": 0.01,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 0,
+          "maxDose": 0.02,
+          "source": "Noradrenaline is given as a titrated infusion, not a bolus."
+        }
+      ],
+      "infusion": {
+        "unit": "mcg/kg/min",
+        "standardRate": 0.1,
+        "minRate": 0.02,
+        "maxRate": 1,
+        "perKg": true,
+        "amountPerMinPerRate": 0.001,
+        "source": "First-line vasopressor to a MAP of 65 mmHg; may be started peripherally (Surviving Sepsis Campaign, 2021). Rate range is a teaching estimate.",
+        "reviewNeeded": true
+      },
+      "effects": [
+        {
+          "target": "sbp",
+          "emax": 55,
+          "ec50": 0.03,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        },
+        {
+          "target": "hr",
+          "emax": 6,
+          "ec50": 0.05,
+          "source": "Teaching parameter.",
+          "reviewNeeded": true
+        }
+      ],
+      "adverse": [
+        {
+          "id": "noradrenaline_bolus",
+          "routes": ["IV"],
+          "level": "warn",
+          "message": "Noradrenaline is given as a titrated infusion, not a bolus.",
+          "source": "Surviving Sepsis Campaign (2021)."
+        }
+      ]
+    },
+    {
+      "id": "tranexamic_acid",
+      "name": "Tranexamic acid",
+      "aliases": ["TXA"],
+      "drugClass": "Antifibrinolytic",
+      "unit": "g",
+      "halfLifeMin": 120,
+      "routes": [
+        {
+          "route": "IV",
+          "label": "IV over 10 minutes",
+          "standardDose": 1,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 3,
+          "maxDose": 1,
+          "source": "1 g IV over 10 minutes then 1 g over 8 hours, within 3 hours of injury (CRASH-2 trial, Lancet 2010)."
+        }
+      ],
+      "effects": [
+        {
+          "target": "process:hypovolaemia",
+          "emax": -0.8,
+          "ec50": 0.4,
+          "source": "Teaching parameter: reduces the bleeding rate.",
+          "reviewNeeded": true
         }
       ]
     }
@@ -211,8 +1012,74 @@
       "standardVolumeMl": 500,
       "maxRateMlPerMin": 100,
       "redistributionTauMin": 25,
-      "effects": [{ "target": "sbp", "perLitre": 28, "maxLitres": 0.75 }],
-      "source": "Bolus volume: Resuscitation Council UK (2021) anaphylaxis — adult IV fluid bolus 500–1000 ml crystalloid. Infusion rate, redistribution and BP effect are teaching parameters from the prototype.",
+      "effects": [
+        {
+          "target": "sbp",
+          "perLitre": 28,
+          "maxLitres": 0.75
+        },
+        {
+          "target": "process:hypovolaemia",
+          "perLitre": -10
+        },
+        {
+          "target": "process:dka",
+          "perLitre": -6
+        },
+        {
+          "target": "process:sepsis",
+          "perLitre": -3
+        },
+        {
+          "target": "lab:hb",
+          "perLitre": -12
+        }
+      ],
+      "source": "Bolus volumes: Resuscitation Council UK (2021) anaphylaxis 500–1000 ml; Surviving Sepsis Campaign (2021) 30 ml/kg in sepsis-induced hypoperfusion; JBDS DKA (2021) 500 ml over 10–15 min if SBP < 90. Rates, redistribution and effects are teaching parameters.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "blood",
+      "name": "Packed red cells",
+      "standardVolumeMl": 300,
+      "maxRateMlPerMin": 100,
+      "redistributionTauMin": 240,
+      "effects": [
+        {
+          "target": "sbp",
+          "perLitre": 40,
+          "maxLitres": 2
+        },
+        {
+          "target": "process:hypovolaemia",
+          "perLitre": -45
+        },
+        {
+          "target": "lab:hb",
+          "perLitre": 30
+        }
+      ],
+      "source": "Major haemorrhage: early blood and plasma in a balanced ratio, limiting crystalloid (ATLS 10th edition, 2018). Effect sizes are teaching parameters.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "ffp",
+      "name": "Fresh frozen plasma",
+      "standardVolumeMl": 250,
+      "maxRateMlPerMin": 80,
+      "redistributionTauMin": 180,
+      "effects": [
+        {
+          "target": "sbp",
+          "perLitre": 30,
+          "maxLitres": 2
+        },
+        {
+          "target": "process:hypovolaemia",
+          "perLitre": -35
+        }
+      ],
+      "source": "Teaching parameters; given with red cells in major haemorrhage (ATLS 10th edition, 2018).",
       "reviewNeeded": true
     }
   ]

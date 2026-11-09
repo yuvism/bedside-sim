@@ -30,6 +30,8 @@ export function validateCaseRefs(c: CaseDef, lib: EngineLibrary): string[] {
   const processIds = new Set(c.processes.map((p) => p.id));
   const drugIds = new Set(lib.formulary.drugs.map((d) => d.id));
   const deviceIds = new Set(lib.devices.devices.map((d) => d.id));
+  const procIds = new Set(lib.devices.procedures.map((p) => p.id));
+  const infusionIds = new Set(lib.formulary.drugs.filter((d) => d.infusion).map((d) => d.id));
   const invIds = new Set(lib.investigations.investigations.map((i) => i.id));
   const ruleIds = new Set(c.scoring.map((r) => r.id));
   const examIds = new Set(c.exam.map((e) => e.id));
@@ -79,6 +81,12 @@ export function validateCaseRefs(c: CaseDef, lib: EngineLibrary): string[] {
     if ('device' in x && !deviceIds.has(x.device)) {
       errors.push(`${where}: unknown device "${x.device}".`);
     }
+    if ('procedure' in x && !procIds.has(x.procedure)) {
+      errors.push(`${where}: unknown procedure "${x.procedure}".`);
+    }
+    if ('infusing' in x && !infusionIds.has(x.infusing)) {
+      errors.push(`${where}: "${x.infusing}" has no infusion in the formulary.`);
+    }
   };
   c.exam.forEach((e) =>
     e.findings.forEach((f) => f.when && walkCondition(f.when, checkCond(`exam ${e.id}`))),
@@ -89,6 +97,11 @@ export function validateCaseRefs(c: CaseDef, lib: EngineLibrary): string[] {
   c.patientLines.forEach((l) => walkCondition(l.when, checkCond(`patient line ${l.id}`)));
   (c.rhythmRules ?? []).forEach((r) => walkCondition(r.when, checkCond(`rhythm rule ${r.id}`)));
   walkCondition(c.outcomes.stabilised.when, checkCond('outcomes.stabilised'));
+  for (const p of c.processes) {
+    for (const tr of p.treatments ?? []) {
+      walkCondition(tr.when, checkCond(`treatment ${p.id}.${tr.id}`));
+    }
+  }
 
   const checkRule = (where: string) => (t: RuleTest) => {
     if ((t.type === 'rulePassed' || t.type === 'ruleFailed') && !ruleIds.has(t.id)) {

@@ -6,30 +6,84 @@ Each item below is a teaching parameter or an uncertain value marked `"reviewNee
 A clinician should check it against its source, then either confirm it (cite the guideline
 and remove the flag) or correct it.
 
-**28 flagged items.**
+**84 flagged items.**
 
 ## src/content/formulary.json
 
 | Item | Values | Source |
 | --- | --- | --- |
-| `drugs[adrenaline]` | id adrenaline; name Adrenaline; drugClass Sympathomimetic; unit mg; halfLifeMin 3; 2 routes (see file); 3 effects (see file); 2 adverse (see file) | Teaching parameter. Adrenaline is cleared within minutes; the half-life is tuned so one IM dose wears off over 10–15 minutes, as in the prototype. |
+| `drugs[adrenaline]` | id adrenaline; name Adrenaline; drugClass Sympathomimetic; unit mg; halfLifeMin 3; 3 routes (see file); 3 effects (see file); 2 adverse (see file) | Teaching parameter. Adrenaline is cleared within minutes; the half-life is tuned so one IM dose wears off over 10–15 minutes, as in the prototype. |
 | `drugs[adrenaline].routes[IM]` | route IM; standardDose 0.5; maxDose 0.5; bioavailability 1; absorptionHalfLifeMin 1 | Dose: Resuscitation Council UK, Emergency treatment of anaphylaxis (2021) — adult IM adrenaline 500 micrograms, repeat after 5 minutes if no improvement. Absorption half-life is a teaching parameter. |
 | `drugs[adrenaline].effects[process:anaphylaxis]` | target process:anaphylaxis; emax -18; ec50 0.35 | Teaching parameter tuned so a single IM dose improves the patient within 3 minutes but usually needs repeating. |
 | `drugs[adrenaline].effects[hr]` | target hr; emax 40; ec50 0.5 | Teaching parameter (prototype: about +22/min per IM dose). |
 | `drugs[adrenaline].effects[sbp]` | target sbp; emax 16; ec50 0.5 | Teaching parameter (prototype: about +8 mmHg per IM dose). |
 | `drugs[adrenaline].adverse[iv_bolus_outside_arrest]` | id iv_bolus_outside_arrest; whenNotArrest true; level danger; say My chest… my heart’s pounding…; harm true | Resuscitation Council UK, Emergency treatment of anaphylaxis (2021): IV adrenaline outside cardiac arrest only as a titrated infusion by experienced specialists. Size and duration of the surge are teaching parameters. |
 | `drugs[adrenaline].adverse[im_repeat_early]` | id im_repeat_early; repeatWithinSec 180; level warn | Resuscitation Council UK (2021): repeat IM adrenaline after 5 minutes if no improvement. The 3-minute warning threshold comes from the prototype. |
+| `drugs[adrenaline].infusion` | unit mcg/kg/min; standardRate 0.05; minRate 0.01; maxRate 0.5; perKg true; amountPerMinPerRate 0.001 | Refractory anaphylaxis: low-dose adrenaline infusion by experienced staff (Resuscitation Council UK, 2021). Rate range is a teaching estimate. |
 | `drugs[chlorphenamine]` | id chlorphenamine; name Chlorphenamine; drugClass Antihistamine (H1); unit mg; halfLifeMin 120; 2 routes (see file); 1 effects (see file) | Resuscitation Council UK (2021) no longer recommends antihistamines in the initial emergency treatment of anaphylaxis; they may help skin symptoms once stable. Effect duration is a teaching parameter. |
 | `drugs[chlorphenamine].routes[IV]` | route IV; label Slow IV; standardDose 10; maxDose 10; bioavailability 1; absorptionHalfLifeMin 0 | 10 mg adult dose as listed in the Resuscitation Council UK 2008 anaphylaxis algorithm. |
 | `drugs[chlorphenamine].routes[IM]` | route IM; label IM; standardDose 10; maxDose 10; bioavailability 1; absorptionHalfLifeMin 10 | 10 mg adult dose as listed in the Resuscitation Council UK 2008 anaphylaxis algorithm. |
 | `drugs[chlorphenamine].effects[block:skin]` | target block:skin; emax 0.8; ec50 3 | Teaching parameter: reduces itch, flushing and hives only. |
-| `drugs[hydrocortisone].routes[IV]` | route IV; label Slow IV; standardDose 200; maxDose 200; bioavailability 1; absorptionHalfLifeMin 0 | 200 mg adult dose as listed in the Resuscitation Council UK 2008 anaphylaxis algorithm. |
+| `drugs[hydrocortisone].routes[IV]` | route IV; label Slow IV; standardDose 100; maxDose 200; bioavailability 1; absorptionHalfLifeMin 0 | 100 mg IV for acute severe asthma (BTS/SIGN 158, 2019); 200 mg was the adult anaphylaxis dose in the Resuscitation Council UK 2008 algorithm. |
 | `drugs[hydrocortisone].routes[IM]` | route IM; label IM; standardDose 200; maxDose 200; bioavailability 1; absorptionHalfLifeMin 15 | 200 mg adult dose as listed in the Resuscitation Council UK 2008 anaphylaxis algorithm. |
-| `drugs[salbutamol]` | id salbutamol; name Salbutamol; drugClass Short-acting β2 agonist; unit mg; halfLifeMin 20; 1 routes (see file); 2 effects (see file) | Effect duration is a teaching parameter for the acute bronchodilator effect, not the plasma half-life. |
-| `drugs[salbutamol].routes[NEB]` | route NEB; label Nebulised, oxygen-driven; standardDose 5; maxDose 5; bioavailability 1; absorptionHalfLifeMin 1.5 | 5 mg nebulised for acute severe asthma in adults: BTS/SIGN British guideline on the management of asthma (SIGN 158, 2019). Absorption half-life is a teaching parameter. |
+| `drugs[hydrocortisone].effects[process:asthma]` | target process:asthma; emax -1.5; ec50 60 | Teaching parameter: slow anti-inflammatory effect in asthma. |
+| `drugs[salbutamol]` | id salbutamol; name Salbutamol; drugClass Short-acting β2 agonist; unit mg; halfLifeMin 20; 1 routes (see file); 4 effects (see file) | Effect duration is a teaching parameter for the acute bronchodilator effect, not the plasma half-life. |
+| `drugs[salbutamol].routes[NEB]` | route NEB; label Nebulised, oxygen-driven; standardDose 5; maxDose 20; bioavailability 1; absorptionHalfLifeMin 1.5 | 5 mg nebulised for acute asthma in adults (BTS/SIGN 158, 2019); 10–20 mg nebulised as an adjunct in hyperkalaemia (UK Kidney Association, 2020). Absorption half-life is a teaching parameter. |
 | `drugs[salbutamol].effects[block:bronchospasm]` | target block:bronchospasm; emax 0.7; ec50 2 | Teaching parameter. |
 | `drugs[salbutamol].effects[hr]` | target hr; emax 15; ec50 4 | Teaching parameter (β2-agonist tachycardia). |
-| `fluids[crystalloid]` | id crystalloid; name Crystalloid; standardVolumeMl 500; maxRateMlPerMin 100; redistributionTauMin 25; 1 effects (see file) | Bolus volume: Resuscitation Council UK (2021) anaphylaxis — adult IV fluid bolus 500–1000 ml crystalloid. Infusion rate, redistribution and BP effect are teaching parameters from the prototype. |
+| `drugs[salbutamol].effects[process:asthma]` | target process:asthma; emax -2.5; ec50 4 | Teaching parameter. |
+| `drugs[salbutamol].effects[lab:k]` | target lab:k; emax -0.9; ec50 8 | Teaching parameter: K⁺ shift into cells, larger at 10–20 mg. |
+| `drugs[amiodarone]` | id amiodarone; name Amiodarone; drugClass Antiarrhythmic; unit mg; halfLifeMin 240; 2 routes (see file) | Amiodarone raises ROSC odds in the ROSC model; the size is set in src/engine/als.ts (teaching parameter). |
+| `drugs[aspirin].effects[process:myocardial_ischaemia]` | target process:myocardial_ischaemia; emax -0.6; ec50 100 | Teaching parameter. |
+| `drugs[ticagrelor].effects[process:myocardial_ischaemia]` | target process:myocardial_ischaemia; emax -0.4; ec50 60 | Teaching parameter. |
+| `drugs[gtn].routes[SL]` | route SL; label Sublingual spray, 400 micrograms; standardDose 0.4; bioavailability 1; absorptionHalfLifeMin 1; maxDose 0.8 | 400 microgram sublingual dose for ischaemic chest pain; avoid if SBP < 90 mmHg (ESC ACS guidelines, 2023). PK is a teaching parameter. |
+| `drugs[gtn].effects[sbp]` | target sbp; emax -22; ec50 0.3 | Teaching parameter. |
+| `drugs[gtn].effects[block:pain]` | target block:pain; emax 0.5; ec50 0.2 | Teaching parameter. |
+| `drugs[gtn].effects[process:myocardial_ischaemia]` | target process:myocardial_ischaemia; emax -0.4; ec50 0.3 | Teaching parameter. |
+| `drugs[gtn].adverse[gtn_hypotension]` | id gtn_hypotension; doseAbove 0.8; level warn | Teaching rule. |
+| `drugs[morphine].routes[IV]` | route IV; label IV, titrated in small increments; standardDose 2.5; bioavailability 1; absorptionHalfLifeMin 0; maxDose 5 | Titrated IV opioid may be considered for severe ischaemic pain (ESC ACS guidelines, 2023). Increment size is a teaching estimate. |
+| `drugs[morphine].effects[block:pain]` | target block:pain; emax 0.8; ec50 2 | Teaching parameter. |
+| `drugs[morphine].effects[rr]` | target rr; emax -3; ec50 5 | Teaching parameter. |
+| `drugs[morphine].effects[process:opioid_toxicity]` | target process:opioid_toxicity; emax 4; ec50 10 | Teaching parameter: adds to any existing opioid toxicity. |
+| `drugs[naloxone]` | id naloxone; name Naloxone; drugClass Opioid antagonist; unit mg; halfLifeMin 60; 2 routes (see file); 1 effects (see file); 1 adverse (see file) | Shorter-acting than most opioids, so toxicity can return as it wears off. Half-life is a teaching estimate. |
+| `drugs[naloxone].routes[IV]` | route IV; label IV, titrate to breathing; standardDose 0.4; bioavailability 1; absorptionHalfLifeMin 0; maxDose 2 | Adult opioid overdose: 400 micrograms IV, repeated and titrated to adequate breathing (BNF). Smaller titrated doses reduce acute withdrawal. |
+| `drugs[naloxone].routes[IM]` | route IM; label IM; standardDose 0.4; bioavailability 1; absorptionHalfLifeMin 4; maxDose 2 | IM 400 micrograms when there is no IV access (BNF). |
+| `drugs[naloxone].effects[block:opioid]` | target block:opioid; emax 0.97; ec50 0.06 | Teaching parameter. |
+| `drugs[naloxone].adverse[naloxone_withdrawal]` | id naloxone_withdrawal; doseAbove 0.8; level warn | Teaching rule: titrate naloxone to breathing, not to full consciousness. |
+| `drugs[glucose_10].effects[glucose]` | target glucose; emax 12; ec50 100 | Teaching parameter. |
+| `drugs[glucose_10].effects[process:hypoglycaemia]` | target process:hypoglycaemia; emax -18; ec50 100 | Teaching parameter. |
+| `drugs[glucose_20].effects[glucose]` | target glucose; emax 12; ec50 50 | Teaching parameter. |
+| `drugs[glucose_20].effects[process:hypoglycaemia]` | target process:hypoglycaemia; emax -18; ec50 50 | Teaching parameter. |
+| `drugs[glucose_50].effects[glucose]` | target glucose; emax 14; ec50 30 | Teaching parameter. |
+| `drugs[glucose_50].effects[process:hypoglycaemia]` | target process:hypoglycaemia; emax -18; ec50 30 | Teaching parameter. |
+| `drugs[glucagon].effects[glucose]` | target glucose; emax 6; ec50 0.5 | Teaching parameter. |
+| `drugs[glucagon].effects[process:hypoglycaemia]` | target process:hypoglycaemia; emax -8; ec50 0.5 | Teaching parameter. |
+| `drugs[insulin]` | id insulin; name Soluble insulin; drugClass Insulin; unit units; halfLifeMin 25; 1 routes (see file); 4 effects (see file) | Effect duration, not plasma half-life. Teaching parameter. |
+| `drugs[insulin].effects[glucose]` | target glucose; emax -9; ec50 6 | Teaching parameter. |
+| `drugs[insulin].effects[lab:k]` | target lab:k; emax -1.3; ec50 5 | Teaching parameter. |
+| `drugs[insulin].effects[process:hyperkalaemia]` | target process:hyperkalaemia; emax -3; ec50 5 | Teaching parameter. |
+| `drugs[insulin].effects[process:dka]` | target process:dka; emax -3.5; ec50 3 | Teaching parameter. |
+| `drugs[potassium_chloride].effects[lab:k]` | target lab:k; emax 1.4; ec50 30 | Teaching parameter. |
+| `drugs[calcium_gluconate]` | id calcium_gluconate; name Calcium gluconate 10%; drugClass Electrolyte; unit ml; halfLifeMin 40; 1 routes (see file); 2 effects (see file) | The membrane-stabilising effect lasts roughly 30–60 minutes (UK Kidney Association, 2020). Half-life is a teaching estimate. |
+| `drugs[calcium_gluconate].effects[block:membrane]` | target block:membrane; emax 0.9; ec50 10 | Teaching parameter. |
+| `drugs[calcium_gluconate].effects[block:ecg]` | target block:ecg; emax 0.7; ec50 10 | Teaching parameter. |
+| `drugs[calcium_chloride].effects[block:membrane]` | target block:membrane; emax 0.9; ec50 3.4 | Teaching parameter. |
+| `drugs[calcium_chloride].effects[block:ecg]` | target block:ecg; emax 0.7; ec50 3.4 | Teaching parameter. |
+| `drugs[ipratropium].effects[block:bronchospasm]` | target block:bronchospasm; emax 0.3; ec50 0.25 | Teaching parameter. |
+| `drugs[prednisolone].routes[PO]` | route PO; label Oral; standardDose 40; bioavailability 1; absorptionHalfLifeMin 30; maxDose 50 | 40–50 mg oral prednisolone in acute asthma (BTS/SIGN 158, 2019). Slow onset is a teaching parameter. |
+| `drugs[prednisolone].effects[process:asthma]` | target process:asthma; emax -1.5; ec50 20 | Teaching parameter. |
+| `drugs[magnesium_sulfate].effects[block:bronchospasm]` | target block:bronchospasm; emax 0.3; ec50 1 | Teaching parameter. |
+| `drugs[magnesium_sulfate].effects[process:asthma]` | target process:asthma; emax -2; ec50 1.5 | Teaching parameter. |
+| `drugs[piperacillin_tazobactam]` | id piperacillin_tazobactam; name Piperacillin–tazobactam; drugClass Broad-spectrum antibiotic; unit g; halfLifeMin 90; 1 routes (see file); 1 effects (see file) | Antibiotic choice follows local policy. Effect size and onset are teaching parameters. |
+| `drugs[piperacillin_tazobactam].routes[IV]` | route IV; label IV; standardDose 4.5; bioavailability 1; absorptionHalfLifeMin 0; maxDose 4.5 | 4.5 g IV is a common adult dose; follow local sepsis policy. Surviving Sepsis Campaign (2021): antimicrobials within 1 hour when shock is present. |
+| `drugs[piperacillin_tazobactam].effects[process:sepsis]` | target process:sepsis; emax -1.6; ec50 1.5 | Teaching parameter. |
+| `drugs[noradrenaline].infusion` | unit mcg/kg/min; standardRate 0.1; minRate 0.02; maxRate 1; perKg true; amountPerMinPerRate 0.001 | First-line vasopressor to a MAP of 65 mmHg; may be started peripherally (Surviving Sepsis Campaign, 2021). Rate range is a teaching estimate. |
+| `drugs[noradrenaline].effects[sbp]` | target sbp; emax 55; ec50 0.03 | Teaching parameter. |
+| `drugs[noradrenaline].effects[hr]` | target hr; emax 6; ec50 0.05 | Teaching parameter. |
+| `drugs[tranexamic_acid].effects[process:hypovolaemia]` | target process:hypovolaemia; emax -0.8; ec50 0.4 | Teaching parameter: reduces the bleeding rate. |
+| `fluids[crystalloid]` | id crystalloid; name Crystalloid; standardVolumeMl 500; maxRateMlPerMin 100; redistributionTauMin 25; 5 effects (see file) | Bolus volumes: Resuscitation Council UK (2021) anaphylaxis 500–1000 ml; Surviving Sepsis Campaign (2021) 30 ml/kg in sepsis-induced hypoperfusion; JBDS DKA (2021) 500 ml over 10–15 min if SBP < 90. Rates, redistribution and effects are teaching parameters. |
+| `fluids[blood]` | id blood; name Packed red cells; standardVolumeMl 300; maxRateMlPerMin 100; redistributionTauMin 240; 3 effects (see file) | Major haemorrhage: early blood and plasma in a balanced ratio, limiting crystalloid (ATLS 10th edition, 2018). Effect sizes are teaching parameters. |
+| `fluids[ffp]` | id ffp; name Fresh frozen plasma; standardVolumeMl 250; maxRateMlPerMin 80; redistributionTauMin 180; 2 effects (see file) | Teaching parameters; given with red cells in major haemorrhage (ATLS 10th edition, 2018). |
 
 ## src/content/devices.json
 
@@ -37,6 +91,8 @@ and remove the flag) or correct it.
 | --- | --- | --- |
 | `devices[o2_nrb]` | id o2_nrb; label High-flow oxygen; sub 15 L/min, non-rebreather mask; category oxygen; short 15 L O₂; fio2 0.6; onText High-flow oxygen started, 15 L/min.; offText Oxygen stopped. | Teaching estimate. The FiO₂ delivered by a reservoir mask at 15 L/min varies with fit and breathing pattern. |
 | `devices[o2_nasal]` | id o2_nasal; label Nasal cannula; sub 2–4 L/min; category oxygen; short nasal O₂; fio2 0.3; onText Nasal cannula oxygen started, 3 L/min.; offText Oxygen stopped. | Teaching estimate. Variable-performance device; FiO₂ depends on flow and breathing pattern. |
+| `devices[airway_manoeuvres]` | id airway_manoeuvres; label Head tilt, chin lift; sub Or jaw thrust if trauma; category airway; offText Airway manoeuvre released. | Teaching estimate of the benefit of opening an obstructed airway. |
+| `devices[bvm]` | id bvm; label Bag-valve-mask ventilation; sub With oxygen, two-person technique; category airway; short BVM; fio2 0.85; offText Bag-valve-mask ventilation stopped. | Teaching estimate. Delivered FiO₂ and ventilation depend on mask seal and technique. |
 | `devices[legs_raised]` | id legs_raised; label Lie flat, raise legs; sub Supports blood pressure; category position; 1 effects (see file); onText Laid flat with legs raised.; offText Sat back up. | Resuscitation Council UK (2021) anaphylaxis: lie flat, with or without legs raised, if hypotensive; sit up if breathing is difficult. Size of the BP effect is a teaching parameter. |
 
 ## src/content/investigations.json
@@ -77,3 +133,24 @@ delivery, consciousness, lactate, urine output). None are taken from a guideline
 | `hypoGlucose` | 3 |
 | `lactatePerMapDeficit` | 0.05 |
 | `urinePerMapPoint` | 1.4 |
+
+## ROSC model constants
+
+Teaching parameters for the chance of return of spontaneous circulation in `src/engine/als.ts`.
+Shock and pulse-check odds rise with CPR fraction, early action, fixing the cause and ALS drugs.
+
+| Constant | Value |
+| --- | --- |
+| `baseShock` | 0.45 |
+| `baseCheck` | 0.35 |
+| `minCheckCprSec` | 90 |
+| `timeTauMin` | 10 |
+| `causeUnfixedShockable` | 0.55 |
+| `causeUnfixedNonShockable` | 0.12 |
+| `causeFixedMargin` | 20 |
+| `adrenalineGain` | 1.25 |
+| `amiodaroneGain` | 1.3 |
+| `noAdrenalineNonShockable` | 0.4 |
+| `vfToAsystolePerMinNoCpr` | 0.15 |
+| `vfToAsystolePerMinCpr` | 0.03 |
+| `maxChance` | 0.92 |

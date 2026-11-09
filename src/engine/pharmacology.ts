@@ -12,7 +12,7 @@ const NEGLIGIBLE = 1e-6;
 const MAX_BLOCK = 0.95;
 
 export function newDrugState(drugId: string): DrugState {
-  return { drugId, depots: [], central: 0, doses: [] };
+  return { drugId, depots: [], central: 0, doses: [], infusionRate: 0 };
 }
 
 export function findRoute(def: DrugDef, route: Route): DrugRoute | undefined {
@@ -32,8 +32,16 @@ export function addDose(s: DrugState, route: DrugRoute, dose: number, t: number)
   s.doses.push({ t, route: route.route, dose });
 }
 
-/** Advance absorption and elimination by dtMin minutes (exact exponentials). */
-export function stepDrug(def: DrugDef, s: DrugState, dtMin: number): void {
+/** Drug amount per minute delivered by the current infusion rate. */
+export function infusionAmountPerMin(def: DrugDef, rate: number, weightKg: number): number {
+  const inf = def.infusion;
+  if (!inf || rate <= 0) return 0;
+  return rate * inf.amountPerMinPerRate * (inf.perKg ? weightKg : 1);
+}
+
+/** Advance infusion, absorption and elimination by dtMin minutes. */
+export function stepDrug(def: DrugDef, s: DrugState, dtMin: number, weightKg = 70): void {
+  s.central += infusionAmountPerMin(def, s.infusionRate, weightKg) * dtMin;
   for (const depot of s.depots) {
     const r = findRoute(def, depot.route);
     const half = r && r.absorptionHalfLifeMin > 0 ? r.absorptionHalfLifeMin : 1e-3;

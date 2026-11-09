@@ -44,6 +44,13 @@ export interface ProcessEffect {
   group?: string;
 }
 
+/** A non-drug treatment: while `when` holds, severity changes by ratePerMin. */
+export interface ProcessTreatment extends Sourced {
+  id: string;
+  when: Condition;
+  ratePerMin: number;
+}
+
 export interface ProcessDef extends Sourced {
   id: string;
   /** Matched by drug effects targeting process:<type>. */
@@ -64,6 +71,7 @@ export interface ProcessDef extends Sourced {
   arrestAt?: number;
   arrestRhythm?: Rhythm;
   effects: ProcessEffect[];
+  treatments?: ProcessTreatment[];
 }
 
 export interface TextVariant {
@@ -198,6 +206,8 @@ export interface CaseDef {
   rhythmRules?: RhythmRule[];
   outcomes: {
     stabilised: { when: Condition; forSec: number; text: string };
+    /** Death after this long in continuous cardiac arrest (default 900 s). */
+    maxArrestSec?: number;
   };
   diagnosis: { correct: string[]; options: { id: string; label: string }[] };
   scoring: ScoringRule[];

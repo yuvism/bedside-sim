@@ -16,6 +16,7 @@ const ROUTE_NAMES: Record<Route, string> = {
   PO: 'Oral',
   SC: 'Subcut',
   IN: 'Intranasal',
+  SL: 'Sublingual',
 };
 
 function matches(d: DrugDef, q: string): boolean {

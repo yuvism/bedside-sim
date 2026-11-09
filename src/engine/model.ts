@@ -44,6 +44,8 @@ export interface Computed {
   signs: Signs;
   /** Physiological heart rate before any rhythm override. */
   hrPre: number;
+  /** Current drug effects: additive targets plus block:<group> fractions. */
+  fx: Record<string, number>;
 }
 
 export interface Model {
@@ -93,6 +95,7 @@ export function collectEffects(m: Model): CollectedEffects {
     const def = defs.fluids.get(f.fluidId);
     if (!def) continue;
     for (const e of def.effects) {
+      if (e.target.startsWith('process:')) continue; // applied per litre infused, in the tick
       const litres = Math.min(f.circulatingMl / 1000, e.maxLitres ?? Infinity);
       addTo(deltas, e.target, e.perLitre * litres);
     }
@@ -103,6 +106,10 @@ export function collectEffects(m: Model): CollectedEffects {
     if (!def) continue;
     if (def.fio2 !== undefined) fio2 = Math.max(fio2, def.fio2);
     for (const e of def.effects ?? []) addTo(deltas, e.target, e.value);
+    if (def.ventilation) {
+      deltas['_ventSupport'] = Math.max(deltas['_ventSupport'] ?? 0, def.ventilation.support);
+      deltas['_minRr'] = Math.max(deltas['_minRr'] ?? 0, def.ventilation.minRr);
+    }
   }
   for (const tr of s.transients) {
     for (const e of tr.effects) addTo(deltas, e.target, e.value * tr.amplitude);
@@ -122,6 +129,8 @@ export function compute(m: Model, eff: CollectedEffects = collectEffects(m)): Co
     weightKg: c.patient.weightKg,
   });
   const ectopy = s.transients.some((tr) => tr.ectopy && tr.amplitude > ECTOPY_MIN);
+  const fx: Record<string, number> = { ...eff.totals.add };
+  for (const [g, b] of Object.entries(eff.totals.block)) fx[`block:${g}`] = b;
   if (s.arrest || !isPerfusing(s.rhythm)) {
     const vitals: Vitals = {
       hr: arrestMonitorRate(s.rhythm),
@@ -130,7 +139,8 @@ export function compute(m: Model, eff: CollectedEffects = collectEffects(m)): Co
       map: null,
       spo2: null,
       rr: 0,
-      etco2: 0,
+      // Good-quality CPR gives an EtCO2 of roughly 2–3 kPa.
+      etco2: s.cpr ? 18 + (s.noise['etco2'] ?? 0) * 2 : 2,
       temp: p.temp,
       gcs: 3,
       glucose: p.glucose,
@@ -138,7 +148,7 @@ export function compute(m: Model, eff: CollectedEffects = collectEffects(m)): Co
       ectopy: false,
     };
     const signs = { ...p.signs, cyanosis: 1, eyesClosed: 1, effort: 0, sweating: 0 };
-    return { vitals, labs: p.labs, signs, hrPre: p.hr };
+    return { vitals, labs: p.labs, signs, hrPre: p.hr, fx };
   }
   const vitals: Vitals = {
     hr: p.hr,
@@ -154,16 +164,18 @@ export function compute(m: Model, eff: CollectedEffects = collectEffects(m)): Co
     rhythm: s.rhythm,
     ectopy,
   };
-  return { vitals, labs: p.labs, signs: p.signs, hrPre: p.hr };
+  return { vitals, labs: p.labs, signs: p.signs, hrPre: p.hr, fx };
 }
 
 export function severityOf(m: Model, processId: string): number {
   return m.s.processes.find((p) => p.id === processId)?.severity ?? 0;
 }
 
-export function drugGiven(m: Model, drugId: string, route?: Route): boolean {
+export function firstDoseT(m: Model, drugId: string, route?: Route): number | null {
   const d = m.s.drugs.find((x) => x.drugId === drugId);
-  return !!d && d.doses.some((x) => !route || x.route === route);
+  const dose = d?.doses.find((x) => !route || x.route === route);
+  if (dose) return dose.t;
+  return d && d.infusionRate > 0 && !route ? m.s.t : null;
 }
 
 export function context(m: Model): ConditionContext {
@@ -172,10 +184,14 @@ export function context(m: Model): ConditionContext {
     severity: (id) => severityOf(m, id),
     vitals: m.out.vitals,
     labs: m.out.labs,
-    drugGiven: (id, route) => drugGiven(m, id, route),
+    firstDoseT: (id, route) => firstDoseT(m, id, route),
+    infusing: (id) => (m.s.drugs.find((d) => d.drugId === id)?.infusionRate ?? 0) > 0,
+    procedureT: (id) => m.s.procedures[id] ?? null,
+    effect: (target) => m.out.fx[target] ?? 0,
     deviceOn: (id) => m.s.devices.includes(id),
     access: m.s.access,
     arrest: m.s.arrest,
+    cpr: m.s.cpr,
   };
 }
 

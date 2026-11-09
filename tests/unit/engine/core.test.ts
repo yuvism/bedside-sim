@@ -202,10 +202,14 @@ const ctx = (over: Partial<ConditionContext> = {}): ConditionContext => ({
   severity: () => 50,
   vitals: VITALS,
   labs: { k: 4 },
-  drugGiven: (id) => id === 'adrenaline',
+  firstDoseT: (id) => (id === 'adrenaline' ? 30 : null),
+  infusing: (id) => id === 'noradrenaline',
+  procedureT: (id) => (id === 'needle_decompression' ? 100 : null),
+  effect: (target) => (target === 'block:membrane' ? 0.8 : 0),
   deviceOn: () => false,
   access: { iv: true, io: false, art: false },
   arrest: false,
+  cpr: false,
   ...over,
 });
 
@@ -222,6 +226,17 @@ describe('conditions, narrative and rhythm', () => {
     expect(evalCondition({ vital: 'sbp', gte: 0 }, ctx({ vitals: { ...VITALS, sbp: null } }))).toBe(
       false,
     );
+  });
+
+  it('checks timing of drugs and procedures, infusions and drug effects', () => {
+    expect(evalCondition({ drugGiven: 'adrenaline', forSec: 60 }, ctx())).toBe(true);
+    expect(evalCondition({ drugGiven: 'adrenaline', forSec: 100 }, ctx())).toBe(false);
+    expect(evalCondition({ procedure: 'needle_decompression', withinSec: 30 }, ctx())).toBe(true);
+    expect(evalCondition({ procedure: 'needle_decompression', withinSec: 10 }, ctx())).toBe(false);
+    expect(evalCondition({ procedure: 'chest_drain' }, ctx())).toBe(false);
+    expect(evalCondition({ infusing: 'noradrenaline' }, ctx())).toBe(true);
+    expect(evalCondition({ effect: 'block:membrane', gte: 0.5 }, ctx())).toBe(true);
+    expect(evalCondition({ cpr: false }, ctx())).toBe(true);
   });
 
   it('picks severity bands and fills templates', () => {

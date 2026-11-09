@@ -9,6 +9,7 @@
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { ROSC } from '../src/engine/als.ts';
 import { COUPLING } from '../src/engine/coupling.ts';
 
 export interface ContentFile {
@@ -95,6 +96,7 @@ export function buildClinicalReview(files: readonly ContentFile[]): string {
     );
   }
   const coupling = Object.entries(COUPLING).map(([k, v]) => `| \`${k}\` | ${v} |`);
+  const rosc = Object.entries(ROSC).map(([k, v]) => `| \`${k}\` | ${v} |`);
   return [
     '# Clinical review list',
     '',
@@ -115,6 +117,15 @@ export function buildClinicalReview(files: readonly ContentFile[]): string {
     '| Constant | Value |',
     '| --- | --- |',
     ...coupling,
+    '',
+    '## ROSC model constants',
+    '',
+    'Teaching parameters for the chance of return of spontaneous circulation in `src/engine/als.ts`.',
+    'Shock and pulse-check odds rise with CPR fraction, early action, fixing the cause and ALS drugs.',
+    '',
+    '| Constant | Value |',
+    '| --- | --- |',
+    ...rosc,
     '',
   ].join('\n');
 }

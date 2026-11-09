@@ -8,7 +8,8 @@ export function runExport(session: Session, score: number | null): RunExport {
     caseId: session.caseDef.id,
     caseVersion: session.caseDef.version,
     seed: session.seed,
-    outcome: session.engine.status().outcome ?? 'ended',
+    outcome:
+      session.engine.status().outcome ?? (session.engine.status().arrest ? 'arrest' : 'ended'),
     diagnosis: lastDiagnosis(session.events),
     score,
     durationSec: session.t,

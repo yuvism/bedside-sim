@@ -8,6 +8,7 @@
  * checked. Same seed + same actions at the same ticks = identical run.
  */
 import { applyAction } from './actions.ts';
+import { arrestTick, enterArrest } from './als.ts';
 import { evalCondition } from './conditions.ts';
 import { buildDefs, collectEffects, compute, context, event, type Model } from './model.ts';
 import { stepDrug } from './pharmacology.ts';
@@ -20,7 +21,6 @@ import type {
   CaseDef,
   EngineLibrary,
   EngineState,
-  Rhythm,
   SimEvent,
   Signs,
   Vitals,
@@ -48,6 +48,11 @@ export interface EngineStatus {
   devices: string[];
   access: Access;
   fluidsRunning: { fluidId: string; pendingMl: number }[];
+  infusions: { drugId: string; rate: number }[];
+  cpr: boolean;
+  /** Present while in cardiac arrest. */
+  als: { t0: number; cprSec: number; shocks: number; cprSinceCheck: number } | null;
+  procedures: Record<string, number>;
   doses: { drugId: string; count: number; lastT: number }[];
   pendingOrders: { investigationId: string; dueT: number }[];
   helpCalled: boolean;
@@ -108,6 +113,10 @@ export class SimpleEngine implements BedsideEngine {
       rhythm: 'sinus',
       arrest: false,
       arrestT: null,
+      als: null,
+      cpr: false,
+      arrests: 0,
+      procedures: {},
       linesFired: [],
       stableForSec: 0,
       outcome: null,
@@ -115,7 +124,7 @@ export class SimpleEngine implements BedsideEngine {
       helpCalled: false,
       diagnosis: null,
     };
-    const placeholder = { vitals: {} as Vitals, labs: {}, signs: {}, hrPre: b.hr };
+    const placeholder = { vitals: {} as Vitals, labs: {}, signs: {}, hrPre: b.hr, fx: {} };
     const m: Model = { c: caseDef, s, rng, defs: buildDefs(this.lib, caseDef), out: placeholder };
     m.out = compute(m);
     s.rhythm = sinusFor(m.out.hrPre);
@@ -181,6 +190,12 @@ export class SimpleEngine implements BedsideEngine {
       fluidsRunning: s.fluids
         .filter((f) => f.pendingMl > 0)
         .map((f) => ({ fluidId: f.fluidId, pendingMl: f.pendingMl })),
+      infusions: s.drugs
+        .filter((d) => d.infusionRate > 0)
+        .map((d) => ({ drugId: d.drugId, rate: d.infusionRate })),
+      cpr: s.cpr,
+      als: s.als ? { ...s.als } : null,
+      procedures: { ...s.procedures },
       doses: s.drugs.map((d) => ({
         drugId: d.drugId,
         count: d.doses.length,
@@ -220,7 +235,7 @@ export class SimpleEngine implements BedsideEngine {
 
     for (const d of s.drugs) {
       const def = defs.drugs.get(d.drugId);
-      if (def) stepDrug(def, d, dtMin);
+      if (def) stepDrug(def, d, dtMin, c.patient.weightKg);
     }
     for (const f of s.fluids) {
       const def = defs.fluids.get(f.fluidId);
@@ -230,6 +245,17 @@ export class SimpleEngine implements BedsideEngine {
         f.pendingMl -= g;
         f.circulatingMl += g;
         f.totalMl += g;
+        for (const e of def.effects) {
+          if (!e.target.startsWith('process:')) continue;
+          const type = e.target.slice('process:'.length);
+          for (const ps of s.processes) {
+            if (defs.processes.get(ps.id)?.type !== type) continue;
+            ps.severity = Math.max(
+              0,
+              Math.min(100, ps.severity + (e.perLitre * g * ps.sensitivity) / 1000),
+            );
+          }
+        }
         if (f.pendingMl <= 1e-6) {
           f.pendingMl = 0;
           ev.push(event(m, 'system', `done:fluid:${def.id}`, `${def.name} bolus finished.`));
@@ -240,11 +266,18 @@ export class SimpleEngine implements BedsideEngine {
     for (const tr of s.transients) tr.amplitude *= Math.exp(-dtMin / tr.tauMin);
     s.transients = s.transients.filter((tr) => tr.amplitude > 0.01);
 
-    if (!s.arrest) {
+    {
+      // Processes keep going in arrest; drugs then only circulate with CPR.
       const { totals } = collectEffects(m);
+      const circulation = s.arrest ? (s.cpr ? 0.5 : 0) : 1;
+      const ctx = context(m);
       for (const ps of s.processes) {
         const def = defs.processes.get(ps.id);
-        if (def) stepProcess(def, ps, tMin, dtMin, totals.add[`process:${def.type}`] ?? 0);
+        if (!def) continue;
+        let rate = (totals.add[`process:${def.type}`] ?? 0) * circulation;
+        for (const tr of def.treatments ?? [])
+          if (evalCondition(tr.when, ctx)) rate += tr.ratePerMin;
+        stepProcess(def, ps, tMin, dtMin, rate);
       }
     }
     for (const [k, spec] of Object.entries(NOISE)) {
@@ -260,7 +293,7 @@ export class SimpleEngine implements BedsideEngine {
       for (const ps of s.processes) {
         const def = defs.processes.get(ps.id);
         if (def?.arrestAt !== undefined && ps.severity >= def.arrestAt) {
-          ev.push(...this.enterArrest(m, def.arrestRhythm ?? 'vf'));
+          ev.push(...enterArrest(m, def.arrestRhythm ?? 'vf'));
           break;
         }
       }
@@ -268,7 +301,7 @@ export class SimpleEngine implements BedsideEngine {
     if (!s.arrest) {
       const r = nextRhythm(s.rhythm, m.out.hrPre, c.rhythmRules ?? [], context(m), m.rng, dtMin);
       if (r.rhythm !== s.rhythm) {
-        if (!isPerfusing(r.rhythm)) ev.push(...this.enterArrest(m, r.rhythm));
+        if (!isPerfusing(r.rhythm)) ev.push(...enterArrest(m, r.rhythm));
         else {
           const quiet = r.ruleId === null;
           s.rhythm = r.rhythm;
@@ -279,6 +312,8 @@ export class SimpleEngine implements BedsideEngine {
         }
       }
     }
+
+    if (s.arrest) ev.push(...arrestTick(m, TICK));
 
     if (!s.arrest) {
       const ctx = context(m);
@@ -306,24 +341,6 @@ export class SimpleEngine implements BedsideEngine {
           ev.push(event(m, 'outcome', 'outcome:stabilised', 'Patient stabilised.'));
         }
       } else s.stableForSec = 0;
-    }
-    return ev;
-  }
-
-  private enterArrest(m: Model, rhythm: Rhythm): SimEvent[] {
-    const s = m.s;
-    s.arrest = true;
-    s.arrestT = s.t;
-    s.rhythm = rhythm;
-    m.out = compute(m);
-    const ev = [
-      event(m, 'danger', 'arrest', `Cardiac arrest. ${RHYTHM_LABELS[rhythm]} on the monitor.`, {
-        rhythm,
-      }),
-    ];
-    if (!s.outcome) {
-      s.outcome = 'arrest';
-      ev.push(event(m, 'outcome', 'outcome:arrest', 'Patient went into cardiac arrest.'));
     }
     return ev;
   }

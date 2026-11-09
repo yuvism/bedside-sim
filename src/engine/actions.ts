@@ -1,5 +1,6 @@
 /** Applies a clinician's action to the model and returns the resulting events. */
 import { bandFor, fillTemplate, isNonVerbal, pickVariant, templateValues } from './narrative.ts';
+import { pulseCheck, setCpr, shock } from './als.ts';
 import { addDose, findRoute, newDrugState, sinceLastDose } from './pharmacology.ts';
 import { context, event, o2Label, severityOf, type Model } from './model.ts';
 import type { Action, AdverseRule, Route, SimEvent } from './types.ts';
@@ -96,6 +97,50 @@ function giveDrug(m: Model, a: Of<'drug'>): SimEvent[] {
   return out;
 }
 
+function setInfusion(m: Model, a: Of<'infusion'>): SimEvent[] {
+  const def = m.defs.drugs.get(a.drugId);
+  const inf = def?.infusion;
+  if (!def || !inf) {
+    return [
+      event(m, 'warn', `blocked:infusion:${a.drugId}`, 'That drug is not given as an infusion.'),
+    ];
+  }
+  if (!hasAccess(m, 'IV'))
+    return [event(m, 'warn', `blocked:access:infusion:${def.id}`, NO_ACCESS)];
+  let state = m.s.drugs.find((d) => d.drugId === def.id);
+  if (!state) {
+    state = newDrugState(def.id);
+    m.s.drugs.push(state);
+  }
+  const rate = Math.max(0, a.rate);
+  const was = state.infusionRate;
+  state.infusionRate = rate;
+  if (rate === 0) {
+    if (was === 0) return [event(m, 'system', `noop:infusion:${def.id}`, 'No infusion running.')];
+    return [event(m, 'action', `infusion:${def.id}:stop`, `${def.name} infusion stopped.`)];
+  }
+  const out = [
+    event(
+      m,
+      'action',
+      `infusion:${def.id}`,
+      `${def.name} infusion ${was > 0 ? 'changed to' : 'started at'} ${fmtDose(rate)} ${inf.unit}.`,
+      { drug: def.id, rate, unit: inf.unit },
+    ),
+  ];
+  if (rate > inf.maxRate * 1.0001 || rate < inf.minRate * 0.9999) {
+    out.push(
+      event(
+        m,
+        'warn',
+        `rate-range:${def.id}`,
+        `That's outside the usual range (${fmtDose(inf.minRate)}–${fmtDose(inf.maxRate)} ${inf.unit}).`,
+      ),
+    );
+  }
+  return out;
+}
+
 function giveFluid(m: Model, a: Of<'fluid'>): SimEvent[] {
   const def = m.defs.fluids.get(a.fluidId);
   if (!def) return [event(m, 'warn', `unknown:fluid:${a.fluidId}`, `Unknown fluid: ${a.fluidId}.`)];
@@ -145,13 +190,13 @@ function setDevice(m: Model, a: Of<'device'>): SimEvent[] {
 function doProcedure(m: Model, a: Of<'procedure'>): SimEvent[] {
   const def = m.defs.procedures.get(a.procedureId);
   if (!def) return [event(m, 'warn', `unknown:procedure:${a.procedureId}`, `Unknown procedure.`)];
-  if (def.grants) {
-    if (m.s.access[def.grants]) {
-      const text = def.alreadyText ?? `${def.label} already done.`;
-      return [event(m, 'system', `noop:procedure:${def.id}`, text)];
-    }
-    m.s.access[def.grants] = true;
+  const done = def.grants ? m.s.access[def.grants] : m.s.procedures[def.id] !== undefined;
+  if (done) {
+    const text = def.alreadyText ?? `${def.label}: already done.`;
+    return [event(m, 'system', `noop:procedure:${def.id}`, text)];
   }
+  if (def.grants) m.s.access[def.grants] = true;
+  m.s.procedures[def.id] = m.s.t;
   return [event(m, 'action', `procedure:${def.id}`, def.doneText)];
 }
 
@@ -212,6 +257,14 @@ export function applyAction(m: Model, a: Action): SimEvent[] {
   switch (a.kind) {
     case 'drug':
       return giveDrug(m, a);
+    case 'infusion':
+      return setInfusion(m, a);
+    case 'cpr':
+      return setCpr(m, a.on);
+    case 'shock':
+      return shock(m, a.joules);
+    case 'pulse_check':
+      return pulseCheck(m);
     case 'fluid':
       return giveFluid(m, a);
     case 'device':

@@ -104,8 +104,9 @@ export function physiology(i: PhysInput): PhysOutput {
   const hr = clamp(base.hr + g('hr') + baro + n('hr'), 20, 230);
 
   // Ventilation
-  const rr = Math.max(4, base.rr + g('rr') + n('rr'));
-  const ventLoss = clamp(g('ventLoss'), 0, 0.9);
+  // Assisted ventilation (BVM, ventilator) sets a floor on RR and replaces lost ventilation.
+  const rr = Math.max(4, g('_minRr'), base.rr + g('rr') + n('rr'));
+  const ventLoss = clamp(g('ventLoss') - g('_ventSupport'), 0, 0.9);
   const paco2Base = baseline.paco2 ?? COUPLING.defaultPaco2;
   // Fast, shallow breathing raises alveolar ventilation less than RR alone suggests.
   const ventGain = Math.pow(base.rr / rr, COUPLING.rrVentExponent);

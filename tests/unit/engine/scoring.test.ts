@@ -199,11 +199,12 @@ describe('anaphylaxis-01 scoring end to end', () => {
     expect(s.percent).toBe(100);
     expect(s.teaching.map((t) => t.id)).toEqual([]);
 
-    const idle = runScript(LIBRARY, c, 1, [], { maxSec: min(30) });
+    const idle = runScript(LIBRARY, c, 1, [], { maxSec: min(45) });
+    expect(idle.outcome).toBe('died');
     const z = scoreRun(c, {
       events: idle.events,
       trace: idle.trace,
-      outcome: 'arrest',
+      outcome: 'died',
       diagnosis: null,
     });
     expect(z.percent).toBe(0);

@@ -25,7 +25,7 @@ export type Rhythm = (typeof RHYTHMS)[number];
 /** Rhythms with no cardiac output: these are cardiac arrest. */
 export const NON_PERFUSING: readonly Rhythm[] = ['pvt', 'vf', 'pea', 'asystole'];
 
-export const ROUTES = ['IM', 'IV', 'IO', 'NEB', 'INH', 'PO', 'SC', 'IN'] as const;
+export const ROUTES = ['IM', 'IV', 'IO', 'NEB', 'INH', 'PO', 'SL', 'SC', 'IN'] as const;
 export type Route = (typeof ROUTES)[number];
 
 export const VITAL_KEYS = [
@@ -81,10 +81,18 @@ export type Condition =
   | ({ vital: VitalKey } & Range)
   | ({ lab: string } & Range)
   | { time: Range }
-  | { drugGiven: string; route?: Route }
+  /** Given at all (by route if set), and at least `forSec` ago if set. */
+  | { drugGiven: string; route?: Route; forSec?: number }
+  /** An infusion of this drug is running. */
+  | { infusing: string }
+  /** Done at least `forSec` ago and/or less than `withinSec` ago. */
+  | { procedure: string; forSec?: number; withinSec?: number }
+  /** Current summed drug effect on a target, e.g. block:membrane. */
+  | ({ effect: string } & Range)
   | { device: string }
   | { access: AccessKind | 'any' }
   | { arrest: boolean }
+  | { cpr: boolean }
   | { ectopy: boolean }
   | { rhythm: Rhythm[] }
   | { all: Condition[] }
@@ -162,6 +170,19 @@ export interface DrugRoute extends Sourced {
   absorptionHalfLifeMin: number;
 }
 
+/** Continuous IV infusion. Rate is entered in `unit` and converted to drug amount per minute. */
+export interface InfusionDef extends Sourced {
+  /** Display unit for the rate, e.g. "mcg/kg/min", "units/kg/h", "mg/h". */
+  unit: string;
+  standardRate: number;
+  minRate: number;
+  maxRate: number;
+  /** Rate unit uses body weight (per kg). */
+  perKg: boolean;
+  /** Drug amount (formulary unit) per minute for a rate of 1 (before × weight). */
+  amountPerMinPerRate: number;
+}
+
 export interface DrugDef extends Sourced {
   id: string;
   name: string;
@@ -170,12 +191,17 @@ export interface DrugDef extends Sourced {
   unit: string;
   halfLifeMin: number;
   routes: DrugRoute[];
+  infusion?: InfusionDef;
   effects: DrugEffect[];
   adverse?: AdverseRule[];
   /** Shown after giving it (hidden in exam mode). */
   feedback?: string;
 }
 
+/**
+ * Vital/lab targets act through the volume still circulating. process:<type>
+ * targets act as each millilitre goes in (severity change per litre infused).
+ */
 export interface FluidEffect {
   target: EffectTarget;
   perLitre: number;
@@ -204,6 +230,8 @@ export interface DeviceDef extends Sourced {
   label: string;
   sub?: string;
   category: 'oxygen' | 'position' | 'airway' | 'monitoring';
+  /** Assisted ventilation (BVM, ventilator): replaces this much lost ventilation and sets a minimum RR. */
+  ventilation?: { support: number; minRr: number };
   /** Short label used in text templates, e.g. "15 L O₂". */
   short?: string;
   fio2?: number;
@@ -216,6 +244,7 @@ export interface ProcedureDef extends Sourced {
   id: string;
   label: string;
   sub?: string;
+  category: 'access' | 'airway' | 'breathing' | 'circulation' | 'team';
   grants?: AccessKind;
   doneText: string;
   alreadyText?: string;
@@ -254,6 +283,11 @@ export type { CaseDef } from './caseTypes.ts';
 
 export type Action =
   | { kind: 'drug'; drugId: string; route: Route; dose: number }
+  /** Start, change or (rate 0) stop an infusion; rate in the drug's infusion unit. */
+  | { kind: 'infusion'; drugId: string; rate: number }
+  | { kind: 'cpr'; on: boolean }
+  | { kind: 'shock'; joules: number }
+  | { kind: 'pulse_check' }
   | { kind: 'fluid'; fluidId: string; volumeMl: number }
   | { kind: 'device'; deviceId: string; on: boolean }
   | { kind: 'procedure'; procedureId: string }
@@ -270,13 +304,14 @@ export interface SimEvent {
   /** Sim time in whole seconds. */
   t: number;
   type: SimEventType;
-  /** Machine-readable, used by scoring: e.g. drug:adrenaline:IM, exam:A, outcome:arrest. */
+  /** Machine-readable, used by scoring: e.g. drug:adrenaline:IM, exam:A, arrest, rosc. */
   code: string;
   text: string;
   data?: Record<string, string | number | boolean>;
 }
 
-export type Outcome = 'stabilised' | 'arrest';
+/** Terminal outcomes. Cardiac arrest is not one: the clinician can still get ROSC. */
+export type Outcome = 'stabilised' | 'died';
 
 // ---------------------------------------------------------------------------
 // Serialisable engine state
@@ -302,6 +337,8 @@ export interface DrugState {
   depots: { route: Route; amount: number }[];
   central: number;
   doses: DoseRecord[];
+  /** Running infusion rate in the drug's infusion unit (0 = off). */
+  infusionRate: number;
 }
 
 export interface FluidState {
@@ -330,6 +367,16 @@ export interface BaselineState {
   rr: number;
 }
 
+export interface ArrestState {
+  /** When this arrest began. */
+  t0: number;
+  /** Seconds of CPR delivered during this arrest. */
+  cprSec: number;
+  shocks: number;
+  /** Seconds of CPR since the last rhythm/pulse check. */
+  cprSinceCheck: number;
+}
+
 export interface EngineState {
   caseId: string;
   seed: number;
@@ -348,6 +395,11 @@ export interface EngineState {
   rhythm: Rhythm;
   arrest: boolean;
   arrestT: number | null;
+  als: ArrestState | null;
+  cpr: boolean;
+  arrests: number;
+  /** Procedure id → time it was done. */
+  procedures: Record<string, number>;
   linesFired: string[];
   stableForSec: number;
   outcome: Outcome | null;

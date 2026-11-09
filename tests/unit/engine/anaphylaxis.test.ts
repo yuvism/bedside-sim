@@ -16,10 +16,9 @@ const severity = (e: SimpleEngine) => e.severities()['anaphylaxis'] ?? NaN;
 describe('anaphylaxis-01 acceptance', () => {
   it('(a) untreated, arrests between 10 and 18 sim minutes in every seed', () => {
     const times = SEEDS.map((seed) => {
-      const r = runScript(LIBRARY, CASE, seed, [], { maxSec: min(30) });
-      expect(r.outcome).toBe('arrest');
-      const arrest = r.events.find((e) => e.code === 'outcome:arrest');
-      return (arrest?.t ?? Infinity) / 60;
+      const r = runScript(LIBRARY, CASE, seed, [], { maxSec: min(30), stopOnArrest: true });
+      expect(r.arrestT).not.toBeNull();
+      return (r.arrestT ?? Infinity) / 60;
     });
     expect(Math.min(...times)).toBeGreaterThanOrEqual(10);
     expect(Math.max(...times)).toBeLessThanOrEqual(18);

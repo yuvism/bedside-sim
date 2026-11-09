@@ -35,6 +35,9 @@ const drugTarget = z
     new RegExp(`^(${PHYS}|(lab|sign|process|block):[A-Za-z0-9_]+)$`),
     'unknown drug effect target',
   );
+const fluidTarget = z
+  .string()
+  .regex(new RegExp(`^(${PHYS}|(lab|sign|process):[A-Za-z0-9_]+)$`), 'unknown fluid effect target');
 
 export const ConditionSchema: z.ZodType<Condition> = z.lazy(() =>
   z.union([
@@ -42,10 +45,22 @@ export const ConditionSchema: z.ZodType<Condition> = z.lazy(() =>
     z.strictObject({ vital: VitalKeySchema, ...range }),
     z.strictObject({ lab: z.string(), ...range }),
     z.strictObject({ time: z.strictObject(range) }),
-    z.strictObject({ drugGiven: z.string(), route: RouteSchema.optional() }),
+    z.strictObject({
+      drugGiven: z.string(),
+      route: RouteSchema.optional(),
+      forSec: z.number().min(0).optional(),
+    }),
+    z.strictObject({ infusing: z.string() }),
+    z.strictObject({
+      procedure: z.string(),
+      forSec: z.number().min(0).optional(),
+      withinSec: z.number().min(0).optional(),
+    }),
+    z.strictObject({ effect: z.string(), ...range }),
     z.strictObject({ device: z.string() }),
-    z.strictObject({ access: z.enum(['iv', 'io', 'any']) }),
+    z.strictObject({ access: z.enum(['iv', 'io', 'art', 'any']) }),
     z.strictObject({ arrest: z.boolean() }),
+    z.strictObject({ cpr: z.boolean() }),
     z.strictObject({ ectopy: z.boolean() }),
     z.strictObject({ rhythm: z.array(RhythmSchema).min(1) }),
     z.strictObject({ all: z.array(ConditionSchema).min(1) }),
@@ -155,6 +170,9 @@ export const CaseSchema = z.strictObject({
         arrestAt: z.number().min(0).max(100).optional(),
         arrestRhythm: RhythmSchema.optional(),
         effects: z.array(processEffect),
+        treatments: z
+          .array(z.strictObject({ id, when: ConditionSchema, ratePerMin: z.number(), ...sourced }))
+          .optional(),
         ...sourced,
       }),
     )
@@ -200,6 +218,7 @@ export const CaseSchema = z.strictObject({
       forSec: z.number().min(0),
       text,
     }),
+    maxArrestSec: z.number().positive().optional(),
   }),
   diagnosis: z.strictObject({
     correct: z.array(id).min(1),
@@ -238,6 +257,17 @@ export const FormularySchema = z.strictObject({
       halfLifeMin: z.number().positive(),
       feedback: z.string().optional(),
       ...sourced,
+      infusion: z
+        .strictObject({
+          unit: text,
+          standardRate: z.number().positive(),
+          minRate: z.number().min(0),
+          maxRate: z.number().positive(),
+          perKg: z.boolean(),
+          amountPerMinPerRate: z.number().positive(),
+          ...sourced,
+        })
+        .optional(),
       routes: z
         .array(
           z.strictObject({
@@ -288,7 +318,7 @@ export const FormularySchema = z.strictObject({
       redistributionTauMin: z.number().positive(),
       effects: z.array(
         z.strictObject({
-          target: effectTarget,
+          target: fluidTarget,
           perLitre: z.number(),
           maxLitres: z.number().positive().optional(),
         }),
@@ -308,6 +338,9 @@ export const DeviceTableSchema = z.strictObject({
       category: z.enum(['oxygen', 'position', 'airway', 'monitoring']),
       short: z.string().optional(),
       fio2: z.number().min(0.21).max(1).optional(),
+      ventilation: z
+        .strictObject({ support: z.number().min(0).max(1), minRr: z.number().min(0) })
+        .optional(),
       effects: z.array(z.strictObject({ target: effectTarget, value: z.number() })).optional(),
       onText: text,
       offText: text,
@@ -319,6 +352,7 @@ export const DeviceTableSchema = z.strictObject({
       id,
       label: text,
       sub: z.string().optional(),
+      category: z.enum(['access', 'airway', 'breathing', 'circulation', 'team']),
       grants: z.enum(['iv', 'io', 'art']).optional(),
       doneText: text,
       alreadyText: z.string().optional(),

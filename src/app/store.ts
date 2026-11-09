@@ -12,7 +12,7 @@ import { Session, type Bubble, type NibpReading, type ResultItem } from './sessi
 export const SPEEDS = [1, 2, 4, 8] as const;
 export type Speed = (typeof SPEEDS)[number];
 export type Phase = 'brief' | 'running' | 'ended';
-export type EndReason = 'stabilised' | 'arrest' | 'ended';
+export type EndReason = 'stabilised' | 'died' | 'ended';
 
 /** Real milliseconds between an outcome and the case closing, so the moment is visible. */
 export const OUTCOME_GRACE_MS = 1800;
@@ -178,7 +178,8 @@ export const useSim = create<SimState>()((set, get) => {
         ]);
       }
       session.recorder.sample(session.t, session.engine.vitals(), true);
-      const outcome = session.engine.status().outcome ?? 'ended';
+      const st = session.engine.status();
+      const outcome = st.outcome ?? (st.arrest ? 'arrest' : 'ended');
       const score = scoreRun(session.caseDef, {
         events: session.events,
         trace: session.recorder.trace,

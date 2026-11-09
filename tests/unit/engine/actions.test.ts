@@ -108,10 +108,10 @@ describe('engine actions', () => {
   });
 
   it('speaks threshold lines once as the patient deteriorates', () => {
-    const r = runScript(LIBRARY, CASE, 5, [], { maxSec: min(30) });
+    const r = runScript(LIBRARY, CASE, 5, [], { maxSec: min(30), stopOnArrest: true });
     const lines = r.events.filter((x) => x.code.startsWith('line:')).map((x) => x.code);
     expect(lines).toEqual(['line:faint', 'line:cant-breathe']);
-    expect(r.events.at(-1)?.code).toBe('outcome:arrest');
+    expect(r.events.at(-1)?.code).toBe('arrest');
     expect(r.final.rhythm).toBe('pea');
   });
 });
