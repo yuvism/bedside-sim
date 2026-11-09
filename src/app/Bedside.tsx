@@ -11,6 +11,7 @@ import { NursePanel } from '../ui/panels/NursePanel.tsx';
 import { PatientCard } from '../ui/patient/PatientCard.tsx';
 import { Footer } from './Footer.tsx';
 import { SPEEDS, useSim } from './store.ts';
+import { SettingsButton } from '../ui/settings/SettingsButton.tsx';
 import { ThemeToggle } from './ThemeToggle.tsx';
 
 const TICK_MS = 250;
@@ -134,6 +135,7 @@ export function Bedside({ caseDef, seed }: { caseDef: CaseDef; seed: number }) {
         </div>
         <Controls />
         <ModeBadge />
+        <SettingsButton />
         <ThemeToggle />
       </header>
       <main className="page bedside">

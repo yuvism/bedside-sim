@@ -67,3 +67,25 @@ test('exam mode is chosen on the brief and shows the badge', async ({ page }) =>
   await page.getByRole('button', { name: 'Start case' }).click();
   await expect(page.locator('.mode-badge')).toHaveText('Exam');
 });
+
+test('free-text questions work offline and the settings warn about the key', async ({ page }) => {
+  await page.goto('./#/case/anaphylaxis-01?seed=1');
+  await page.getByRole('button', { name: 'Start case' }).click();
+  const box = page.getByLabel('Ask the patient anything');
+  await box.fill('Are you allergic to anything?');
+  await box.press('Enter');
+  const log = page.locator('ol.log');
+  await expect(log.getByText('You: Are you allergic to anything?')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Any allergies?' })).toHaveClass(/is-done/);
+  await box.fill('Who won the football?');
+  await page.getByRole('button', { name: 'Ask', exact: true }).click();
+  await expect(log.getByText(/don't know/).first()).toBeVisible();
+
+  await page.getByRole('button', { name: 'Settings' }).click();
+  const dlg = page.getByRole('dialog', { name: 'Settings' });
+  await expect(dlg.getByText('Your key stays in this browser.')).toBeVisible();
+  await expect(dlg.getByLabel('Model')).toHaveValue('claude-opus-5-5');
+  await expect(dlg.getByLabel('Anthropic API key')).toHaveAttribute('type', 'password');
+  await dlg.getByRole('button', { name: 'Close' }).click();
+  await expect(dlg).toBeHidden();
+});

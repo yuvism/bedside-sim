@@ -1,0 +1,72 @@
+dialog.settings {
+  border: 0;
+  border-radius: 14px;
+  padding: 0;
+  max-width: 560px;
+  width: calc(100% - 28px);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+dialog.settings::backdrop {
+  background: rgba(5, 20, 22, 0.55);
+}
+
+.settings-form h2 {
+  margin: 0 0 4px;
+  font-size: 1.35rem;
+}
+
+.settings-form h3 {
+  margin: 14px 0 6px;
+  font-size: 1rem;
+}
+
+.settings-form .input {
+  margin-bottom: 10px;
+}
+
+.key-warning {
+  margin: 12px 0 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--warn-soft);
+  color: var(--ink);
+  border-left: 4px solid var(--warn);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.settings-check {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 4px 0 8px;
+}
+
+.settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.settings-actions .hint {
+  margin: 0;
+}
+
+.ask {
+  margin-bottom: 4px;
+}
+
+.ask-row {
+  display: flex;
+  gap: 8px;
+}
+
+.ask-row .input {
+  flex: 1;
+  min-width: 0;
+}

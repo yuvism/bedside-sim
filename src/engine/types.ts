@@ -303,7 +303,15 @@ export type Action =
   | { kind: 'fluid'; fluidId: string; volumeMl: number }
   | { kind: 'device'; deviceId: string; on: boolean }
   | { kind: 'procedure'; procedureId: string }
-  | { kind: 'talk'; questionId: string }
+  | {
+      kind: 'talk';
+      /** Dialogue id, or null for a free-text question the case doesn't cover. */
+      questionId: string | null;
+      /** The clinician's own words for a free-text question. */
+      text?: string;
+      /** A reply generated outside the engine (the optional AI patient). */
+      reply?: string;
+    }
   | { kind: 'exam'; examId: string }
   | { kind: 'order'; investigationId: string }
   | { kind: 'diagnosis'; diagnosisId: string }

@@ -105,9 +105,22 @@ The build brief is in [PROMPT.md](PROMPT.md). The single-file prototype is in `r
 
 - **Tests (107 unit, 7 e2e):** nurse delays (cannula 60–120 s, drug 30–60 s, arrest drugs 10–20 s), immediate clinician actions, allergy, contraindication, dose and access queries, confirm and cancel, cannula-first chaining and snapshot/restore; guided mode hints after idling, while exam mode shows no hints or teaching notes; variations are deterministic, in range and valid; OSCE domains. The e2e tests cover the nurse query flow and exam mode.
 
+### Phase 6 — AI patient conversation
+
+- **"Ask the patient anything"** box at the top of the Talk panel. Every typed question becomes a `talk` action with a dialogue id, or `null` when the case doesn't cover it, so scoring and replay treat it like a button press. The log shows the clinician's own words.
+- **Offline matcher** (`src/engine/dialogue.ts`, pure TS): normalises and lightly stems the question, then scores each dialogue entry by its `keywords` (single words and phrases) plus words shared with the scripted question. Below the threshold it's unmatched, and the patient says they don't know, in the way they're talking in that severity band (non-verbal when most of that band's answers are).
+- **Optional Claude patient** (`src/app/claudePatient.ts`, `patientPrompt.ts`, `patientChat.ts`):
+  - Off by default. In Settings the user pastes their own Anthropic API key, chooses the model (default `claude-opus-5-5`) and turns it on. The key is kept only in this browser's localStorage, with a clear warning, and a Forget key button removes it.
+  - The SDK (`@anthropic-ai/sdk`) is loaded lazily as its own chunk (about 84 kB gzipped), only when a question goes to Claude. It calls the API straight from the browser with `dangerouslyAllowBrowser`, which sends the `anthropic-dangerous-direct-browser-access` header.
+  - The system prompt is built from the case file only: name, age, sex, occupation, persona, how unwell they are in the current band, and the scripted answers for that band. The diagnosis, labs, exam findings, results, brief and teaching points are never included. The patient is told to say they don't know anything else, and never to guess a diagnosis or result.
+  - Structured output (a JSON schema) returns `reply` and `questionId`, an enum of the case's dialogue ids plus `none`, so every answer maps back to a dialogue id. Effort is `low` for a quick reply. The last six exchanges go along for continuity.
+  - Refusal fallbacks are on: `fallbacks: "default"` with the `server-side-fallback-2026-07-01` beta. If Claude still declines, or the key, network or reply fails, the offline matcher answers and a notice explains why. In cardiac arrest no request is made.
+  - The reply is stored on the action, so a run with Claude replays exactly.
+- **Tests (164 unit, 8 e2e):** every scripted question in all ten cases matches itself, plus paraphrases and off-topic questions; band-appropriate unknown answers; free-text talk events, scoring and replay; the prompt for every case leaves out the diagnosis, brief, results, exam findings and teaching; request shape (model, effort, fallbacks, schema); reply parsing; a mocked client for success, refusal, unreadable output, a rejected key and a network failure; offline resolution never calls the API; settings storage. The e2e test asks typed questions with no key and checks the Settings warning.
+
 ## Next
 
-- **Phase 6:** free-text "Ask the patient anything", with an offline keyword and intent matcher (works with no key), an optional Anthropic API patient built from the case file only, and every question mapped back to a dialogue id for scoring
+- **Phase 7 (optional):** 3D bedside view. Needs your go-ahead on three.js / React Three Fiber size, which is likely over the 200 kB gzipped limit, so it would be lazy-loaded.
 
 ## Design decisions to review
 
@@ -123,5 +136,6 @@ The build brief is in [PROMPT.md](PROMPT.md). The single-file prototype is in `r
 ## Known issues
 
 - TypeScript is pinned to 6.0.x because typescript-eslint 8 supports only `<6.1`. Move to TS 7 once typescript-eslint supports it.
-- **Not pushed yet.** The repo github.com/yuvism/bedside-sim exists but is empty, because GitHub rejects workflow files from a token without the `workflow` scope. Commits are kept locally until the gh login has that scope (`gh auth refresh -h github.com -s workflow`), then `git push -u origin main`.
-- Bundle sizes are under the 200 kB gzipped limit: the main bundle is about 135 kB (React, Zod and the ten bundled cases), and the lazy debrief chunk is about 109 kB (mostly Recharts). If the library grows much more, cases should load lazily.
+- **Not pushed yet.** The repo github.com/yuvism/bedside-sim exists but is empty, because GitHub rejects workflow files from a token without the `workflow` scope. Commits are kept locally until a GitHub login with that scope pushes them: `gh auth login -h github.com -s workflow`, then `git push -u origin main` from the project folder.
+- Bundle sizes are under the 200 kB gzipped limit: the main bundle is about 147 kB (React, Zod and the ten bundled cases), the lazy debrief chunk about 109 kB (mostly Recharts) and the lazy Anthropic SDK chunk about 84 kB. If the library grows much more, cases should load lazily.
+- The AI patient was tested with a mocked client only. A live call needs a real key, which the project never stores.

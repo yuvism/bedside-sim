@@ -1,5 +1,6 @@
 /** Applies a clinician's action to the model and returns the resulting events. */
 import { bandFor, fillTemplate, isNonVerbal, pickVariant, templateValues } from './narrative.ts';
+import { unknownAnswer } from './dialogue.ts';
 import { pulseCheck, setCpr, shock } from './als.ts';
 import { addDose, findRoute, newDrugState, sinceLastDose } from './pharmacology.ts';
 import { check, context, event, o2Label, severityOf, type Model } from './model.ts';
@@ -235,17 +236,31 @@ function doProcedure(m: Model, a: Of<'procedure'>): SimEvent[] {
   return [event(m, 'action', `procedure:${def.id}`, def.doneText)];
 }
 
+/** Severity band of the case's banding process: how well the patient can talk. */
+export const talkBand = (m: Model) => bandFor(m.c.bands, severityOf(m, m.c.bands.process));
+
 function talk(m: Model, a: Of<'talk'>): SimEvent[] {
-  const q = m.c.dialogue.find((d) => d.id === a.questionId);
-  if (!q) return [event(m, 'warn', `unknown:talk:${a.questionId}`, 'Unknown question.')];
-  const asked = event(m, 'action', `talk:${q.id}`, `You: ${q.q}`);
-  if (m.s.arrest) {
-    return [asked, event(m, 'patient', `answer:${q.id}`, 'No response.', { nonVerbal: true })];
+  const free = a.text?.trim();
+  const q = a.questionId === null ? null : m.c.dialogue.find((d) => d.id === a.questionId);
+  if (q === undefined) {
+    return [event(m, 'warn', `unknown:talk:${a.questionId}`, 'Unknown question.')];
   }
-  const band = bandFor(m.c.bands, severityOf(m, m.c.bands.process));
-  const raw = q.a[Math.min(band, q.a.length - 1)] ?? '';
-  const text = fillTemplate(raw, values(m));
-  return [asked, event(m, 'patient', `answer:${q.id}`, text, { nonVerbal: isNonVerbal(text) })];
+  if (!q && !free) return [event(m, 'warn', 'unknown:talk:free', 'Nothing to ask.')];
+  const id = q ? q.id : 'free';
+  const asked = event(
+    m,
+    'action',
+    `talk:${id}`,
+    `You: ${free || q?.q}`,
+    free ? { free: true } : undefined,
+  );
+  if (m.s.arrest) {
+    return [asked, event(m, 'patient', `answer:${id}`, 'No response.', { nonVerbal: true })];
+  }
+  const band = talkBand(m);
+  const scripted = q ? fillTemplate(q.a[Math.min(band, q.a.length - 1)] ?? '', values(m)) : null;
+  const text = a.reply?.trim() || scripted || unknownAnswer(m.c.dialogue, band);
+  return [asked, event(m, 'patient', `answer:${id}`, text, { nonVerbal: isNonVerbal(text) })];
 }
 
 function examine(m: Model, a: Of<'exam'>): SimEvent[] {

@@ -8,6 +8,8 @@ import type { Action, CaseDef, SimEvent, Signs, Vitals } from '../engine/types.t
 import type { Mode } from '../engine/coach.ts';
 import { lastDiagnosis, scoreRun, type ScoreResult } from '../engine/scoring.ts';
 import type { NurseQuery, PendingTask } from '../engine/team.ts';
+import { loadAiSettings, saveAiSettings, type AiSettings } from './aiSettings.ts';
+import { resolveQuestion } from './patientChat.ts';
 import { recordAttempt, type CaseProgress } from './progress.ts';
 import { Session, type Bubble, type NibpReading, type ResultItem } from './session.ts';
 
@@ -57,6 +59,12 @@ interface SimState {
   score: ScoreResult | null;
   progress: CaseProgress | null;
   mode: Mode;
+  /** Optional AI patient settings (key kept in localStorage only). */
+  ai: AiSettings;
+  /** A typed question is waiting for its answer. */
+  asking: boolean;
+  /** Why the last typed question fell back to the offline matcher. */
+  askNotice: string | null;
   load(caseDef: CaseDef, seed: number): void;
   /** Switch guided/exam before starting (reloads the same patient). */
   setMode(mode: Mode): void;
@@ -68,6 +76,9 @@ interface SimState {
   /** Called by the clock loop with real elapsed seconds. */
   advance(realSec: number): void;
   act(action: Action): SimEvent[];
+  /** Ask the patient a free-text question (offline matcher, or Claude with a key). */
+  ask(text: string): Promise<void>;
+  setAi(ai: AiSettings): void;
   cycleNibp(): void;
   setDiagnosis(id: string): void;
   markRead(investigationId?: string): void;
@@ -123,6 +134,9 @@ export const useSim = create<SimState>()((set, get) => {
     score: null,
     progress: null,
     mode: readMode(),
+    ai: loadAiSettings(),
+    asking: false,
+    askNotice: null,
 
     load(caseDef, seed) {
       const session = new Session(caseDef, seed, undefined, { mode: get().mode });
@@ -135,6 +149,8 @@ export const useSim = create<SimState>()((set, get) => {
         endScheduled: false,
         score: null,
         progress: null,
+        asking: false,
+        askNotice: null,
         view: viewOf(session, null),
       });
     },
@@ -188,6 +204,26 @@ export const useSim = create<SimState>()((set, get) => {
       if (action.kind === 'diagnosis') set({ diagnosis: action.diagnosisId });
       refresh();
       return evs;
+    },
+
+    async ask(text) {
+      const { session, phase, ai, asking } = get();
+      if (!session || phase !== 'running' || asking || !text.trim()) return;
+      set({ asking: true, askNotice: null });
+      try {
+        const r = await resolveQuestion(session, text, ai);
+        // The case may have ended or been reloaded while Claude was answering.
+        if (get().session !== session || get().phase !== 'running') return;
+        get().act(r.action);
+        set({ askNotice: r.notice });
+      } finally {
+        set({ asking: false });
+      }
+    },
+
+    setAi(ai) {
+      saveAiSettings(ai);
+      set({ ai, askNotice: null });
     },
 
     cycleNibp() {

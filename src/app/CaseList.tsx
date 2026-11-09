@@ -4,6 +4,7 @@ import type { CaseDef } from '../engine/types.ts';
 import { Footer } from './Footer.tsx';
 import { getProgress } from './progress.ts';
 import { caseHref } from './router.ts';
+import { SettingsButton } from '../ui/settings/SettingsButton.tsx';
 import { ThemeToggle } from './ThemeToggle.tsx';
 
 const DIFFICULTY = { foundation: 'Foundation', core: 'Core', advanced: 'Advanced' } as const;
@@ -46,6 +47,7 @@ export function CaseList() {
           <h1>Bedside sim</h1>
           <p>Virtual patient simulator</p>
         </div>
+        <SettingsButton />
         <ThemeToggle />
       </header>
       <main className="page">

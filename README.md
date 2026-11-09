@@ -8,7 +8,7 @@ An open-source virtual patient simulator that runs in the browser. You talk to t
 
 ## Status
 
-Phases 0–5 of 10 are built. See [PROGRESS.md](PROGRESS.md) for what's done and what's next.
+Phases 0–6 of 10 are built. See [PROGRESS.md](PROGRESS.md) for what's done and what's next.
 
 ## Features
 
@@ -28,8 +28,13 @@ Phases 0–5 of 10 are built. See [PROGRESS.md](PROGRESS.md) for what's done and
 - **A nurse at the bedside:** she reads back your orders, carries them out after realistic delays, and challenges unsafe ones (allergies, contraindications, overdoses, no IV access).
 - **Guided mode:** prompts and teaching notes as you go. **Exam mode:** silent, with an OSCE-style breakdown and pass mark at the end.
 - **Seeded patient variations:** age, weight, allergies, comorbidities and where the key clue hides, so each run is a little different.
+- **Ask the patient anything:** type a question in your own words. With no key, an offline matcher maps it to the case's scripted questions. With your own Anthropic API key (Settings), Claude plays the patient using only what's in the case file, and never reveals the diagnosis or results.
 
-Still to come: free-text patient conversation, an optional 3D view, a case editor, video validation mode and a Unity port pack.
+Still to come: an optional 3D view, a case editor, video validation mode and a Unity port pack.
+
+### About the optional AI patient
+
+The AI patient is off by default and the app works fully without it. If you turn it on, your API key is saved only in your browser's local storage and sent only to the Anthropic API, directly from the page. Anyone who can use that browser profile could read it, so use a key with a low spend limit and select **Forget key** when you're done. Each question is billed to your Anthropic account.
 
 ## Cases
 
