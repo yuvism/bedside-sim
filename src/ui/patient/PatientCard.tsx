@@ -15,7 +15,8 @@ function trendOf(session: Session, now: Record<string, number>): string | null {
   return delta > 2 ? 'worsening' : delta < -2 ? 'improving' : 'steady';
 }
 
-export function PatientCard() {
+/** hideAvatar: the 3D view is showing the patient instead. */
+export function PatientCard({ hideAvatar = false }: { hideAvatar?: boolean }) {
   const session = useSim((s) => s.session);
   const view = useSim((s) => s.view);
   const phase = useSim((s) => s.phase);
@@ -36,17 +37,19 @@ export function PatientCard() {
         : '…';
   const silent = phase === 'brief' || !bubble || bubble.nonVerbal;
   return (
-    <section className="card patient" aria-label="Patient">
-      <Avatar
-        signs={phase === 'brief' ? {} : view.signs}
-        rr={phase === 'running' ? view.vitals.rr : 0}
-        arrest={arrest}
-        label={
-          phase === 'brief'
-            ? `${first}, before you start.`
-            : describeSigns(view.signs, arrest, first, p.sex === 'female' ? 'her' : 'his')
-        }
-      />
+    <section className={`card patient${hideAvatar ? ' no-avatar' : ''}`} aria-label="Patient">
+      {!hideAvatar && (
+        <Avatar
+          signs={phase === 'brief' ? {} : view.signs}
+          rr={phase === 'running' ? view.vitals.rr : 0}
+          arrest={arrest}
+          label={
+            phase === 'brief'
+              ? `${first}, before you start.`
+              : describeSigns(view.signs, arrest, first, p.sex === 'female' ? 'her' : 'his')
+          }
+        />
+      )}
       <div className="patient-body">
         <p className="who">
           {p.name}{' '}

@@ -36,6 +36,20 @@ export interface SimView {
   queries: NurseQuery[];
 }
 
+export type PanelTab = 'talk' | 'exam' | 'tests' | 'treat';
+export type BayView = '2d' | '3d';
+
+const VIEW_KEY = 'bedside-sim:view';
+function readView(): BayView {
+  try {
+    return typeof window !== 'undefined' && window.localStorage.getItem(VIEW_KEY) === '3d'
+      ? '3d'
+      : '2d';
+  } catch {
+    return '2d';
+  }
+}
+
 const MODE_KEY = 'bedside-sim:mode';
 function readMode(): Mode {
   try {
@@ -61,6 +75,10 @@ interface SimState {
   mode: Mode;
   /** Optional AI patient settings (key kept in localStorage only). */
   ai: AiSettings;
+  /** Open action panel tab. */
+  panel: PanelTab;
+  /** 2D panel view (default) or the 3D resus bay. */
+  bayView: BayView;
   /** A typed question is waiting for its answer. */
   asking: boolean;
   /** Why the last typed question fell back to the offline matcher. */
@@ -79,6 +97,8 @@ interface SimState {
   /** Ask the patient a free-text question (offline matcher, or Claude with a key). */
   ask(text: string): Promise<void>;
   setAi(ai: AiSettings): void;
+  setPanel(tab: PanelTab): void;
+  setBayView(v: BayView): void;
   cycleNibp(): void;
   setDiagnosis(id: string): void;
   markRead(investigationId?: string): void;
@@ -135,6 +155,8 @@ export const useSim = create<SimState>()((set, get) => {
     progress: null,
     mode: readMode(),
     ai: loadAiSettings(),
+    panel: 'talk',
+    bayView: readView(),
     asking: false,
     askNotice: null,
 
@@ -151,6 +173,7 @@ export const useSim = create<SimState>()((set, get) => {
         progress: null,
         asking: false,
         askNotice: null,
+        panel: 'talk',
         view: viewOf(session, null),
       });
     },
@@ -224,6 +247,19 @@ export const useSim = create<SimState>()((set, get) => {
     setAi(ai) {
       saveAiSettings(ai);
       set({ ai, askNotice: null });
+    },
+
+    setPanel(panel) {
+      set({ panel });
+    },
+
+    setBayView(bayView) {
+      try {
+        window.localStorage.setItem(VIEW_KEY, bayView);
+      } catch {
+        /* storage unavailable */
+      }
+      set({ bayView });
     },
 
     cycleNibp() {

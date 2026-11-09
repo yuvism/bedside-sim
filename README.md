@@ -8,7 +8,7 @@ An open-source virtual patient simulator that runs in the browser. You talk to t
 
 ## Status
 
-Phases 0–6 of 10 are built. See [PROGRESS.md](PROGRESS.md) for what's done and what's next.
+Phases 0–7 of 10 are built. See [PROGRESS.md](PROGRESS.md) for what's done and what's next.
 
 ## Features
 
@@ -29,8 +29,9 @@ Phases 0–6 of 10 are built. See [PROGRESS.md](PROGRESS.md) for what's done and
 - **Guided mode:** prompts and teaching notes as you go. **Exam mode:** silent, with an OSCE-style breakdown and pass mark at the end.
 - **Seeded patient variations:** age, weight, allergies, comorbidities and where the key clue hides, so each run is a little different.
 - **Ask the patient anything:** type a question in your own words. With no key, an offline matcher maps it to the case's scripted questions. With your own Anthropic API key (Settings), Claude plays the patient using only what's in the case file, and never reveals the diagnosis or results.
+- **Optional 3D bedside view:** a low-poly resus bay that follows the patient's state, with a live monitor screen and clickable objects that open the matching panel. 2D stays the default.
 
-Still to come: an optional 3D view, a case editor, video validation mode and a Unity port pack.
+Still to come: a case editor, video validation mode and a Unity port pack.
 
 ### About the optional AI patient
 
@@ -72,6 +73,8 @@ npm run dev
 For the first e2e run, install the Playwright browser once with `npx playwright install chromium`.
 
 ## Credits and inspiration
+
+- The optional 3D view uses [three.js](https://threejs.org/) (MIT). Every 3D object is built from primitives in code; see [ASSETS.md](ASSETS.md).
 
 - [Pulse Physiology Engine](https://pulse.kitware.com/) (Kitware, Apache-2.0) and [BioGears](https://www.biogearsengine.com/) are the reference open-source physiology engines. The engine interface is designed so a Pulse-backed engine can be swapped in for the Unity version.
 - [Infirmary Integrated](https://www.infirmary-integrated.com/) is the reference for monitor waveforms and the rhythm list.

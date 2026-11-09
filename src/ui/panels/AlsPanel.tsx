@@ -25,7 +25,7 @@ export function AlsPanel() {
   const cprFraction = Math.round((100 * als.cprSec) / Math.max(1, t - als.t0));
 
   return (
-    <section className="card als" aria-labelledby="als-h" role="region">
+    <section id="als" className="card als" aria-labelledby="als-h" role="region">
       <div className="als-head">
         <h2 id="als-h">Cardiac arrest</h2>
         <p>

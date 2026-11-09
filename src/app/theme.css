@@ -2,6 +2,8 @@
 :root {
   --bg: #e7efed;
   --surface: #ffffff;
+  --bay-top: #eef4f3;
+  --bay-bottom: #d9e3e1;
   --ink: #16262b;
   --muted: #56696d;
   --line: #c7d5d2;
@@ -29,6 +31,10 @@
   :root:not([data-theme='light']) {
     --bg: #0d191b;
     --surface: #142326;
+    --bay-top: #1f2e30;
+    --bay-bottom: #2b3739;
+    --bay-top: #1f2e30;
+    --bay-bottom: #2b3739;
     --ink: #e2ecea;
     --muted: #93a7aa;
     --line: #2a3e42;
@@ -48,6 +54,8 @@
 :root[data-theme='dark'] {
   --bg: #0d191b;
   --surface: #142326;
+  --bay-top: #1f2e30;
+  --bay-bottom: #2b3739;
   --ink: #e2ecea;
   --muted: #93a7aa;
   --line: #2a3e42;

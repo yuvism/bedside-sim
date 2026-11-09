@@ -11,6 +11,7 @@ import { NursePanel } from '../ui/panels/NursePanel.tsx';
 import { PatientCard } from '../ui/patient/PatientCard.tsx';
 import { Footer } from './Footer.tsx';
 import { SPEEDS, useSim } from './store.ts';
+import { BayCard, ViewToggle } from '../ui/bay/BayView.tsx';
 import { SettingsButton } from '../ui/settings/SettingsButton.tsx';
 import { ThemeToggle } from './ThemeToggle.tsx';
 
@@ -119,6 +120,7 @@ function BriefCard({ caseDef }: { caseDef: CaseDef }) {
 export function Bedside({ caseDef, seed }: { caseDef: CaseDef; seed: number }) {
   const phase = useSim((s) => s.phase);
   const load = useSim((s) => s.load);
+  const bayView = useSim((s) => s.bayView);
   useEffect(() => load(caseDef, seed), [caseDef, seed, load]);
   useSimLoop();
 
@@ -141,7 +143,9 @@ export function Bedside({ caseDef, seed }: { caseDef: CaseDef; seed: number }) {
       <main className="page bedside">
         <div className="col">
           <Monitor />
-          <PatientCard />
+          <ViewToggle />
+          {bayView === '3d' && <BayCard />}
+          <PatientCard hideAvatar={bayView === '3d'} />
           {phase === 'brief' && <BriefCard caseDef={caseDef} />}
         </div>
         <div className="col">

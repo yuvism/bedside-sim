@@ -1,5 +1,5 @@
-import { useRef, useState, type KeyboardEvent } from 'react';
-import { useSim } from '../../app/store.ts';
+import { useRef, type KeyboardEvent } from 'react';
+import { useSim, type PanelTab } from '../../app/store.ts';
 import { ExamPanel } from './ExamPanel.tsx';
 import { InvestigatePanel } from './InvestigatePanel.tsx';
 import { TalkPanel } from './TalkPanel.tsx';
@@ -11,11 +11,11 @@ const TABS = [
   { id: 'exam', label: 'Examine' },
   { id: 'tests', label: 'Investigate' },
   { id: 'treat', label: 'Treat' },
-] as const;
-type TabId = (typeof TABS)[number]['id'];
+] as const satisfies readonly { id: PanelTab; label: string }[];
 
 export function ActionPanels() {
-  const [tab, setTab] = useState<TabId>('talk');
+  const tab = useSim((s) => s.panel);
+  const setTab = useSim((s) => s.setPanel);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const unread = useSim((s) => s.view?.unread ?? 0);
   const session = useSim((s) => s.session);
@@ -39,7 +39,7 @@ export function ActionPanels() {
   };
 
   return (
-    <section className="card actions" aria-label="Actions">
+    <section id="actions" className="card actions" aria-label="Actions">
       <div className="tabs" role="tablist" aria-label="Action type">
         {TABS.map((t, i) => (
           <button

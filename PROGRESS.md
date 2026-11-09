@@ -118,9 +118,23 @@ The build brief is in [PROMPT.md](PROMPT.md). The single-file prototype is in `r
   - The reply is stored on the action, so a run with Claude replays exactly.
 - **Tests (164 unit, 8 e2e):** every scripted question in all ten cases matches itself, plus paraphrases and off-topic questions; band-appropriate unknown answers; free-text talk events, scoring and replay; the prompt for every case leaves out the diagnosis, brief, results, exam findings and teaching; request shape (model, effort, fallbacks, schema); reply parsing; a mocked client for success, refusal, unreadable output, a rejected key and a network failure; offline resolution never calls the API; settings storage. The e2e test asks typed questions with no key and checks the Settings warning.
 
+### Phase 7 — Optional 3D bedside view
+
+- **2D / 3D toggle** above the patient card. 2D stays the default, and the choice is remembered in this browser. In 3D, the low-poly resus bay replaces the 2D avatar; the monitor, speech bubble and intervention chips stay as they are.
+- **Plain three.js, not React Three Fiber.** R3F + drei measured about 280 kB gzipped, over the 200 kB limit, while three.js alone is about 147 kB including the orbit controls and scene. You chose plain three.js. The 3D chunk loads only when someone switches to 3D; the main bundle is unchanged.
+- **The bay** (`src/ui/bay/`), built entirely from three.js primitives, with no model files (see [ASSETS.md](ASSETS.md)):
+  - A bed with a head section that tilts, a patient, a wall-mounted monitor, a drip stand, a crash trolley with a defibrillator, and oxygen and suction outlets.
+  - The monitor screen mirrors the live 2D waveform canvas plus the numbers, redrawn 12 times a second.
+  - It follows the engine: sits up at about 30° and lies flat in arrest or with GCS ≤ 8 (eyes closed); breathes at the current RR; chest compressions at 110/min during CPR; skin colour from flushing, hives, pallor and cyanosis, and grey in arrest; oxygen mask, nasal cannula or bag-valve-mask; cannula on the arm; fluid bag and line while fluids or an infusion run; defibrillator pads on the chest.
+  - Light and dark themes.
+- **Clicking objects opens the matching panel:** patient's head → Talk, body → Examine, drip stand or oxygen outlet → Treat, trolley → Treat (or the ALS panel in arrest), monitor → scrolls to the full monitor. Hovering shows a label and highlights the object. A row of buttons does the same for keyboard and screen-reader users.
+- **Performance:** about 70 low-poly meshes, Lambert materials, three lights, no shadows, pixel ratio capped at 1.5. It renders only while on screen (IntersectionObserver) and frees its WebGL context when switched off. It held 60 fps in headless Chromium on this machine. Dragging orbits within limits; zoom is off so the mouse wheel still scrolls the page, and on phones vertical swipes scroll the page.
+- If WebGL isn't available or the 3D chunk fails to download, a message asks you to switch back to 2D.
+- **Tests (178 unit, 11 e2e):** click targets and their panels, oxygen kinds, posture, eyes, drips, pads, skin colour mixing, breathing and compression timing, and the 3D monitor screen's numbers. The e2e tests check that 2D is the default; that the 3D canvas renders and reports a frame rate; that the object buttons open Treat, Examine and Talk; that a real click on the patient's torso and head in the scene opens Examine and Talk; that the choice is remembered; and that 3D fits a 375 px phone.
+
 ## Next
 
-- **Phase 7 (optional):** 3D bedside view. Needs your go-ahead on three.js / React Three Fiber size, which is likely over the 200 kB gzipped limit, so it would be lazy-loaded.
+- **Phase 8:** case editor.
 
 ## Design decisions to review
 
@@ -137,5 +151,7 @@ The build brief is in [PROMPT.md](PROMPT.md). The single-file prototype is in `r
 
 - TypeScript is pinned to 6.0.x because typescript-eslint 8 supports only `<6.1`. Move to TS 7 once typescript-eslint supports it.
 - **Not pushed yet.** The repo github.com/yuvism/bedside-sim exists but is empty, because GitHub rejects workflow files from a token without the `workflow` scope. Commits are kept locally until a GitHub login with that scope pushes them: `gh auth login -h github.com -s workflow`, then `git push -u origin main` from the project folder.
-- Bundle sizes are under the 200 kB gzipped limit: the main bundle is about 147 kB (React, Zod and the ten bundled cases), the lazy debrief chunk about 109 kB (mostly Recharts) and the lazy Anthropic SDK chunk about 84 kB. If the library grows much more, cases should load lazily.
+- Bundle sizes are under the 200 kB gzipped limit: the main bundle is about 147 kB (React, Zod and the ten bundled cases), and the lazy chunks are about 109 kB for the debrief (mostly Recharts), 84 kB for the Anthropic SDK and 147 kB for the 3D view (three.js). If the library grows much more, cases should load lazily.
+- The 3D view's frame rate was measured in headless Chromium only (60 fps), not yet on a mid-range laptop GPU.
+- `npm audit` reports 10 moderate advisories, all in the lint tooling (minimatch, through ESLint and typescript-eslint). None are in code shipped to the browser.
 - The AI patient was tested with a mocked client only. A live call needs a real key, which the project never stores.

@@ -1,0 +1,67 @@
+.view-toggle {
+  display: flex;
+  gap: 6px;
+  margin: 0 0 10px;
+}
+
+.view-toggle .btn.is-on {
+  background: var(--scrub);
+  border-color: var(--scrub);
+  color: var(--scrub-ink);
+}
+
+.card.bay {
+  padding: 10px;
+}
+
+.bay-stage {
+  position: relative;
+  height: 340px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--bay-top) 0%, var(--bay-bottom) 100%);
+}
+
+.bay-stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+
+.bay-tip {
+  position: absolute;
+  transform: translate(12px, -28px);
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--surface);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.bay-loading {
+  height: 340px;
+  display: grid;
+  place-items: center;
+  margin: 0;
+}
+
+.bay-objects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.card.bay > .hint {
+  margin: 8px 0 0;
+}
+
+@media (max-width: 600px) {
+  .bay-stage,
+  .bay-loading {
+    height: 260px;
+  }
+}

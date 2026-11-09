@@ -8,6 +8,9 @@ export default defineConfig({
   build: {
     target: 'es2022',
     sourcemap: true,
+    // The lazy 3D chunk (three.js) is ~585 kB raw but ~147 kB gzipped. The
+    // project's real budget is 200 kB gzipped per dependency (see PROMPT.md).
+    chunkSizeWarningLimit: 600,
   },
   test: {
     include: ['tests/unit/**/*.test.{ts,tsx}'],

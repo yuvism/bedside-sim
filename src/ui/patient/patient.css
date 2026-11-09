@@ -6,6 +6,10 @@
   align-items: center;
 }
 
+.patient.no-avatar {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 @media (max-width: 480px) {
   .patient {
     grid-template-columns: 96px minmax(0, 1fr);

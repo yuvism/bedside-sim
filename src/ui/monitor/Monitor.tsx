@@ -6,6 +6,7 @@ import { fmtClock, fmtInt } from '../format.ts';
 import { evaluateAlarms, topPriority, type ActiveAlarm, type AlarmKey } from './alarms.ts';
 import { monitorAudio } from './audio.ts';
 import { SweepRenderer } from './sweep.ts';
+import { setTraceCanvas } from './traceSource.ts';
 import './monitor.css';
 
 const RHYTHM_SHORT: Record<Rhythm, string> = {
@@ -104,9 +105,11 @@ export function Monitor() {
     raf = requestAnimationFrame(loop);
     const onResize = () => r.resize();
     window.addEventListener('resize', onResize);
+    setTraceCanvas(canvas);
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', onResize);
+      setTraceCanvas(null);
     };
   }, []);
 
@@ -158,7 +161,7 @@ export function Monitor() {
   };
 
   return (
-    <section className="monitor-wrap" aria-label="Patient monitor">
+    <section id="monitor" className="monitor-wrap" aria-label="Patient monitor">
       <div className="monitor">
         <div className="alarm-strip" aria-hidden="true">
           {alarms.slice(0, 3).map((a) => (
