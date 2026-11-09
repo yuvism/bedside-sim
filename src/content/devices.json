@@ -64,6 +64,14 @@
       "grants": "io",
       "doneText": "Intraosseous needle inserted.",
       "alreadyText": "IO access already in."
+    },
+    {
+      "id": "art_line",
+      "label": "Arterial line",
+      "sub": "Radial, continuous BP",
+      "grants": "art",
+      "doneText": "Radial arterial line placed. Continuous blood pressure on the monitor.",
+      "alreadyText": "Arterial line already in."
     }
   ]
 }

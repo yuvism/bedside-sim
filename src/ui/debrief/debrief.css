@@ -1,0 +1,37 @@
+dialog.debrief {
+  border: 0;
+  border-radius: 14px;
+  padding: 0;
+  max-width: 760px;
+  width: calc(100% - 28px);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+dialog.debrief::backdrop {
+  background: rgba(5, 20, 22, 0.55);
+}
+
+.dlg {
+  padding: 22px;
+  max-height: 88vh;
+  overflow: auto;
+}
+
+.dlg h2 {
+  margin: 0 0 2px;
+  font-size: 1.35rem;
+}
+
+.muted {
+  color: var(--muted);
+  margin: 0;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}

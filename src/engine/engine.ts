@@ -15,6 +15,7 @@ import { initProcess, stepProcess } from './processes.ts';
 import { isPerfusing, nextRhythm, RHYTHM_LABELS, sinusFor } from './rhythms.ts';
 import { ouStep, Rng, seedToState } from './rng.ts';
 import type {
+  Access,
   Action,
   CaseDef,
   EngineLibrary,
@@ -45,7 +46,7 @@ export interface EngineStatus {
   arrest: boolean;
   outcome: EngineState['outcome'];
   devices: string[];
-  access: { iv: boolean; io: boolean };
+  access: Access;
   fluidsRunning: { fluidId: string; pendingMl: number }[];
   doses: { drugId: string; count: number; lastT: number }[];
   pendingOrders: { investigationId: string; dueT: number }[];
@@ -102,7 +103,7 @@ export class SimpleEngine implements BedsideEngine {
       fluids: [],
       transients: [],
       devices: [],
-      access: { iv: false, io: false },
+      access: { iv: false, io: false, art: false },
       noise: Object.fromEntries(Object.keys(NOISE).map((k) => [k, 0])),
       rhythm: 'sinus',
       arrest: false,

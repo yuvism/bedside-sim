@@ -269,6 +269,98 @@
         },
         { "text": "Rash fading. Temperature {temp:1} °C." }
       ]
+    },
+    {
+      "id": "head",
+      "label": "Face and mouth",
+      "kind": "region",
+      "region": "head",
+      "findings": [
+        { "when": { "arrest": true }, "text": "Unresponsive. Lips and tongue swollen, cyanosed." },
+        {
+          "when": { "severity": "anaphylaxis", "gte": 55 },
+          "text": "Lips and tongue grossly swollen. Uvula swollen. Eyes puffy and watering. Drooling slightly."
+        },
+        {
+          "when": { "severity": "anaphylaxis", "gte": 20 },
+          "text": "Lips swollen, tongue normal size. Mild periorbital swelling. Conjunctivae injected."
+        },
+        { "text": "Lip swelling settling. Tongue and uvula normal." }
+      ]
+    },
+    {
+      "id": "neck",
+      "label": "Neck",
+      "kind": "region",
+      "region": "neck",
+      "findings": [
+        {
+          "when": { "severity": "anaphylaxis", "gte": 55 },
+          "text": "Inspiratory stridor audible over the trachea. Using sternocleidomastoids. Trachea central."
+        },
+        { "text": "No stridor. Trachea central. JVP not visible." }
+      ]
+    },
+    {
+      "id": "chest",
+      "label": "Chest",
+      "kind": "region",
+      "region": "chest",
+      "findings": [
+        { "when": { "arrest": true }, "text": "No breath sounds. No heart sounds." },
+        {
+          "when": { "severity": "anaphylaxis", "gte": 60 },
+          "text": "Hyperexpanded, poor air entry throughout with a quiet, tight wheeze. Heart sounds normal, tachycardic."
+        },
+        {
+          "when": { "severity": "anaphylaxis", "gte": 25 },
+          "text": "Widespread polyphonic expiratory wheeze. Heart sounds normal, tachycardic."
+        },
+        { "text": "Good air entry, scattered wheeze. Heart sounds normal." }
+      ]
+    },
+    {
+      "id": "abdomen",
+      "label": "Abdomen",
+      "kind": "region",
+      "region": "abdomen",
+      "findings": [
+        {
+          "when": { "severity": "anaphylaxis", "gte": 40 },
+          "text": "Soft, mildly tender centrally. He says he feels sick and crampy. Wheals across the abdomen."
+        },
+        { "text": "Soft, non-tender." }
+      ]
+    },
+    {
+      "id": "arms",
+      "label": "Arms and hands",
+      "kind": "region",
+      "region": "arms",
+      "findings": [
+        {
+          "when": { "vital": "sbp", "lt": 80 },
+          "text": "Hands cool and clammy. Radial pulse weak and thready. Wheals on both forearms."
+        },
+        {
+          "when": { "severity": "anaphylaxis", "gte": 25 },
+          "text": "Warm, flushed. Radial pulse fast and bounding. Raised wheals on both forearms, scratch marks."
+        },
+        { "text": "Warm, well perfused. Rash fading." }
+      ]
+    },
+    {
+      "id": "legs",
+      "label": "Legs",
+      "kind": "region",
+      "region": "legs",
+      "findings": [
+        {
+          "when": { "severity": "anaphylaxis", "gte": 25 },
+          "text": "Wheals on both thighs. No calf swelling or tenderness."
+        },
+        { "text": "No rash. No calf swelling or tenderness." }
+      ]
     }
   ],
   "investigations": [

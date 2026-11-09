@@ -1,0 +1,70 @@
+.logwrap h2 {
+  font-size: 1rem;
+  margin: 0;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.log {
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  max-height: 360px;
+  overflow: auto;
+}
+
+.log li {
+  display: grid;
+  grid-template-columns: 3.4em minmax(0, 1fr);
+  gap: 8px;
+  padding: 6px 16px;
+  border-left: 3px solid transparent;
+  font-size: 0.92rem;
+}
+
+.log time {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.log li.patient {
+  border-left-color: var(--scrub);
+}
+
+.log li.patient span {
+  font-style: italic;
+}
+
+.log li.finding span,
+.log li.result span {
+  color: var(--ink);
+}
+
+.log li.result {
+  border-left-color: var(--line);
+}
+
+.log li.warn {
+  border-left-color: var(--warn);
+  background: var(--warn-soft);
+}
+
+.log li.danger {
+  border-left-color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.log li.action span {
+  font-weight: 700;
+}
+
+.log li.system span,
+.log li.outcome span {
+  color: var(--muted);
+}
+
+.empty {
+  color: var(--muted);
+  padding: 10px 16px;
+  margin: 0;
+}

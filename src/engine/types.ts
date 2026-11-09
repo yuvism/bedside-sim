@@ -60,6 +60,10 @@ export interface Vitals {
   ectopy: boolean;
 }
 
+/** Vascular access and invasive monitoring lines. */
+export type AccessKind = 'iv' | 'io' | 'art';
+export type Access = Record<AccessKind, boolean>;
+
 /** Visible signs, each 0–1. Drives the avatar and some exam text. */
 export type Signs = Record<string, number>;
 
@@ -79,7 +83,7 @@ export type Condition =
   | { time: Range }
   | { drugGiven: string; route?: Route }
   | { device: string }
-  | { access: 'iv' | 'io' | 'any' }
+  | { access: AccessKind | 'any' }
   | { arrest: boolean }
   | { ectopy: boolean }
   | { rhythm: Rhythm[] }
@@ -212,7 +216,7 @@ export interface ProcedureDef extends Sourced {
   id: string;
   label: string;
   sub?: string;
-  grants?: 'iv' | 'io';
+  grants?: AccessKind;
   doneText: string;
   alreadyText?: string;
 }
@@ -339,7 +343,7 @@ export interface EngineState {
   fluids: FluidState[];
   transients: TransientState[];
   devices: string[];
-  access: { iv: boolean; io: boolean };
+  access: Access;
   noise: Record<string, number>;
   rhythm: Rhythm;
   arrest: boolean;

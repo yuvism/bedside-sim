@@ -36,9 +36,19 @@ The build brief is in [PROMPT.md](PROMPT.md). The single-file prototype is in `r
 - (c) a single dose never stabilises, and severity rebounds as it wears off. With a second dose at 7:00, every seed stabilises (11–20 min) ✓
 - (d) same seed + script gives identical trace, events and final state; snapshot/restore resumes identically ✓
 
+### Phase 2 — Bedside UI
+
+- **App shell:** hash router (`#/` case list, `#/case/<id>?seed=N`; a missing seed is filled in so every run can be replayed from its URL), Zustand store (`src/app/store.ts`) around a framework-free `Session` (`src/app/session.ts`: engine + recorder + NIBP cycling + results inbox + speech bubble), a 250 ms sim loop, pause and 1×/2×/4×/8×, light/dark/auto theme toggle
+- **Monitor (`src/ui/monitor/`):** sweep-style canvas with ECG (rhythm-aware: ectopics, VF, PEA, AF, ST elevation), SpO₂ pleth scaled by perfusion, capnogram with a bronchospasm "shark fin", and an arterial trace once a line is placed. Numerics for HR, SpO₂, NIBP (auto every 3 min plus "Take NIBP now"), ART, RR, EtCO₂ and temp. Alarm limits graded medium/high, shown in colour, announced politely to screen readers and sounded with Web Audio. The pulse beep pitch falls with SpO₂. Mute and 2-minute alarm silence.
+- **Patient (`src/ui/patient/`):** SVG avatar driven by engine signs (flush, hives, lip swelling, cyanosis, sweating, breathing effort with RR-paced animation, eyes closed), a plain-language description for screen readers, a speech bubble and intervention chips
+- **Panels (`src/ui/panels/`):** Talk grouped by history category; Examine with ABCDE plus a head-to-toe body map with matching buttons; Investigate with bedside/lab/imaging turnaround times, "due in" countdowns and a results inbox with unread badges; Treat with team, oxygen/position, access/procedures (IV, IO, arterial line), fluids and a searchable formulary with route picker, dose input and a "Standard dose" shortcut
+- **Event log**, working-diagnosis picker, end-case button and a temporary end dialog (the full debrief comes in Phase 3)
+- **Content:** head-to-toe regions added to `anaphylaxis-01`, and an `art_line` procedure in `devices.json`
+- **Tests:** unit tests for alarms, waveform shapes, the router and the session. The Playwright test plays `anaphylaxis-01` to "Arjun is stable" using a fake clock, and a 375 px layout check confirms no sideways scrolling.
+
 ## Next
 
-- **Phase 2:** bedside UI: monitor (ECG, pleth, capnography, arterial line; alarms and audio), SVG avatar, Talk/Examine/Investigate/Treat panels, event log, clock and speed, responsive and accessible; a Playwright test that plays to a stabilised outcome
+- **Phase 3:** rule-based scoring (`src/engine/scoring.ts`), a debrief with checklist, a vitals chart with action markers, teaching points and references, "replay from minute X", JSON/CSV export (copy and download), and local progress history
 
 ## Design decisions to review
 
@@ -50,4 +60,5 @@ The build brief is in [PROMPT.md](PROMPT.md). The single-file prototype is in `r
 ## Known issues
 
 - TypeScript is pinned to 6.0.x because typescript-eslint 8 supports only `<6.1`. Move to TS 7 once typescript-eslint supports it.
-- Not pushed yet: the GitHub repo hasn't been created (waiting for the go-ahead), and the gh token needs the `workflow` scope before workflow files can be pushed.
+- **Not pushed yet.** The repo github.com/yuvism/bedside-sim exists but is empty, because GitHub rejects workflow files from a token without the `workflow` scope. Commits are kept locally until the gh login has that scope (`gh auth refresh -h github.com -s workflow`), then `git push -u origin main`.
+- The bundle is about 103 kB gzipped, mostly React and Zod. That's well under the 200 kB limit.

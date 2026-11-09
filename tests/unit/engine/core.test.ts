@@ -204,7 +204,7 @@ const ctx = (over: Partial<ConditionContext> = {}): ConditionContext => ({
   labs: { k: 4 },
   drugGiven: (id) => id === 'adrenaline',
   deviceOn: () => false,
-  access: { iv: true, io: false },
+  access: { iv: true, io: false, art: false },
   arrest: false,
   ...over,
 });

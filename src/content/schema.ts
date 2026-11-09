@@ -319,7 +319,7 @@ export const DeviceTableSchema = z.strictObject({
       id,
       label: text,
       sub: z.string().optional(),
-      grants: z.enum(['iv', 'io']).optional(),
+      grants: z.enum(['iv', 'io', 'art']).optional(),
       doneText: text,
       alreadyText: z.string().optional(),
       ...sourced,

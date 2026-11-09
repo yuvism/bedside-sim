@@ -1,5 +1,5 @@
 /** Evaluates the serialisable Condition language used in case files. */
-import type { Condition, Range, Rhythm, Route, Vitals } from './types.ts';
+import type { Access, Condition, Range, Rhythm, Route, Vitals } from './types.ts';
 
 export interface ConditionContext {
   /** Sim time, seconds. */
@@ -9,7 +9,7 @@ export interface ConditionContext {
   labs: Readonly<Record<string, number>>;
   drugGiven(drugId: string, route?: Route): boolean;
   deviceOn(deviceId: string): boolean;
-  access: { iv: boolean; io: boolean };
+  access: Access;
   arrest: boolean;
 }
 

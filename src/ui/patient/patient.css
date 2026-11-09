@@ -1,0 +1,92 @@
+.patient {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 16px;
+  padding: 16px;
+  align-items: center;
+}
+
+@media (max-width: 480px) {
+  .patient {
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 12px;
+    padding: 12px;
+  }
+}
+
+.avatar {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.avatar-breath {
+  transform-box: view-box;
+  transform-origin: 100px 200px;
+  animation-name: breathe;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes breathe {
+  50% {
+    transform: scale(calc(1 + var(--effort, 0.02)), calc(1 + var(--effort, 0.02) * 2));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar-breath {
+    animation: none;
+  }
+}
+
+.patient-body {
+  min-width: 0;
+}
+
+.who {
+  font-weight: 700;
+  margin: 0;
+}
+
+.who span {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.bubble {
+  position: relative;
+  background: var(--scrub-soft);
+  border-radius: 4px 14px 14px 14px;
+  padding: 10px 14px;
+  margin: 8px 0 10px;
+  min-height: 2.6em;
+}
+
+.bubble.silent {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.chip {
+  font-size: 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 10px;
+  color: var(--muted);
+}
+
+.chip.on {
+  border-color: var(--scrub);
+  color: var(--ink);
+  background: var(--scrub-soft);
+}
