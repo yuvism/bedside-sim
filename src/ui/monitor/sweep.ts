@@ -2,7 +2,7 @@
  * Sweep-style canvas renderer: traces are drawn left to right in real time
  * with an erase bar ahead of the pen, like a bedside monitor.
  */
-import type { Rhythm, Vitals } from '../../engine/types.ts';
+import type { Rhythm, Signs, Vitals } from '../../engine/types.ts';
 import {
   artShape,
   capnoShape,
@@ -25,6 +25,9 @@ export interface WaveInput {
   artLine: boolean;
   /** 0–1, bronchospasm severity for the capnogram shape. */
   obstruction: number;
+  /** ECG morphology hints from the engine (ecg_st, ecg_peakedT, ecg_wide). */
+  signs: Signs;
+  cpr: boolean;
 }
 
 type Lane = 'ecg' | 'pleth' | 'art' | 'co2';
@@ -34,11 +37,11 @@ const STEPS = 8;
 const ART_MAX = 200;
 const CO2_MAX = 60;
 
-function beatOpts(r: Rhythm, ectopic: boolean) {
-  if (ectopic || r === 'pea' || r === 'vt' || r === 'pvt') return { wide: true };
-  if (r === 'af' || r === 'svt') return { noP: true };
-  if (r === 'stemi') return { st: 0.3 };
-  return {};
+function beatOpts(r: Rhythm, ectopic: boolean, signs: Signs) {
+  const wide = (signs['ecg_wide'] ?? 0) > 0.5;
+  if (ectopic || wide || r === 'pea' || r === 'vt' || r === 'pvt') return { wide: true };
+  const st = r === 'stemi' ? 0.3 : (signs['ecg_st'] ?? 0) * 0.35;
+  return { st, peakedT: signs['ecg_peakedT'] ?? 0, noP: r === 'af' || r === 'svt' };
 }
 
 export class SweepRenderer {
@@ -104,7 +107,9 @@ export class SweepRenderer {
         this.rrScale = v.rhythm === 'af' ? 0.7 + Math.random() * 0.6 : 1;
         if (perfusing) this.onBeat();
       }
-      this.respPhase += (sdt * (live ? v.rr : 0)) / 60;
+      const cpr = live && input.cpr;
+      this.respPhase += (sdt * (live ? (cpr ? 10 : v.rr) : 0)) / 60;
+      const compression = cpr ? Math.max(0, Math.sin(2 * Math.PI * 1.85 * this.clockSec)) : 0;
       const p = this.ecgPhase % 1;
       const ectopic = live && v.ectopy && this.beat % 3 === 2;
 
@@ -112,14 +117,17 @@ export class SweepRenderer {
       if (!live || v.rhythm === 'asystole') y.ecg = live ? 0.01 * Math.sin(this.clockSec * 3) : 0;
       else if (v.rhythm === 'vf') y.ecg = vfWave(this.clockSec);
       else {
-        y.ecg = ecgBeat(p, beatOpts(v.rhythm, ectopic));
+        y.ecg = ecgBeat(p, beatOpts(v.rhythm, ectopic, input.signs));
         if (v.rhythm === 'af') y.ecg += fibrillatoryBaseline(this.clockSec);
       }
+      if (cpr) y.ecg += 0.55 * compression - 0.2;
       y.pleth = plethShape(p) * pAmp;
       if (input.artLine && live) {
         const sbp = perfusing ? (v.sbp ?? 0) : 12;
         const dbp = perfusing ? (v.dbp ?? 0) : 10;
-        y.art = (dbp + (sbp - dbp) * (perfusing ? artShape(p) : 0)) / ART_MAX;
+        y.art = perfusing
+          ? (dbp + (sbp - dbp) * artShape(p)) / ART_MAX
+          : (10 + 55 * compression) / ART_MAX;
       }
       y.co2 = live ? (capnoShape(this.respPhase % 1, input.obstruction) * v.etco2) / CO2_MAX : 0;
 

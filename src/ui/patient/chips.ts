@@ -21,6 +21,14 @@ export function statusChips(st: EngineStatus): { text: string; on: boolean }[] {
     const name = label(LIBRARY.formulary.drugs, d.drugId);
     chips.push({ text: `${name} ×${d.count}, last ${fmtClock(st.t - d.lastT)} ago`, on: true });
   }
+  for (const i of st.infusions) {
+    const def = LIBRARY.formulary.drugs.find((d) => d.id === i.drugId);
+    chips.push({
+      text: `${def?.name ?? i.drugId} infusion ${i.rate} ${def?.infusion?.unit ?? ''}`.trim(),
+      on: true,
+    });
+  }
+  if (st.cpr) chips.push({ text: 'CPR in progress', on: true });
   if (st.helpCalled) chips.push({ text: 'Help called', on: true });
   if (!chips.length) chips.push({ text: 'No interventions yet', on: false });
   return chips;

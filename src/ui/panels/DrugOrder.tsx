@@ -6,6 +6,7 @@ import { useId, useMemo, useState } from 'react';
 import { LIBRARY } from '../../content/library.ts';
 import { useSim } from '../../app/store.ts';
 import type { DrugDef, Route } from '../../engine/types.ts';
+import { InfusionControl } from './InfusionControl.tsx';
 
 const ROUTE_NAMES: Record<Route, string> = {
   IM: 'IM',
@@ -30,7 +31,7 @@ export function DrugOrder({ locked }: { locked: boolean }) {
   const access = useSim((s) => s.view?.status.access);
   const [query, setQuery] = useState('');
   const [drugId, setDrugId] = useState<string | null>(null);
-  const [route, setRoute] = useState<Route | null>(null);
+  const [route, setRoute] = useState<Route | 'INF' | null>(null);
   const [dose, setDose] = useState('');
   const uid = useId();
   const list = useMemo(() => LIBRARY.formulary.drugs.filter((d) => matches(d, query)), [query]);
@@ -40,10 +41,10 @@ export function DrugOrder({ locked }: { locked: boolean }) {
   const pick = (d: DrugDef) => {
     setDrugId(d.id);
     const first = d.routes[0];
-    setRoute(first?.route ?? null);
+    setRoute(d.infusion && d.drugClass === 'Vasopressor' ? 'INF' : (first?.route ?? null));
     setDose(first ? String(first.standardDose) : '');
   };
-  const pickRoute = (r: Route) => {
+  const pickRoute = (r: Route | 'INF') => {
     setRoute(r);
     const def = drug?.routes.find((x) => x.route === r);
     if (def) setDose(String(def.standardDose));
@@ -52,7 +53,7 @@ export function DrugOrder({ locked }: { locked: boolean }) {
   const needsAccess = route === 'IV' || route === 'IO';
   const hasAccess = route === 'IO' ? access?.io : access?.iv || access?.io;
   const give = () => {
-    if (!drug || !route || !(doseNum > 0)) return;
+    if (!drug || !route || route === 'INF' || !(doseNum > 0)) return;
     act({ kind: 'drug', drugId: drug.id, route, dose: doseNum });
   };
 
@@ -105,40 +106,62 @@ export function DrugOrder({ locked }: { locked: boolean }) {
                 <small>{r.label}</small>
               </label>
             ))}
-          </fieldset>
-          <div className="dose-row">
-            <label className="field" htmlFor={`${uid}-dose`}>
-              Dose ({drug.unit})
-            </label>
-            <input
-              id={`${uid}-dose`}
-              className="input dose"
-              type="number"
-              inputMode="decimal"
-              min="0"
-              step="any"
-              value={dose}
-              onChange={(e) => setDose(e.target.value)}
-              disabled={locked}
-            />
-            {routeDef && (
-              <button
-                className="btn"
-                disabled={locked}
-                onClick={() => setDose(String(routeDef.standardDose))}
-              >
-                Standard dose ({routeDef.standardDose} {drug.unit})
-              </button>
+            {drug.infusion && (
+              <label className="radio">
+                <input
+                  type="radio"
+                  name={`${uid}-route`}
+                  value="INF"
+                  checked={route === 'INF'}
+                  onChange={() => pickRoute('INF')}
+                  disabled={locked}
+                />
+                Infusion
+                <small>Continuous, {drug.infusion.unit}</small>
+              </label>
             )}
-          </div>
-          {needsAccess && !hasAccess && <p className="hint warn">Needs IV or IO access first.</p>}
-          <button
-            className="btn primary"
-            disabled={locked || !route || !(doseNum > 0)}
-            onClick={give}
-          >
-            Give {drug.name.toLowerCase()}
-          </button>
+          </fieldset>
+          {route === 'INF' ? (
+            <InfusionControl drug={drug} locked={locked} />
+          ) : (
+            <>
+              <div className="dose-row">
+                <label className="field" htmlFor={`${uid}-dose`}>
+                  Dose ({drug.unit})
+                </label>
+                <input
+                  id={`${uid}-dose`}
+                  className="input dose"
+                  type="number"
+                  inputMode="decimal"
+                  min="0"
+                  step="any"
+                  value={dose}
+                  onChange={(e) => setDose(e.target.value)}
+                  disabled={locked}
+                />
+                {routeDef && (
+                  <button
+                    className="btn"
+                    disabled={locked}
+                    onClick={() => setDose(String(routeDef.standardDose))}
+                  >
+                    Standard dose ({routeDef.standardDose} {drug.unit})
+                  </button>
+                )}
+              </div>
+              {needsAccess && !hasAccess && (
+                <p className="hint warn">Needs IV or IO access first.</p>
+              )}
+              <button
+                className="btn primary"
+                disabled={locked || !route || !(doseNum > 0)}
+                onClick={give}
+              >
+                Give {drug.name.toLowerCase()}
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>

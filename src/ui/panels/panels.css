@@ -326,3 +326,66 @@
     max-height: none;
   }
 }
+
+.als {
+  border: 2px solid var(--danger);
+  background: var(--danger-soft);
+  padding: 14px 16px;
+}
+
+.als-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 14px;
+}
+
+.als-head h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--danger);
+}
+
+.als-head p {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.als-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 8px;
+}
+
+.als-shock {
+  display: flex;
+  gap: 4px;
+}
+
+.als-shock select {
+  padding: 7px 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.btn.danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: var(--surface);
+  font-weight: 700;
+}
+
+.row-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.infusion {
+  display: grid;
+  gap: 8px;
+}

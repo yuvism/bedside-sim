@@ -332,3 +332,71 @@ a {
   font-size: 0.85rem;
   margin: 0;
 }
+
+.list-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: end;
+  gap: 10px 20px;
+  margin-bottom: 6px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.filters label {
+  display: grid;
+  gap: 2px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.filters select,
+.filters input {
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  min-width: 10em;
+}
+
+.case-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.case-card .foot {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.case-card .diff {
+  font-weight: 700;
+}
+
+.case-card .diff.foundation {
+  color: var(--ok);
+}
+
+.case-card .diff.core {
+  color: var(--warn);
+}
+
+.case-card .diff.advanced {
+  color: var(--danger);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.small {
+  font-size: 0.85rem;
+}

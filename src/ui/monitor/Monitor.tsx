@@ -95,6 +95,8 @@ export function Monitor() {
           live: st.phase === 'running',
           artLine: st.view.status.access.art,
           obstruction: Math.min(1, (st.view.signs['wheeze'] ?? 0) * 0.9),
+          signs: st.view.signs,
+          cpr: st.view.status.cpr,
         });
       }
       raf = requestAnimationFrame(loop);

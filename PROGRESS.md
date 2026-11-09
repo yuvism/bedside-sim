@@ -56,15 +56,43 @@ The build brief is in [PROMPT.md](PROMPT.md). The single-file prototype is in `r
 - **Tests:** 11 scoring tests (every rule type, totals, the critical cap, teaching, an ideal anaphylaxis run scoring 100 and a do-nothing run scoring 0), chart-marker alignment, progress, and replay. The e2e test now checks the debrief and replay.
 - Bundle: main 105 kB gz; debrief chunk 109 kB gz
 
+### Phase 4 — Case library
+
+- **Engine:** a real ALS loop (`src/engine/als.ts`). Arrest no longer ends the case. CPR, defibrillation (pads required), and rhythm/pulse checks; ROSC is a seeded chance shaped by CPR fraction, timing, whether the cause has been fixed, and adrenaline/amiodarone. VF decays to asystole, and death follows 15 minutes of continuous arrest. Shocks to non-shockable rhythms or to a patient with a pulse are flagged as harm.
+- **More engine:** continuous infusions (mcg/kg/min, units/kg/h, ml/h) with range warnings; condition-driven process treatments (needle decompression that kinks after 15 min, chest drain, primary PCI, haemorrhage control, dialysis); fluids that act on processes per litre infused; assisted ventilation (bag-valve-mask, airway manoeuvres); new conditions (`procedure` with timing, `infusing`, `effect`, `cpr`, `drugGiven.forSec`); a policy-driven headless runner (`runPolicy`).
+- **Content:** formulary v2 (24 drugs, 3 fluids including red cells and FFP), devices v2 (procedures grouped by category), investigations v2 (19 tests), and nine new cases:
+  - asthma-01 (BTS/SIGN)
+  - stemi-01 (ESC 2023 + ALS)
+  - sepsis-01 (Surviving Sepsis 2021)
+  - dka-01 (JBDS)
+  - hypo-01 (JBDS)
+  - opioid-01 (BNF/ALS)
+  - tension-01 (ATLS)
+  - haemorrhage-01 (ATLS, CRASH-2)
+  - hyperk-01 (UK Kidney Association)
+
+  Each has 10–13 scoring rules (credits, penalties, critical rules), teaching points and references.
+
+- **UI:**
+  - an ALS panel during arrest (CPR, energy and shock, rhythm check, adrenaline and amiodarone via IV or IO, down time and CPR fraction)
+  - infusion start, titrate and stop in the drug picker
+  - procedures grouped by access, airway, breathing, circulation and referrals
+  - ECG morphology from engine signs (ST elevation, peaked T, broad QRS) and CPR artifact on the ECG and arterial trace
+  - case list with specialty, difficulty and text filters plus best score and attempts
+- **Tests (93 unit, 5 e2e):** each case has an "ideal clinician" policy (`tests/unit/cases/policies.ts`) that stabilises the patient in 8/8 seeds with a mean score ≥ 80, plus a do-nothing run that ends in death. There are also ALS and infusion engine tests, and e2e tests for the case filters and the ALS panel.
+
 ## Next
 
-- **Phase 4:** a case library of 10 cases (with the ALS loop for the STEMI/VF case), a case-select screen with filters, and ideal-run and do-nothing tests per case
+- **Phase 5:** a nurse who executes orders after realistic delays with closed-loop read-back and refuses unsafe orders; allergies and contraindications; Guided vs Exam modes; seeded case variations; spontaneous patient lines
 
 ## Design decisions to review
 
 - **Arrest rhythm for anaphylaxis is PEA**, not VF as in the prototype, because anaphylactic arrest is usually non-shockable. This is flagged for clinical review.
 - **IM adrenaline is absorbed from a depot** (absorption half-life 1 min) rather than acting instantly, so improvement starts within a minute and peaks at about 3 minutes.
-- **The ALS loop** (CPR cycles, shocks, ROSC) is deferred to Phase 4 with the STEMI/VF case. Until then, arrest ends the case.
+- **ROSC model** constants are teaching parameters and are listed in `docs/clinical-review.md`. A shock within the first minute of monitored VF counts as full-quality (no no-flow penalty).
+- **Time compression:** DKA, sepsis and hyperkalaemia resolve in tens of minutes rather than hours, so a case fits a teaching session. Every case process says so in its `source`.
+- **Fluid boluses** run at up to 100 ml/min (a pressure bag) whatever the clinical context. JBDS-style "1 L over 1 hour" rates aren't modelled yet.
+- **Ventilator settings** (FiO₂/PEEP/RR/TV) from the brief are not built yet. Bag-valve-mask ventilation covers assisted breathing for now.
 - **Critical-fail cap:** a failed critical rule caps the score at 40/100 (`CRITICAL_CAP` in `scoring.ts`).
 - **Debrief chart as small multiples** rather than one chart with several y-axes, so each vital keeps its own honest scale.
 
@@ -72,4 +100,4 @@ The build brief is in [PROMPT.md](PROMPT.md). The single-file prototype is in `r
 
 - TypeScript is pinned to 6.0.x because typescript-eslint 8 supports only `<6.1`. Move to TS 7 once typescript-eslint supports it.
 - **Not pushed yet.** The repo github.com/yuvism/bedside-sim exists but is empty, because GitHub rejects workflow files from a token without the `workflow` scope. Commits are kept locally until the gh login has that scope (`gh auth refresh -h github.com -s workflow`), then `git push -u origin main`.
-- Bundle sizes are well under the 200 kB gzipped limit: the main bundle is about 105 kB (mostly React and Zod), and the lazy debrief chunk is about 109 kB (mostly Recharts).
+- Bundle sizes are under the 200 kB gzipped limit: the main bundle is about 135 kB (React, Zod and the ten bundled cases), and the lazy debrief chunk is about 109 kB (mostly Recharts). If the library grows much more, cases should load lazily.

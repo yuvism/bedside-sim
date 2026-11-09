@@ -8,17 +8,39 @@ An open-source virtual patient simulator that runs in the browser. You talk to t
 
 ## Status
 
-Early build. See [PROGRESS.md](PROGRESS.md) for what's done and what's next.
+Phases 0–4 of 10 are built. See [PROGRESS.md](PROGRESS.md) for what's done and what's next.
 
-## Planned features
+## Features
 
-- A live bedside monitor (ECG, SpO₂ pleth, capnography, arterial line) with alarms and audio
-- A deterministic, data-driven physiology engine: disease processes, pharmacology, rhythm changes and cardiac arrest
-- Talk, examine (ABCDE and head-to-toe), investigate and treat panels
-- Rule-based scoring and a debrief with a timeline drawn over the vitals
-- Ten cases written as plain JSON, plus a case editor
-- A video validation mode that compares a simulated run with a timeline annotated from a real treatment video
-- A Unity port pack that mirrors the engine in C#
+- **A live bedside monitor:**
+  - ECG that reflects the rhythm, ST elevation, peaked T waves and CPR artifact
+  - SpO₂ pleth, capnography and an arterial line
+  - NIBP cycling
+  - graded alarms with sound, and a pulse beep whose pitch falls with SpO₂
+- **A deterministic, data-driven physiology engine:** disease processes, one-compartment pharmacology with Emax effects, infusions, baroreflex and gas-exchange coupling, a rhythm state machine, and a full ALS loop with CPR, shocks and ROSC
+- **Talk, Examine, Investigate and Treat panels:**
+  - examination by ABCDE plus a head-to-toe body map
+  - tests with realistic turnaround times and a results inbox
+  - a searchable formulary with route, dose and infusion pickers
+- **Scoring and debrief:** rule-based scoring with critical fails, and a debrief with a checklist, a vitals timeline with action markers and teaching points. Runs can be exported as JSON or CSV, or replayed from any minute.
+- **Ten cases written as plain JSON:** anaphylaxis, acute severe asthma, STEMI with VF, septic shock, DKA, hypoglycaemia, opioid overdose, tension pneumothorax, pelvic haemorrhage and hyperkalaemia. Each has an automated ideal-run test and a do-nothing test.
+
+Still to come: a nurse with order delays, Guided and Exam modes, free-text patient conversation, an optional 3D view, a case editor, video validation mode and a Unity port pack.
+
+## Cases
+
+| Case                           | Specialty      | Guideline                      |
+| ------------------------------ | -------------- | ------------------------------ |
+| Collapse after lunch           | Emergency      | Resuscitation Council UK 2021  |
+| Can't finish a sentence        | Respiratory    | BTS/SIGN 158                   |
+| Crushing chest pain            | Cardiology     | ESC ACS 2023, RCUK ALS 2021    |
+| Feverish and muddled           | Acute medicine | Surviving Sepsis Campaign 2021 |
+| Vomiting and breathing fast    | Endocrinology  | JBDS DKA                       |
+| Found drowsy at home           | Endocrinology  | JBDS hypoglycaemia             |
+| Unresponsive in the toilets    | Toxicology     | BNF naloxone, RCUK ALS         |
+| Motorbike crash, can't breathe | Trauma         | ATLS 10th edition              |
+| Pelvic crush                   | Trauma         | ATLS 10th edition, CRASH-2     |
+| Weak and dizzy on dialysis day | Renal          | UK Kidney Association 2020     |
 
 ## Run locally
 

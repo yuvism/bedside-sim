@@ -18,6 +18,8 @@ export interface EcgOpts {
   noP?: boolean;
   /** Broad ventricular complex (PVC, PEA, VT). */
   wide?: boolean;
+  /** Tall, narrow T waves (hyperkalaemia): 0 = normal, 1 = very peaked. */
+  peakedT?: number;
 }
 
 /** Lead II complex; returns roughly −0.4 … 1 (R wave = 1). */
@@ -32,7 +34,7 @@ export function ecgBeat(p: number, o: EcgOpts = {}): number {
     gauss(p, 0.28, 0.008, -0.12) +
     gauss(p, 0.31, 0.01, 1) +
     gauss(p, 0.34, 0.01, -0.28) +
-    gauss(p, 0.58, 0.045, 0.25) +
+    gauss(p, 0.58, 0.045 - 0.015 * (o.peakedT ?? 0), 0.25 + 0.55 * (o.peakedT ?? 0)) +
     st
   );
 }

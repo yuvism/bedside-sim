@@ -6,6 +6,7 @@ import { EventLog } from '../ui/log/EventLog.tsx';
 import { monitorAudio } from '../ui/monitor/audio.ts';
 import { Monitor } from '../ui/monitor/Monitor.tsx';
 import { ActionPanels } from '../ui/panels/ActionPanels.tsx';
+import { AlsPanel } from '../ui/panels/AlsPanel.tsx';
 import { PatientCard } from '../ui/patient/PatientCard.tsx';
 import { Footer } from './Footer.tsx';
 import { SPEEDS, useSim } from './store.ts';
@@ -102,6 +103,7 @@ export function Bedside({ caseDef, seed }: { caseDef: CaseDef; seed: number }) {
           {phase === 'brief' && <BriefCard caseDef={caseDef} />}
         </div>
         <div className="col">
+          <AlsPanel />
           <ActionPanels />
           <EventLog />
         </div>

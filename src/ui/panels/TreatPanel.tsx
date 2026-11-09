@@ -3,7 +3,15 @@ import { LIBRARY } from '../../content/library.ts';
 import { useSim } from '../../app/store.ts';
 import { DrugOrder } from './DrugOrder.tsx';
 
-const VOLUMES = [250, 500, 1000];
+const VOLUMES = [250, 300, 500, 1000];
+
+const PROC_GROUPS = [
+  { id: 'access', label: 'Access and lines' },
+  { id: 'airway', label: 'Airway' },
+  { id: 'breathing', label: 'Breathing procedures' },
+  { id: 'circulation', label: 'Circulation procedures' },
+  { id: 'team', label: 'Referrals and escalation' },
+] as const;
 
 export function TreatPanel({ locked }: { locked: boolean }) {
   const act = useSim((s) => s.act);
@@ -31,7 +39,7 @@ export function TreatPanel({ locked }: { locked: boolean }) {
       </section>
 
       <section className="group" aria-labelledby="treat-o2">
-        <h3 id="treat-o2">Oxygen and position</h3>
+        <h3 id="treat-o2">Oxygen, airway, position and monitoring</h3>
         <div className="grid">
           {devices.map((d) => (
             <button
@@ -48,25 +56,33 @@ export function TreatPanel({ locked }: { locked: boolean }) {
         </div>
       </section>
 
-      <section className="group" aria-labelledby="treat-proc">
-        <h3 id="treat-proc">Access and procedures</h3>
-        <div className="grid">
-          {procedures.map((p) => {
-            const done = p.grants ? !!status?.access[p.grants] : false;
-            return (
-              <button
-                key={p.id}
-                className={`act${done ? ' is-on' : ''}`}
-                disabled={locked}
-                onClick={() => act({ kind: 'procedure', procedureId: p.id })}
-              >
-                {p.label}
-                {p.sub && <small>{done ? 'In place' : p.sub}</small>}
-              </button>
-            );
-          })}
-        </div>
-      </section>
+      {PROC_GROUPS.map((g) => {
+        const list = procedures.filter((p) => p.category === g.id);
+        if (!list.length) return null;
+        return (
+          <section key={g.id} className="group" aria-labelledby={`treat-proc-${g.id}`}>
+            <h3 id={`treat-proc-${g.id}`}>{g.label}</h3>
+            <div className="grid">
+              {list.map((p) => {
+                const done = p.grants
+                  ? !!status?.access[p.grants]
+                  : status?.procedures[p.id] !== undefined;
+                return (
+                  <button
+                    key={p.id}
+                    className={`act${done ? ' is-on' : ''}`}
+                    disabled={locked}
+                    onClick={() => act({ kind: 'procedure', procedureId: p.id })}
+                  >
+                    {p.label}
+                    {p.sub && <small>{done ? 'Done' : p.sub}</small>}
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+        );
+      })}
 
       <section className="group" aria-labelledby="treat-fluids">
         <h3 id="treat-fluids">Fluids</h3>
