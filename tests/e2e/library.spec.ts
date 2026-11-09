@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
-test('case list shows ten cases and filters by specialty, difficulty and text', async ({ page }) => {
+test('case list shows ten cases and filters by specialty, difficulty and text', async ({
+  page,
+}) => {
   await page.goto('./');
   const cards = page.locator('.case-card');
   await expect(cards).toHaveCount(10);
