@@ -17,7 +17,7 @@
     "persona": "Usually sharp and independent. Today muddled and repetitive, keeps asking where her handbag is."
   },
   "brief": [
-    "Margaret, 74, was brought in by her daughter. She has had a cough with green sputum for three days and today she is confused, hot and wobbly on her feet. Her daughter says she is \"not herself at all\".",
+    "Margaret, {age}, was brought in by her daughter. She has had a cough with green sputum for three days and today she is confused, hot and wobbly on her feet. Her daughter says she is \"not herself at all\".",
     "Recognise sepsis early and deliver the bundle in the first hour."
   ],
   "openingLine": "Where's my handbag? I need to get home for the cat.",
@@ -423,7 +423,14 @@
             "gte": 65
           },
           {
-            "drugGiven": "piperacillin_tazobactam"
+            "any": [
+              {
+                "drugGiven": "piperacillin_tazobactam"
+              },
+              {
+                "drugGiven": "levofloxacin"
+              }
+            ]
           },
           {
             "severity": "sepsis",
@@ -479,7 +486,7 @@
       "critical": true,
       "test": {
         "type": "actionWithin",
-        "codes": ["drug:piperacillin_tazobactam:*"],
+        "codes": ["drug:piperacillin_tazobactam:*", "drug:levofloxacin:*"],
         "withinSec": 3600
       }
     },
@@ -491,7 +498,7 @@
       "test": {
         "type": "actionBefore",
         "codes": ["order:cultures"],
-        "before": ["drug:piperacillin_tazobactam:*"]
+        "before": ["drug:piperacillin_tazobactam:*", "drug:levofloxacin:*"]
       }
     },
     {
@@ -572,7 +579,7 @@
       "test": {
         "type": "actionBefore",
         "codes": ["talk:allergy"],
-        "before": ["drug:piperacillin_tazobactam:*"]
+        "before": ["drug:piperacillin_tazobactam:*", "drug:levofloxacin:*"]
       }
     },
     {
@@ -583,6 +590,17 @@
       "test": {
         "type": "diagnosisIs",
         "ids": ["sepsis"]
+      }
+    },
+    {
+      "id": "no-allergen",
+      "label": "No antibiotic she is allergic to",
+      "weight": 15,
+      "kind": "penalty",
+      "critical": true,
+      "test": {
+        "type": "actionNever",
+        "codes": ["allergy:*"]
       }
     }
   ],
@@ -614,6 +632,14 @@
     {
       "id": "lactate",
       "text": "Lactate measures tissue hypoperfusion. Repeat it to check whether resuscitation is working."
+    },
+    {
+      "id": "allergy",
+      "text": "Always check allergies before the first dose of an antibiotic. With penicillin allergy, use the alternative in your local policy and tell microbiology.",
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "no-allergen"
+      }
     }
   ],
   "references": [
@@ -622,5 +648,58 @@
       "label": "Evans L, et al. Surviving Sepsis Campaign: international guidelines for management of sepsis and septic shock 2021. Critical Care Medicine. 2021.",
       "url": "https://www.sccm.org/"
     }
-  ]
+  ],
+  "hints": [
+    {
+      "id": "source",
+      "text": "She's hot and her chest sounds crackly. Where do you think it's coming from?"
+    },
+    {
+      "id": "lactate",
+      "text": "Shall I take a gas for lactate and some blood cultures?"
+    },
+    {
+      "id": "antibiotics",
+      "when": {
+        "not": {
+          "any": [
+            {
+              "drugGiven": "piperacillin_tazobactam"
+            },
+            {
+              "drugGiven": "levofloxacin"
+            }
+          ]
+        }
+      },
+      "text": "Do you want antibiotics? Shall I check her allergies?"
+    },
+    {
+      "id": "pressor",
+      "when": {
+        "vital": "map",
+        "lt": 65
+      },
+      "text": "Her MAP's still below 65 after fluids."
+    }
+  ],
+  "variation": {
+    "ageRange": [68, 84],
+    "weightKgRange": [52, 74],
+    "options": [
+      {
+        "id": "penicillin-allergy",
+        "label": "Penicillin allergy",
+        "chance": 0.4,
+        "allergies": ["penicillin"],
+        "answers": {
+          "allergy": [
+            "Penicillin. I came out in a terrible rash and my face swelled up.",
+            "Penicillin… rash… face swelled.",
+            "(her daughter says she's allergic to penicillin)"
+          ]
+        }
+      }
+    ]
+  }
 }

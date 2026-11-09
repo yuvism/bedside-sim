@@ -19,6 +19,7 @@ import type {
   Access,
   Action,
   CaseDef,
+  Condition,
   EngineLibrary,
   EngineState,
   SimEvent,
@@ -62,6 +63,10 @@ export interface EngineStatus {
 /** Extra read-outs the bedside UI needs; not part of the portable contract. */
 export interface BedsideEngine extends PhysiologyEngine {
   readonly time: number;
+  /** The loaded case (after any variation). */
+  readonly caseDef: CaseDef;
+  /** Evaluate a case-language condition against the current state. */
+  check(c: Condition): boolean;
   signs(): Signs;
   severities(): Record<string, number>;
   status(): EngineStatus;
@@ -140,6 +145,14 @@ export class SimpleEngine implements BedsideEngine {
 
   get time(): number {
     return this.m?.s.t ?? 0;
+  }
+
+  get caseDef(): CaseDef {
+    return this.model.c;
+  }
+
+  check(c: Condition): boolean {
+    return evalCondition(c, context(this.model));
   }
 
   step(dtSec: number): SimEvent[] {

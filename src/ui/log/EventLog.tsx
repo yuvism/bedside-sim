@@ -9,6 +9,7 @@ function display(e: SimEvent): string {
     const nonVerbal = e.data?.['nonVerbal'] === true || e.text.startsWith('(');
     return nonVerbal ? `Patient ${e.text}` : `Patient: “${e.text}”`;
   }
+  if (e.type === 'nurse') return `Nurse: “${e.text}”`;
   return e.text;
 }
 

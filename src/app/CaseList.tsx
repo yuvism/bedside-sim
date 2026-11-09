@@ -101,7 +101,7 @@ export function CaseList() {
               <h3>
                 <a href={caseHref(c.id)}>{c.title}</a>
               </h3>
-              <p>{c.summary}</p>
+              <p>{c.summary.replaceAll('{age}', String(c.patient.age))}</p>
               <p className="meta foot">
                 <span>About {c.estMinutes} min</span>
                 <Best caseId={c.id} />

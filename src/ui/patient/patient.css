@@ -90,3 +90,13 @@
   color: var(--ink);
   background: var(--scrub-soft);
 }
+
+.chip.trend.improving {
+  border-color: var(--ok);
+  color: var(--ok);
+}
+
+.chip.trend.worsening {
+  border-color: var(--danger);
+  color: var(--danger);
+}

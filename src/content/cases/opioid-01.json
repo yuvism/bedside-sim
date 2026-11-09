@@ -573,5 +573,28 @@
       "label": "Resuscitation Council UK. Adult advanced life support guidelines. 2021.",
       "url": "https://www.resus.org.uk/"
     }
-  ]
+  ],
+  "hints": [
+    {
+      "id": "airway",
+      "text": "He's snoring. Can we open his airway?"
+    },
+    {
+      "id": "pupils",
+      "text": "Have you seen his pupils?"
+    },
+    {
+      "id": "naloxone",
+      "when": {
+        "not": {
+          "drugGiven": "naloxone"
+        }
+      },
+      "text": "Shall I get the naloxone?"
+    }
+  ],
+  "variation": {
+    "ageRange": [24, 45],
+    "weightKgRange": [55, 85]
+  }
 }

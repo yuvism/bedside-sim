@@ -6,7 +6,7 @@ Each item below is a teaching parameter or an uncertain value marked `"reviewNee
 A clinician should check it against its source, then either confirm it (cite the guideline
 and remove the flag) or correct it.
 
-**113 flagged items.**
+**130 flagged items.**
 
 ## src/content/formulary.json
 
@@ -82,6 +82,9 @@ and remove the flag) or correct it.
 | `drugs[noradrenaline].effects[sbp]` | target sbp; emax 55; ec50 0.03 | Teaching parameter. |
 | `drugs[noradrenaline].effects[hr]` | target hr; emax 6; ec50 0.05 | Teaching parameter. |
 | `drugs[tranexamic_acid].effects[process:hypovolaemia]` | target process:hypovolaemia; emax -0.8; ec50 0.4 | Teaching parameter: reduces the bleeding rate. |
+| `drugs[levofloxacin]` | id levofloxacin; name Levofloxacin; drugClass Fluoroquinolone antibiotic; unit mg; halfLifeMin 420; 1 routes (see file); 1 effects (see file) | An option for high-severity community-acquired pneumonia with penicillin allergy; follow local antimicrobial policy and microbiology advice. Effect size is a teaching parameter. |
+| `drugs[levofloxacin].routes[IV]` | route IV; label IV infusion; standardDose 500; maxDose 500; bioavailability 1; absorptionHalfLifeMin 0 | Adult IV dose for severe pneumonia per local policy (check BNF and microbiology). |
+| `drugs[levofloxacin].effects[process:sepsis]` | target process:sepsis; emax -2.6; ec50 160 | Teaching parameter, matched to the first-line antibiotic. |
 | `fluids[crystalloid]` | id crystalloid; name Crystalloid; standardVolumeMl 500; maxRateMlPerMin 100; redistributionTauMin 25; 5 effects (see file) | Bolus volumes: Resuscitation Council UK (2021) anaphylaxis 500–1000 ml; Surviving Sepsis Campaign (2021) 30 ml/kg in sepsis-induced hypoperfusion; JBDS DKA (2021) 500 ml over 10–15 min if SBP < 90. Rates, redistribution and effects are teaching parameters. |
 | `fluids[blood]` | id blood; name Packed red cells; standardVolumeMl 300; maxRateMlPerMin 100; redistributionTauMin 240; 3 effects (see file) | Major haemorrhage: early blood and plasma in a balanced ratio, limiting crystalloid (ATLS 10th edition, 2018). Effect sizes are teaching parameters. |
 | `fluids[ffp]` | id ffp; name Fresh frozen plasma; standardVolumeMl 250; maxRateMlPerMin 80; redistributionTauMin 180; 2 effects (see file) | Teaching parameters; given with red cells in major haemorrhage (ATLS 10th edition, 2018). |
@@ -115,6 +118,25 @@ and remove the flag) or correct it.
 | `investigations[tox]` | id tox; label Paracetamol and salicylate levels; sub Lab; category lab; turnaroundMin 60 | Typical urgent laboratory turnaround. Teaching estimate. |
 | `investigations[fast]` | id fast; label eFAST scan; sub Bedside ultrasound; category imaging; turnaroundMin 3 | Typical time for an extended FAST scan. Teaching estimate. |
 | `investigations[xray_pelvis]` | id xray_pelvis; label Pelvic X-ray; sub Portable; category imaging; turnaroundMin 20 | Typical portable X-ray turnaround. Teaching estimate. |
+
+## src/content/team.json
+
+| Item | Values | Source |
+| --- | --- | --- |
+| `delays.drug` | minSec 30; maxSec 60 | Time to check, draw up and give a drug. Teaching estimate. |
+| `delays.drugArrest` | minSec 10; maxSec 20 | Pre-filled arrest drugs from the resus trolley. Teaching estimate. |
+| `delays.infusion` | minSec 60; maxSec 120 | Making up an infusion and setting up the pump. Teaching estimate. |
+| `delays.fluid` | minSec 30; maxSec 60 | Spiking a bag and priming a giving set. Teaching estimate. |
+| `delays.device` | minSec 10; maxSec 20 | Applying an oxygen mask, pads or airway adjunct. Teaching estimate. |
+| `delays.order` | minSec 20; maxSec 45 | Taking a sample or recording a bedside test. Teaching estimate. |
+| `delays.procedure` | minSec 30; maxSec 60 | Default time to prepare and perform a procedure. Teaching estimate. |
+| `delays.procedure:iv_access` | minSec 60; maxSec 120 | Peripheral IV cannulation. Teaching estimate. |
+| `delays.procedure:io_access` | minSec 30; maxSec 60 | Intraosseous needle insertion. Teaching estimate. |
+| `delays.procedure:art_line` | minSec 120; maxSec 240 | Radial arterial line. Teaching estimate. |
+| `delays.procedure:needle_decompression` | minSec 20; maxSec 40 | Needle decompression. Teaching estimate. |
+| `delays.procedure:chest_drain` | minSec 180; maxSec 300 | Chest drain insertion. Teaching estimate. |
+| `delays.procedure:urinary_catheter` | minSec 120; maxSec 240 | Urinary catheter insertion. Teaching estimate. |
+| `delays.team` | minSec 15; maxSec 30 | Making a referral phone call. Teaching estimate. |
 
 ## src/content/cases/anaphylaxis-01.json
 
@@ -229,3 +251,17 @@ Shock and pulse-check odds rise with CPR fraction, early action, fixing the caus
 | `vfToAsystolePerMinNoCpr` | 0.15 |
 | `vfToAsystolePerMinCpr` | 0.03 |
 | `maxChance` | 0.92 |
+
+## Drug allergy reaction
+
+Giving a drug the patient is documented as allergic to adds this transient reaction
+(decay time constant 10 min) in `src/engine/actions.ts`. Teaching parameters.
+
+| Target | Peak change |
+| --- | --- |
+| `sbp` | -40 |
+| `hr` | 30 |
+| `rr` | 6 |
+| `vq` | 3 |
+| `sign:hives` | 0.9 |
+| `sign:flush` | 0.6 |

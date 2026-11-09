@@ -17,7 +17,7 @@
     "persona": "A frightened university student who knows he has a peanut allergy. Polite and cooperative, but speaks in shorter phrases as his breathing gets worse."
   },
   "brief": [
-    "Arjun, 24, is brought to the emergency department by a friend about 20 minutes after eating at the college canteen. He’s itchy all over, short of breath and says he feels faint. You’re the first doctor to see him.",
+    "Arjun, {age}, is brought to the emergency department by a friend about 20 minutes after eating at the college canteen. He’s itchy all over, short of breath and says he feels faint. You’re the first doctor to see him.",
     "Talk to him, examine him, order tests and treat. His body responds to what you do — and to what you don’t. The clock starts when you do."
   ],
   "openingLine": "Doctor… I can’t stop itching, and my throat feels weird.",
@@ -60,27 +60,96 @@
       "arrestAt": 100,
       "arrestRhythm": "pea",
       "effects": [
-        { "target": "sbp", "perPoint": -0.85, "group": "vasodilation" },
-        { "target": "hr", "perPoint": 0.45 },
-        { "target": "rr", "perPoint": 0.2, "group": "bronchospasm" },
-        { "target": "vq", "perPoint": 0.06, "above": 20, "group": "bronchospasm" },
-        { "target": "ventLoss", "perPoint": 0.006, "above": 50, "group": "bronchospasm" },
-        { "target": "shunt", "perPoint": 0.004, "above": 50, "group": "airway" },
-        { "target": "lab:pef", "perPoint": -5, "group": "bronchospasm" },
-        { "target": "lab:lactate", "perPoint": 0.04, "above": 45 },
-        { "target": "sign:flush", "perPoint": 0.0035, "group": "skin" },
-        { "target": "sign:hives", "perPoint": 0.02, "above": 15, "group": "skin" },
-        { "target": "sign:itch", "perPoint": 0.02, "above": 5, "group": "skin" },
-        { "target": "sign:lipSwelling", "perPoint": 0.012, "above": 10, "group": "airway" },
-        { "target": "sign:stridor", "perPoint": 0.033, "above": 55, "group": "airway" },
-        { "target": "sign:wheeze", "perPoint": 0.0167, "above": 25, "group": "bronchospasm" },
-        { "target": "sign:anxiety", "perPoint": 0.012 }
+        {
+          "target": "sbp",
+          "perPoint": -0.85,
+          "group": "vasodilation"
+        },
+        {
+          "target": "hr",
+          "perPoint": 0.45
+        },
+        {
+          "target": "rr",
+          "perPoint": 0.2,
+          "group": "bronchospasm"
+        },
+        {
+          "target": "vq",
+          "perPoint": 0.06,
+          "above": 20,
+          "group": "bronchospasm"
+        },
+        {
+          "target": "ventLoss",
+          "perPoint": 0.006,
+          "above": 50,
+          "group": "bronchospasm"
+        },
+        {
+          "target": "shunt",
+          "perPoint": 0.004,
+          "above": 50,
+          "group": "airway"
+        },
+        {
+          "target": "lab:pef",
+          "perPoint": -5,
+          "group": "bronchospasm"
+        },
+        {
+          "target": "lab:lactate",
+          "perPoint": 0.04,
+          "above": 45
+        },
+        {
+          "target": "sign:flush",
+          "perPoint": 0.0035,
+          "group": "skin"
+        },
+        {
+          "target": "sign:hives",
+          "perPoint": 0.02,
+          "above": 15,
+          "group": "skin"
+        },
+        {
+          "target": "sign:itch",
+          "perPoint": 0.02,
+          "above": 5,
+          "group": "skin"
+        },
+        {
+          "target": "sign:lipSwelling",
+          "perPoint": 0.012,
+          "above": 10,
+          "group": "airway"
+        },
+        {
+          "target": "sign:stridor",
+          "perPoint": 0.033,
+          "above": 55,
+          "group": "airway"
+        },
+        {
+          "target": "sign:wheeze",
+          "perPoint": 0.0167,
+          "above": 25,
+          "group": "bronchospasm"
+        },
+        {
+          "target": "sign:anxiety",
+          "perPoint": 0.012
+        }
       ],
       "source": "Teaching model ported from the prototype (reference/bedside-sim.html); effect sizes are not taken from a guideline. Arrest rhythm is PEA because anaphylactic arrest is usually non-shockable (the prototype showed VF).",
       "reviewNeeded": true
     }
   ],
-  "bands": { "process": "anaphylaxis", "cutoffs": [30, 65] },
+  "bands": {
+    "process": "anaphylaxis",
+    "cutoffs": [30, 65]
+  },
   "dialogue": [
     {
       "id": "what",
@@ -195,16 +264,29 @@
       "label": "Airway",
       "kind": "abcde",
       "findings": [
-        { "when": { "arrest": true }, "text": "No airway noises. Not breathing." },
         {
-          "when": { "severity": "anaphylaxis", "gte": 55 },
+          "when": {
+            "arrest": true
+          },
+          "text": "No airway noises. Not breathing."
+        },
+        {
+          "when": {
+            "severity": "anaphylaxis",
+            "gte": 55
+          },
           "text": "Hoarse voice, audible inspiratory stridor. Lips and tongue swollen."
         },
         {
-          "when": { "severity": "anaphylaxis", "gte": 25 },
+          "when": {
+            "severity": "anaphylaxis",
+            "gte": 25
+          },
           "text": "Talking in sentences. Voice slightly hoarse, lips swollen, no stridor."
         },
-        { "text": "Airway patent, voice normal. Lip swelling settling." }
+        {
+          "text": "Airway patent, voice normal. Lip swelling settling."
+        }
       ]
     },
     {
@@ -212,16 +294,29 @@
       "label": "Breathing",
       "kind": "abcde",
       "findings": [
-        { "when": { "arrest": true }, "text": "No respiratory effort." },
         {
-          "when": { "severity": "anaphylaxis", "gte": 60 },
+          "when": {
+            "arrest": true
+          },
+          "text": "No respiratory effort."
+        },
+        {
+          "when": {
+            "severity": "anaphylaxis",
+            "gte": 60
+          },
           "text": "RR {rr}/min, SpO₂ {spo2}% on {o2}. Widespread wheeze, poor air entry, using accessory muscles."
         },
         {
-          "when": { "severity": "anaphylaxis", "gte": 25 },
+          "when": {
+            "severity": "anaphylaxis",
+            "gte": 25
+          },
           "text": "RR {rr}/min, SpO₂ {spo2}% on {o2}. Widespread expiratory wheeze."
         },
-        { "text": "RR {rr}/min, SpO₂ {spo2}% on {o2}. Occasional wheeze, good air entry." }
+        {
+          "text": "RR {rr}/min, SpO₂ {spo2}% on {o2}. Occasional wheeze, good air entry."
+        }
       ]
     },
     {
@@ -229,16 +324,29 @@
       "label": "Circulation",
       "kind": "abcde",
       "findings": [
-        { "when": { "arrest": true }, "text": "No central pulse." },
         {
-          "when": { "vital": "sbp", "lt": 80 },
+          "when": {
+            "arrest": true
+          },
+          "text": "No central pulse."
+        },
+        {
+          "when": {
+            "vital": "sbp",
+            "lt": 80
+          },
           "text": "HR {hr}, BP {sbp}/{dbp}. Cool, clammy peripheries, capillary refill 5 seconds, weak pulse."
         },
         {
-          "when": { "vital": "sbp", "lt": 95 },
+          "when": {
+            "vital": "sbp",
+            "lt": 95
+          },
           "text": "HR {hr}, BP {sbp}/{dbp}. Capillary refill 3 seconds, warm and flushed."
         },
-        { "text": "HR {hr}, BP {sbp}/{dbp}. Capillary refill under 2 seconds, warm." }
+        {
+          "text": "HR {hr}, BP {sbp}/{dbp}. Capillary refill under 2 seconds, warm."
+        }
       ]
     },
     {
@@ -246,16 +354,29 @@
       "label": "Disability",
       "kind": "abcde",
       "findings": [
-        { "when": { "arrest": true }, "text": "Unresponsive. GCS 3/15." },
         {
-          "when": { "vital": "gcs", "gte": 15 },
+          "when": {
+            "arrest": true
+          },
+          "text": "Unresponsive. GCS 3/15."
+        },
+        {
+          "when": {
+            "vital": "gcs",
+            "gte": 15
+          },
           "text": "GCS {gcs}/15. Alert, very anxious. Pupils equal and reactive. Glucose {glucose:1} mmol/L."
         },
         {
-          "when": { "vital": "gcs", "gte": 13 },
+          "when": {
+            "vital": "gcs",
+            "gte": 13
+          },
           "text": "GCS {gcs}/15. Drowsy, confused about where he is."
         },
-        { "text": "GCS {gcs}/15. Responds only to pain." }
+        {
+          "text": "GCS {gcs}/15. Responds only to pain."
+        }
       ]
     },
     {
@@ -264,10 +385,15 @@
       "kind": "abcde",
       "findings": [
         {
-          "when": { "severity": "anaphylaxis", "gte": 25 },
+          "when": {
+            "severity": "anaphylaxis",
+            "gte": 25
+          },
           "text": "Raised itchy wheals across trunk and arms, flushed skin. Temperature {temp:1} °C."
         },
-        { "text": "Rash fading. Temperature {temp:1} °C." }
+        {
+          "text": "Rash fading. Temperature {temp:1} °C."
+        }
       ]
     },
     {
@@ -276,16 +402,29 @@
       "kind": "region",
       "region": "head",
       "findings": [
-        { "when": { "arrest": true }, "text": "Unresponsive. Lips and tongue swollen, cyanosed." },
         {
-          "when": { "severity": "anaphylaxis", "gte": 55 },
+          "when": {
+            "arrest": true
+          },
+          "text": "Unresponsive. Lips and tongue swollen, cyanosed."
+        },
+        {
+          "when": {
+            "severity": "anaphylaxis",
+            "gte": 55
+          },
           "text": "Lips and tongue grossly swollen. Uvula swollen. Eyes puffy and watering. Drooling slightly."
         },
         {
-          "when": { "severity": "anaphylaxis", "gte": 20 },
+          "when": {
+            "severity": "anaphylaxis",
+            "gte": 20
+          },
           "text": "Lips swollen, tongue normal size. Mild periorbital swelling. Conjunctivae injected."
         },
-        { "text": "Lip swelling settling. Tongue and uvula normal." }
+        {
+          "text": "Lip swelling settling. Tongue and uvula normal."
+        }
       ]
     },
     {
@@ -295,10 +434,15 @@
       "region": "neck",
       "findings": [
         {
-          "when": { "severity": "anaphylaxis", "gte": 55 },
+          "when": {
+            "severity": "anaphylaxis",
+            "gte": 55
+          },
           "text": "Inspiratory stridor audible over the trachea. Using sternocleidomastoids. Trachea central."
         },
-        { "text": "No stridor. Trachea central. JVP not visible." }
+        {
+          "text": "No stridor. Trachea central. JVP not visible."
+        }
       ]
     },
     {
@@ -307,16 +451,29 @@
       "kind": "region",
       "region": "chest",
       "findings": [
-        { "when": { "arrest": true }, "text": "No breath sounds. No heart sounds." },
         {
-          "when": { "severity": "anaphylaxis", "gte": 60 },
+          "when": {
+            "arrest": true
+          },
+          "text": "No breath sounds. No heart sounds."
+        },
+        {
+          "when": {
+            "severity": "anaphylaxis",
+            "gte": 60
+          },
           "text": "Hyperexpanded, poor air entry throughout with a quiet, tight wheeze. Heart sounds normal, tachycardic."
         },
         {
-          "when": { "severity": "anaphylaxis", "gte": 25 },
+          "when": {
+            "severity": "anaphylaxis",
+            "gte": 25
+          },
           "text": "Widespread polyphonic expiratory wheeze. Heart sounds normal, tachycardic."
         },
-        { "text": "Good air entry, scattered wheeze. Heart sounds normal." }
+        {
+          "text": "Good air entry, scattered wheeze. Heart sounds normal."
+        }
       ]
     },
     {
@@ -326,10 +483,15 @@
       "region": "abdomen",
       "findings": [
         {
-          "when": { "severity": "anaphylaxis", "gte": 40 },
+          "when": {
+            "severity": "anaphylaxis",
+            "gte": 40
+          },
           "text": "Soft, mildly tender centrally. He says he feels sick and crampy. Wheals across the abdomen."
         },
-        { "text": "Soft, non-tender." }
+        {
+          "text": "Soft, non-tender."
+        }
       ]
     },
     {
@@ -339,14 +501,22 @@
       "region": "arms",
       "findings": [
         {
-          "when": { "vital": "sbp", "lt": 80 },
+          "when": {
+            "vital": "sbp",
+            "lt": 80
+          },
           "text": "Hands cool and clammy. Radial pulse weak and thready. Wheals on both forearms."
         },
         {
-          "when": { "severity": "anaphylaxis", "gte": 25 },
+          "when": {
+            "severity": "anaphylaxis",
+            "gte": 25
+          },
           "text": "Warm, flushed. Radial pulse fast and bounding. Raised wheals on both forearms, scratch marks."
         },
-        { "text": "Warm, well perfused. Rash fading." }
+        {
+          "text": "Warm, well perfused. Rash fading."
+        }
       ]
     },
     {
@@ -356,34 +526,61 @@
       "region": "legs",
       "findings": [
         {
-          "when": { "severity": "anaphylaxis", "gte": 25 },
+          "when": {
+            "severity": "anaphylaxis",
+            "gte": 25
+          },
           "text": "Wheals on both thighs. No calf swelling or tenderness."
         },
-        { "text": "No rash. No calf swelling or tenderness." }
+        {
+          "text": "No rash. No calf swelling or tenderness."
+        }
       ]
     }
   ],
   "investigations": [
-    { "id": "glu", "results": [{ "text": "Glucose {glucose:1} mmol/L." }] },
+    {
+      "id": "glu",
+      "results": [
+        {
+          "text": "Glucose {glucose:1} mmol/L."
+        }
+      ]
+    },
     {
       "id": "ecg",
       "results": [
         {
-          "when": { "ectopy": true },
+          "when": {
+            "ectopy": true
+          },
           "text": "Sinus tachycardia {hr}/min with frequent ventricular ectopics."
         },
         {
-          "when": { "vital": "hr", "gte": 100 },
+          "when": {
+            "vital": "hr",
+            "gte": 100
+          },
           "text": "Sinus tachycardia, rate {hr}. No ST changes."
         },
-        { "text": "Sinus rhythm, rate {hr}. No ST changes." }
+        {
+          "text": "Sinus rhythm, rate {hr}. No ST changes."
+        }
       ]
     },
     {
       "id": "pef",
       "results": [
-        { "when": { "severity": "anaphylaxis", "gte": 60 }, "text": "Too breathless to perform." },
-        { "text": "Peak flow {pef} L/min (predicted about 580)." }
+        {
+          "when": {
+            "severity": "anaphylaxis",
+            "gte": 60
+          },
+          "text": "Too breathless to perform."
+        },
+        {
+          "text": "Peak flow {pef} L/min (predicted about 580)."
+        }
       ]
     },
     {
@@ -397,11 +594,19 @@
     {
       "id": "tryp",
       "orderNote": "Sample sent. The result takes hours — it confirms the diagnosis later and won’t guide treatment now.",
-      "results": [{ "text": "Mast cell tryptase raised at 38 µg/L, consistent with anaphylaxis." }]
+      "results": [
+        {
+          "text": "Mast cell tryptase raised at 38 µg/L, consistent with anaphylaxis."
+        }
+      ]
     },
     {
       "id": "fbc",
-      "results": [{ "text": "Hb {hb} g/L, WCC {wcc:1} ×10⁹/L, platelets {plt} ×10⁹/L." }]
+      "results": [
+        {
+          "text": "Hb {hb} g/L, WCC {wcc:1} ×10⁹/L, platelets {plt} ×10⁹/L."
+        }
+      ]
     },
     {
       "id": "ue",
@@ -413,31 +618,57 @@
     },
     {
       "id": "cxr",
-      "results": [{ "text": "Hyperinflated lungs. No consolidation, effusion or pneumothorax." }]
+      "results": [
+        {
+          "text": "Hyperinflated lungs. No consolidation, effusion or pneumothorax."
+        }
+      ]
     }
   ],
   "patientLines": [
     {
       "id": "faint",
-      "when": { "severity": "anaphylaxis", "gte": 62 },
+      "when": {
+        "severity": "anaphylaxis",
+        "gte": 62
+      },
       "text": "I feel like I’m going to pass out…"
     },
     {
       "id": "cant-breathe",
-      "when": { "severity": "anaphylaxis", "gte": 82 },
+      "when": {
+        "severity": "anaphylaxis",
+        "gte": 82
+      },
       "text": "Can’t… breathe…"
     },
     {
       "id": "lying-flat",
       "when": {
-        "all": [{ "device": "legs_raised" }, { "severity": "anaphylaxis", "gte": 55 }]
+        "all": [
+          {
+            "device": "legs_raised"
+          },
+          {
+            "severity": "anaphylaxis",
+            "gte": 55
+          }
+        ]
       },
       "text": "I can’t breathe lying down…"
     },
     {
       "id": "better",
       "when": {
-        "all": [{ "severity": "anaphylaxis", "lt": 25 }, { "drugGiven": "adrenaline" }]
+        "all": [
+          {
+            "severity": "anaphylaxis",
+            "lt": 25
+          },
+          {
+            "drugGiven": "adrenaline"
+          }
+        ]
       },
       "text": "That’s easier… my throat’s opening up a bit."
     }
@@ -445,7 +676,15 @@
   "outcomes": {
     "stabilised": {
       "when": {
-        "all": [{ "severity": "anaphylaxis", "lt": 15 }, { "drugGiven": "adrenaline" }]
+        "all": [
+          {
+            "severity": "anaphylaxis",
+            "lt": 15
+          },
+          {
+            "drugGiven": "adrenaline"
+          }
+        ]
       },
       "forSec": 120,
       "text": "Observations stable for 2 minutes."
@@ -454,11 +693,26 @@
   "diagnosis": {
     "correct": ["anaphylaxis"],
     "options": [
-      { "id": "anaphylaxis", "label": "Anaphylaxis" },
-      { "id": "asthma", "label": "Acute severe asthma" },
-      { "id": "panic", "label": "Panic attack" },
-      { "id": "sepsis", "label": "Septic shock" },
-      { "id": "angioedema", "label": "Isolated angioedema" }
+      {
+        "id": "anaphylaxis",
+        "label": "Anaphylaxis"
+      },
+      {
+        "id": "asthma",
+        "label": "Acute severe asthma"
+      },
+      {
+        "id": "panic",
+        "label": "Panic attack"
+      },
+      {
+        "id": "sepsis",
+        "label": "Septic shock"
+      },
+      {
+        "id": "angioedema",
+        "label": "Isolated angioedema"
+      }
     ]
   },
   "scoring": [
@@ -467,7 +721,10 @@
       "label": "Patient stabilised",
       "weight": 30,
       "kind": "credit",
-      "test": { "type": "outcomeIs", "outcomes": ["stabilised"] }
+      "test": {
+        "type": "outcomeIs",
+        "outcomes": ["stabilised"]
+      }
     },
     {
       "id": "adr-given",
@@ -475,56 +732,81 @@
       "weight": 20,
       "kind": "credit",
       "critical": true,
-      "test": { "type": "actionDone", "codes": ["drug:adrenaline:IM"] }
+      "test": {
+        "type": "actionDone",
+        "codes": ["drug:adrenaline:IM"]
+      }
     },
     {
       "id": "adr-3min",
       "label": "Adrenaline within 3 minutes of arrival",
       "weight": 10,
       "kind": "credit",
-      "test": { "type": "actionWithin", "codes": ["drug:adrenaline:IM"], "withinSec": 180 }
+      "test": {
+        "type": "actionWithin",
+        "codes": ["drug:adrenaline:IM"],
+        "withinSec": 180
+      }
     },
     {
       "id": "oxygen",
       "label": "High-flow oxygen",
       "weight": 8,
       "kind": "credit",
-      "test": { "type": "actionDone", "codes": ["device:o2_nrb:on"] }
+      "test": {
+        "type": "actionDone",
+        "codes": ["device:o2_nrb:on"]
+      }
     },
     {
       "id": "help",
       "label": "Called for help",
       "weight": 8,
       "kind": "credit",
-      "test": { "type": "actionDone", "codes": ["help"] }
+      "test": {
+        "type": "actionDone",
+        "codes": ["help"]
+      }
     },
     {
       "id": "fluids",
       "label": "IV fluid bolus",
       "weight": 8,
       "kind": "credit",
-      "test": { "type": "actionDone", "codes": ["fluid:crystalloid"] }
+      "test": {
+        "type": "actionDone",
+        "codes": ["fluid:crystalloid"]
+      }
     },
     {
       "id": "abcde",
       "label": "Full ABCDE assessment",
       "weight": 8,
       "kind": "credit",
-      "test": { "type": "examined", "ids": ["A", "B", "C", "D", "E"] }
+      "test": {
+        "type": "examined",
+        "ids": ["A", "B", "C", "D", "E"]
+      }
     },
     {
       "id": "allergy",
       "label": "Asked about allergies",
       "weight": 4,
       "kind": "credit",
-      "test": { "type": "asked", "ids": ["allergy"] }
+      "test": {
+        "type": "asked",
+        "ids": ["allergy"]
+      }
     },
     {
       "id": "dx",
       "label": "Working diagnosis: anaphylaxis",
       "weight": 4,
       "kind": "credit",
-      "test": { "type": "diagnosisIs", "ids": ["anaphylaxis"] }
+      "test": {
+        "type": "diagnosisIs",
+        "ids": ["anaphylaxis"]
+      }
     },
     {
       "id": "no-iv-bolus",
@@ -532,14 +814,20 @@
       "weight": 20,
       "kind": "penalty",
       "critical": true,
-      "test": { "type": "actionNever", "codes": ["adverse:iv_bolus_outside_arrest"] }
+      "test": {
+        "type": "actionNever",
+        "codes": ["adverse:iv_bolus_outside_arrest"]
+      }
     }
   ],
   "teaching": [
     {
       "id": "no-adrenaline",
       "text": "IM adrenaline is the first-line treatment for anaphylaxis. Oxygen and fluids buy time but don’t reverse the reaction.",
-      "showIf": { "type": "ruleFailed", "id": "adr-given" }
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "adr-given"
+      }
     },
     {
       "id": "late-adrenaline",
@@ -547,8 +835,14 @@
       "showIf": {
         "type": "all",
         "tests": [
-          { "type": "rulePassed", "id": "adr-given" },
-          { "type": "ruleFailed", "id": "adr-3min" }
+          {
+            "type": "rulePassed",
+            "id": "adr-given"
+          },
+          {
+            "type": "ruleFailed",
+            "id": "adr-3min"
+          }
         ]
       }
     },
@@ -558,8 +852,16 @@
       "showIf": {
         "type": "all",
         "tests": [
-          { "type": "actionCount", "codes": ["drug:adrenaline:IM"], "min": 1, "max": 1 },
-          { "type": "ruleFailed", "id": "stabilised" }
+          {
+            "type": "actionCount",
+            "codes": ["drug:adrenaline:IM"],
+            "min": 1,
+            "max": 1
+          },
+          {
+            "type": "ruleFailed",
+            "id": "stabilised"
+          }
         ]
       }
     },
@@ -575,17 +877,26 @@
     {
       "id": "steroids",
       "text": "Steroids are no longer routinely recommended in the emergency treatment of anaphylaxis (Resuscitation Council UK, 2021).",
-      "showIf": { "type": "actionDone", "codes": ["drug:hydrocortisone:*"] }
+      "showIf": {
+        "type": "actionDone",
+        "codes": ["drug:hydrocortisone:*"]
+      }
     },
     {
       "id": "iv-bolus",
       "text": "Undiluted IV adrenaline outside cardiac arrest can cause severe hypertension, arrhythmias and myocardial ischaemia. Refractory cases get a titrated infusion from a specialist.",
-      "showIf": { "type": "actionDone", "codes": ["adverse:iv_bolus_outside_arrest"] }
+      "showIf": {
+        "type": "actionDone",
+        "codes": ["adverse:iv_bolus_outside_arrest"]
+      }
     },
     {
       "id": "tryptase",
       "text": "Good call sending mast cell tryptase — it supports the diagnosis and the allergy referral later.",
-      "showIf": { "type": "actionDone", "codes": ["order:tryp"] }
+      "showIf": {
+        "type": "actionDone",
+        "codes": ["order:tryp"]
+      }
     }
   ],
   "references": [
@@ -599,5 +910,63 @@
       "label": "Resuscitation Council UK. Adult advanced life support guidelines. 2021.",
       "url": "https://www.resus.org.uk/"
     }
-  ]
+  ],
+  "hints": [
+    {
+      "id": "abcde",
+      "text": "Shall we go through ABCDE? His voice sounds a bit hoarse."
+    },
+    {
+      "id": "trigger",
+      "text": "He said it started after lunch. Do we know what he ate?"
+    },
+    {
+      "id": "adrenaline",
+      "when": {
+        "not": {
+          "drugGiven": "adrenaline"
+        }
+      },
+      "text": "He's getting worse, doctor. Do you want something for the reaction?"
+    },
+    {
+      "id": "repeat",
+      "when": {
+        "all": [
+          {
+            "drugGiven": "adrenaline",
+            "forSec": 300
+          },
+          {
+            "severity": "anaphylaxis",
+            "gte": 30
+          }
+        ]
+      },
+      "text": "It's been five minutes since the adrenaline and he's no better."
+    }
+  ],
+  "variation": {
+    "ageRange": [19, 30],
+    "weightKgRange": [60, 82],
+    "options": [
+      {
+        "id": "unknown-allergy",
+        "label": "Doesn't know about his peanut allergy",
+        "chance": 0.4,
+        "answers": {
+          "allergy": [
+            "Not that I know of. Nothing like this has happened before.",
+            "Not that I know of… this has never happened before.",
+            "(shakes his head)"
+          ],
+          "ate": [
+            "Satay noodles at the canteen, about half an hour ago.",
+            "Satay noodles… peanut sauce…",
+            "Satay… peanut…"
+          ]
+        }
+      }
+    ]
+  }
 }

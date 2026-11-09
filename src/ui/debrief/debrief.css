@@ -231,3 +231,28 @@ dialog.debrief::backdrop {
   font-size: 0.8rem;
   margin-top: 16px;
 }
+
+.domains {
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.domains th,
+.domains td {
+  text-align: left;
+  padding: 3px 16px 3px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.verdict {
+  font-weight: 700;
+  margin: 8px 0 0;
+}
+
+.verdict.pass {
+  color: var(--ok);
+}
+
+.verdict.fail {
+  color: var(--danger);
+}

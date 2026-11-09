@@ -17,7 +17,7 @@
     "persona": "Panicky and breathless, in a lot of pain on the left side of his chest."
   },
   "brief": [
-    "Ryan, 26, came off his motorbike at about 50 mph and hit a lamp post with the left side of his chest. The ambulance crew put on a collar and gave oxygen. In the last few minutes he has become much more breathless.",
+    "Ryan, {age}, came off his motorbike at about 50 mph and hit a lamp post with the left side of his chest. The ambulance crew put on a collar and gave oxygen. In the last few minutes he has become much more breathless.",
     "Run an ATLS-style primary survey. Treat life threats as you find them."
   ],
   "openingLine": "Can't… breathe… my chest…",
@@ -31,7 +31,15 @@
     "hrJitter": 4,
     "sbpJitter": 4
   },
-  "labs": { "lactate": 1.5, "hco3": 24, "k": 4.1, "na": 140, "hb": 145, "wcc": 12, "plt": 250 },
+  "labs": {
+    "lactate": 1.5,
+    "hco3": 24,
+    "k": 4.1,
+    "na": 140,
+    "hb": 145,
+    "wcc": 12,
+    "plt": 250
+  },
   "processes": [
     {
       "id": "ptx",
@@ -45,26 +53,59 @@
       "arrestAt": 100,
       "arrestRhythm": "pea",
       "effects": [
-        { "target": "shunt", "perPoint": 0.004, "above": 10 },
-        { "target": "rr", "perPoint": 0.25 },
-        { "target": "hr", "perPoint": 0.5 },
-        { "target": "sbp", "perPoint": -1, "above": 30 },
-        { "target": "ventLoss", "perPoint": 0.004, "above": 50 },
-        { "target": "sign:effort", "perPoint": 0.012 },
-        { "target": "sign:anxiety", "perPoint": 0.012 },
-        { "target": "sign:sweating", "perPoint": 0.01, "above": 40 }
+        {
+          "target": "shunt",
+          "perPoint": 0.004,
+          "above": 10
+        },
+        {
+          "target": "rr",
+          "perPoint": 0.25
+        },
+        {
+          "target": "hr",
+          "perPoint": 0.5
+        },
+        {
+          "target": "sbp",
+          "perPoint": -1,
+          "above": 30
+        },
+        {
+          "target": "ventLoss",
+          "perPoint": 0.004,
+          "above": 50
+        },
+        {
+          "target": "sign:effort",
+          "perPoint": 0.012
+        },
+        {
+          "target": "sign:anxiety",
+          "perPoint": 0.012
+        },
+        {
+          "target": "sign:sweating",
+          "perPoint": 0.01,
+          "above": 40
+        }
       ],
       "treatments": [
         {
           "id": "needle",
-          "when": { "procedure": "needle_decompression", "withinSec": 900 },
+          "when": {
+            "procedure": "needle_decompression",
+            "withinSec": 900
+          },
           "ratePerMin": -25,
           "source": "Needle decompression releases the tension but the cannula can kink or block; here it stops working after 15 minutes. Teaching parameters.",
           "reviewNeeded": true
         },
         {
           "id": "drain",
-          "when": { "procedure": "chest_drain" },
+          "when": {
+            "procedure": "chest_drain"
+          },
           "ratePerMin": -25,
           "source": "Chest drain is definitive treatment (ATLS 10th edition, 2018). Rate is a teaching parameter.",
           "reviewNeeded": true
@@ -74,7 +115,10 @@
       "reviewNeeded": true
     }
   ],
-  "bands": { "process": "ptx", "cutoffs": [25, 65] },
+  "bands": {
+    "process": "ptx",
+    "cutoffs": [25, 65]
+  },
   "dialogue": [
     {
       "id": "what",
@@ -140,8 +184,15 @@
       "label": "Airway and C-spine",
       "kind": "abcde",
       "findings": [
-        { "when": { "arrest": true }, "text": "No airway noises. Not breathing." },
-        { "text": "Airway patent, talking in gasps. Collar on, C-spine immobilised." }
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "No airway noises. Not breathing."
+        },
+        {
+          "text": "Airway patent, talking in gasps. Collar on, C-spine immobilised."
+        }
       ]
     },
     {
@@ -149,13 +200,23 @@
       "label": "Breathing",
       "kind": "abcde",
       "findings": [
-        { "when": { "arrest": true }, "text": "No respiratory effort." },
         {
-          "when": { "severity": "ptx", "gte": 30 },
+          "when": {
+            "arrest": true
+          },
+          "text": "No respiratory effort."
+        },
+        {
+          "when": {
+            "severity": "ptx",
+            "gte": 30
+          },
           "text": "RR {rr}/min, SpO₂ {spo2}% on {o2}. Trachea deviated to the right. Left chest hyper-resonant with absent breath sounds, moving less. Distended neck veins."
         },
         {
-          "when": { "procedure": "chest_drain" },
+          "when": {
+            "procedure": "chest_drain"
+          },
           "text": "RR {rr}/min, SpO₂ {spo2}% on {o2}. Air entry returning on the left. Drain swinging. Trachea central."
         },
         {
@@ -168,12 +229,22 @@
       "label": "Circulation",
       "kind": "abcde",
       "findings": [
-        { "when": { "arrest": true }, "text": "No central pulse." },
         {
-          "when": { "vital": "sbp", "lt": 90 },
+          "when": {
+            "arrest": true
+          },
+          "text": "No central pulse."
+        },
+        {
+          "when": {
+            "vital": "sbp",
+            "lt": 90
+          },
           "text": "HR {hr}, BP {sbp}/{dbp}. Cool, clammy. No external bleeding. Abdomen and pelvis not obviously injured."
         },
-        { "text": "HR {hr}, BP {sbp}/{dbp}. No external bleeding. Abdomen soft. Pelvis stable." }
+        {
+          "text": "HR {hr}, BP {sbp}/{dbp}. No external bleeding. Abdomen soft. Pelvis stable."
+        }
       ]
     },
     {
@@ -181,7 +252,12 @@
       "label": "Disability",
       "kind": "abcde",
       "findings": [
-        { "when": { "arrest": true }, "text": "Unresponsive. GCS 3/15." },
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "Unresponsive. GCS 3/15."
+        },
         {
           "text": "GCS {gcs}/15. Pupils equal and reactive. Moving all four limbs. Glucose {glucose:1} mmol/L."
         }
@@ -204,10 +280,15 @@
       "region": "neck",
       "findings": [
         {
-          "when": { "severity": "ptx", "gte": 30 },
+          "when": {
+            "severity": "ptx",
+            "gte": 30
+          },
           "text": "Trachea deviated to the right. Neck veins distended. Some surgical emphysema."
         },
-        { "text": "Trachea central. Neck veins not distended." }
+        {
+          "text": "Trachea central. Neck veins not distended."
+        }
       ]
     },
     {
@@ -217,10 +298,15 @@
       "region": "chest",
       "findings": [
         {
-          "when": { "severity": "ptx", "gte": 30 },
+          "when": {
+            "severity": "ptx",
+            "gte": 30
+          },
           "text": "Left: hyper-resonant, silent, moving less. Tender over ribs 5–7. Right: normal."
         },
-        { "text": "Left air entry returning. Ribs tender. Right normal." }
+        {
+          "text": "Left air entry returning. Ribs tender. Right normal."
+        }
       ]
     },
     {
@@ -228,7 +314,11 @@
       "label": "Abdomen and pelvis",
       "kind": "region",
       "region": "abdomen",
-      "findings": [{ "text": "Soft, non-tender. Pelvis stable on gentle examination." }]
+      "findings": [
+        {
+          "text": "Soft, non-tender. Pelvis stable on gentle examination."
+        }
+      ]
     }
   ],
   "investigations": [
@@ -236,10 +326,15 @@
       "id": "fast",
       "results": [
         {
-          "when": { "severity": "ptx", "gte": 20 },
+          "when": {
+            "severity": "ptx",
+            "gte": 20
+          },
           "text": "eFAST: no lung sliding on the left (pneumothorax). No free fluid. No pericardial effusion."
         },
-        { "text": "eFAST: lung sliding returning on the left. No free fluid." }
+        {
+          "text": "eFAST: lung sliding returning on the left. No free fluid."
+        }
       ]
     },
     {
@@ -247,10 +342,15 @@
       "orderNote": "Tension pneumothorax is a clinical diagnosis. Don't wait for an X-ray to decompress.",
       "results": [
         {
-          "when": { "severity": "ptx", "gte": 20 },
+          "when": {
+            "severity": "ptx",
+            "gte": 20
+          },
           "text": "Large left pneumothorax with mediastinal shift to the right. Left rib fractures 5–7."
         },
-        { "text": "Left lung re-expanded, drain in a good position. Rib fractures 5–7." }
+        {
+          "text": "Left lung re-expanded, drain in a good position. Rib fractures 5–7."
+        }
       ]
     },
     {
@@ -261,25 +361,70 @@
         }
       ]
     },
-    { "id": "vbg", "results": [{ "text": "pH {ph:2}, lactate {lactate:1} mmol/L, Hb {hb} g/L." }] },
-    { "id": "xmatch", "results": [{ "text": "Group O RhD positive. 4 units crossmatched." }] },
+    {
+      "id": "vbg",
+      "results": [
+        {
+          "text": "pH {ph:2}, lactate {lactate:1} mmol/L, Hb {hb} g/L."
+        }
+      ]
+    },
+    {
+      "id": "xmatch",
+      "results": [
+        {
+          "text": "Group O RhD positive. 4 units crossmatched."
+        }
+      ]
+    },
     {
       "id": "fbc",
-      "results": [{ "text": "Hb {hb} g/L, WCC {wcc:1} ×10⁹/L, platelets {plt} ×10⁹/L." }]
+      "results": [
+        {
+          "text": "Hb {hb} g/L, WCC {wcc:1} ×10⁹/L, platelets {plt} ×10⁹/L."
+        }
+      ]
     },
-    { "id": "glu", "results": [{ "text": "Glucose {glucose:1} mmol/L." }] }
+    {
+      "id": "glu",
+      "results": [
+        {
+          "text": "Glucose {glucose:1} mmol/L."
+        }
+      ]
+    }
   ],
   "patientLines": [
-    { "id": "worse", "when": { "severity": "ptx", "gte": 70 }, "text": "I'm… going to… die…" },
+    {
+      "id": "worse",
+      "when": {
+        "severity": "ptx",
+        "gte": 70
+      },
+      "text": "I'm… going to… die…"
+    },
     {
       "id": "relief",
-      "when": { "procedure": "needle_decompression", "withinSec": 30 },
+      "when": {
+        "procedure": "needle_decompression",
+        "withinSec": 30
+      },
       "text": "Oh… that's… easier."
     }
   ],
   "outcomes": {
     "stabilised": {
-      "when": { "all": [{ "procedure": "chest_drain" }, { "severity": "ptx", "lt": 15 }] },
+      "when": {
+        "all": [
+          {
+            "procedure": "chest_drain"
+          },
+          {
+            "severity": "ptx",
+            "lt": 15
+          }
+        ]
+      },
       "forSec": 120,
       "text": "Chest drain in, lung re-expanded, observations settling for 2 minutes."
     }
@@ -287,11 +432,26 @@
   "diagnosis": {
     "correct": ["tension"],
     "options": [
-      { "id": "tension", "label": "Tension pneumothorax" },
-      { "id": "haemothorax", "label": "Massive haemothorax" },
-      { "id": "tamponade", "label": "Cardiac tamponade" },
-      { "id": "flail", "label": "Flail chest" },
-      { "id": "contusion", "label": "Pulmonary contusion" }
+      {
+        "id": "tension",
+        "label": "Tension pneumothorax"
+      },
+      {
+        "id": "haemothorax",
+        "label": "Massive haemothorax"
+      },
+      {
+        "id": "tamponade",
+        "label": "Cardiac tamponade"
+      },
+      {
+        "id": "flail",
+        "label": "Flail chest"
+      },
+      {
+        "id": "contusion",
+        "label": "Pulmonary contusion"
+      }
     ]
   },
   "scoring": [
@@ -300,7 +460,10 @@
       "label": "Decompressed, drained and stable",
       "weight": 20,
       "kind": "credit",
-      "test": { "type": "outcomeIs", "outcomes": ["stabilised"] }
+      "test": {
+        "type": "outcomeIs",
+        "outcomes": ["stabilised"]
+      }
     },
     {
       "id": "decompress",
@@ -319,14 +482,20 @@
       "label": "Chest drain placed",
       "weight": 12,
       "kind": "credit",
-      "test": { "type": "actionDone", "codes": ["procedure:chest_drain"] }
+      "test": {
+        "type": "actionDone",
+        "codes": ["procedure:chest_drain"]
+      }
     },
     {
       "id": "oxygen",
       "label": "High-flow oxygen",
       "weight": 6,
       "kind": "credit",
-      "test": { "type": "actionDone", "codes": ["device:o2_nrb:on"] }
+      "test": {
+        "type": "actionDone",
+        "codes": ["device:o2_nrb:on"]
+      }
     },
     {
       "id": "breathing-exam",
@@ -344,35 +513,50 @@
       "label": "IV access",
       "weight": 5,
       "kind": "credit",
-      "test": { "type": "actionDone", "codes": ["procedure:iv_access", "procedure:io_access"] }
+      "test": {
+        "type": "actionDone",
+        "codes": ["procedure:iv_access", "procedure:io_access"]
+      }
     },
     {
       "id": "team",
       "label": "Trauma team called",
       "weight": 5,
       "kind": "credit",
-      "test": { "type": "actionDone", "codes": ["help"] }
+      "test": {
+        "type": "actionDone",
+        "codes": ["help"]
+      }
     },
     {
       "id": "primary-survey",
       "label": "Full primary survey",
       "weight": 6,
       "kind": "credit",
-      "test": { "type": "examined", "ids": ["A", "B", "C", "D", "E"] }
+      "test": {
+        "type": "examined",
+        "ids": ["A", "B", "C", "D", "E"]
+      }
     },
     {
       "id": "efast",
       "label": "eFAST performed",
       "weight": 4,
       "kind": "credit",
-      "test": { "type": "actionDone", "codes": ["order:fast"] }
+      "test": {
+        "type": "actionDone",
+        "codes": ["order:fast"]
+      }
     },
     {
       "id": "dx",
       "label": "Working diagnosis: tension pneumothorax",
       "weight": 4,
       "kind": "credit",
-      "test": { "type": "diagnosisIs", "ids": ["tension"] }
+      "test": {
+        "type": "diagnosisIs",
+        "ids": ["tension"]
+      }
     },
     {
       "id": "no-xray-delay",
@@ -393,22 +577,34 @@
     {
       "id": "clinical",
       "text": "Tension pneumothorax is a clinical diagnosis: respiratory distress, hypotension, tracheal deviation and an absent, hyper-resonant hemithorax. Decompress first and image afterwards.",
-      "showIf": { "type": "ruleFailed", "id": "no-xray-delay" }
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "no-xray-delay"
+      }
     },
     {
       "id": "site",
       "text": "In adults, ATLS (10th edition) recommends needle decompression at the 4th/5th intercostal space just anterior to the mid-axillary line, because the chest wall is thinner there than at the 2nd intercostal space.",
-      "showIf": { "type": "actionDone", "codes": ["procedure:needle_decompression"] }
+      "showIf": {
+        "type": "actionDone",
+        "codes": ["procedure:needle_decompression"]
+      }
     },
     {
       "id": "drain",
       "text": "Needle decompression is a temporising measure: cannulas kink and block. Follow it with a chest drain.",
-      "showIf": { "type": "ruleFailed", "id": "drain" }
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "drain"
+      }
     },
     {
       "id": "late",
       "text": "Untreated tension pneumothorax progresses to cardiac arrest in PEA within minutes. Treat it as soon as you recognise it.",
-      "showIf": { "type": "ruleFailed", "id": "decompress" }
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "decompress"
+      }
     }
   ],
   "references": [
@@ -417,5 +613,32 @@
       "label": "American College of Surgeons. Advanced Trauma Life Support (ATLS) Student Course Manual. 10th edition. 2018.",
       "url": "https://www.facs.org/"
     }
-  ]
+  ],
+  "hints": [
+    {
+      "id": "look",
+      "text": "His trachea looks like it has moved. Want to look at his chest?"
+    },
+    {
+      "id": "decompress",
+      "when": {
+        "not": {
+          "procedure": "needle_decompression"
+        }
+      },
+      "text": "His pressure's dropping fast, doctor."
+    },
+    {
+      "id": "drain",
+      "when": {
+        "procedure": "needle_decompression",
+        "forSec": 120
+      },
+      "text": "Shall I set up for a chest drain?"
+    }
+  ],
+  "variation": {
+    "ageRange": [19, 40],
+    "weightKgRange": [65, 95]
+  }
 }

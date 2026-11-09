@@ -68,3 +68,11 @@
   padding: 10px 16px;
   margin: 0;
 }
+
+.log li.nurse {
+  border-left-color: var(--warn);
+}
+
+.log li.nurse span {
+  color: var(--ink);
+}

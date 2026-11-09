@@ -12,6 +12,8 @@ export interface PatientInfo {
   occupation?: string;
   /** How they talk and behave; also feeds the optional AI patient prompt. */
   persona: string;
+  /** Drug allergy classes, matched against formulary allergyClasses (e.g. "penicillin"). */
+  allergies?: string[];
 }
 
 /** Physiology at severity 0. Gas-exchange terms are optional with healthy defaults. */
@@ -159,9 +161,15 @@ export type RuleTest =
   | { type: 'any'; tests: RuleTest[] }
   | { type: 'not'; test: RuleTest };
 
+/** OSCE-style domains for the exam-mode breakdown. */
+export const SCORE_DOMAINS = ['assessment', 'diagnosis', 'management', 'safety'] as const;
+export type ScoreDomain = (typeof SCORE_DOMAINS)[number];
+
 export interface ScoringRule {
   id: string;
   label: string;
+  /** Inferred from the test type when omitted. */
+  domain?: ScoreDomain;
   /** Points gained when passed (credit) or lost when failed (penalty). */
   weight: number;
   kind: 'credit' | 'penalty';
@@ -213,4 +221,35 @@ export interface CaseDef {
   scoring: ScoringRule[];
   teaching: TeachingPoint[];
   references: Reference[];
+  /** Guided-mode prompts from the nurse, shown after a spell with no action. */
+  hints?: Hint[];
+  /** Seeded variations applied when a session starts. */
+  variation?: Variation;
+}
+
+export interface Hint {
+  id: string;
+  /** Only offered while this holds. */
+  when?: Condition;
+  text: string;
+}
+
+export interface VariationOption {
+  id: string;
+  label: string;
+  /** Probability 0–1 that this option applies. */
+  chance: number;
+  allergies?: string[];
+  /** Replacement answers (one per band) by dialogue id: moves or hides the key clue. */
+  answers?: Record<string, string[]>;
+  /** Offsets to the baseline physiology. */
+  baseline?: { hr?: number; sbp?: number; rr?: number; temp?: number };
+  /** Added to every process's starting severity. */
+  severity?: number;
+}
+
+export interface Variation {
+  ageRange?: [number, number];
+  weightKgRange?: [number, number];
+  options?: VariationOption[];
 }

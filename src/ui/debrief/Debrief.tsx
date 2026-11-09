@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useSim } from '../../app/store.ts';
-import { CRITICAL_CAP, lastDiagnosis, type RuleResult } from '../../engine/scoring.ts';
+import { SCORE_DOMAINS, type ScoreDomain } from '../../engine/caseTypes.ts';
+import { CRITICAL_CAP, lastDiagnosis, PASS_MARK, type RuleResult } from '../../engine/scoring.ts';
 import { fmtClock } from '../format.ts';
 import { buildChartData } from './chartData.ts';
 import { copyText, download, fileStem, runExport } from './exportRun.ts';
@@ -11,6 +12,13 @@ const TITLES = {
   died: (n: string) => `${n} died`,
   ended: () => 'Case ended',
 } as const;
+
+const DOMAIN_LABEL: Record<ScoreDomain, string> = {
+  assessment: 'Assessment',
+  diagnosis: 'Diagnosis',
+  management: 'Management',
+  safety: 'Safety (penalties)',
+};
 
 const MARK: Record<RuleResult['status'], string> = {
   done: '✓',
@@ -38,6 +46,7 @@ export default function Debrief({
   const reason = useSim((s) => s.endReason);
   const score = useSim((s) => s.score);
   const progress = useSim((s) => s.progress);
+  const mode = useSim((s) => s.mode);
   const replayFrom = useSim((s) => s.replayFrom);
   const [copied, setCopied] = useState<string | null>(null);
   const [minute, setMinute] = useState(0);
@@ -92,6 +101,39 @@ export default function Debrief({
           )}
         </div>
       </div>
+
+      <h3>{mode === 'exam' ? 'OSCE breakdown' : 'By domain'}</h3>
+      <table className="domains">
+        <thead>
+          <tr>
+            <th scope="col">Domain</th>
+            <th scope="col">Points</th>
+          </tr>
+        </thead>
+        <tbody>
+          {SCORE_DOMAINS.filter(
+            (d) => score.domains[d].max > 0 || score.domains[d].earned !== 0,
+          ).map((d) => (
+            <tr key={d}>
+              <th scope="row">{DOMAIN_LABEL[d]}</th>
+              <td>
+                {score.domains[d].earned} / {score.domains[d].max}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {mode === 'exam' && (
+        <p className={`verdict ${score.pass ? 'pass' : 'fail'}`}>
+          {score.pass ? 'Pass' : 'Not yet a pass'}: pass mark {PASS_MARK}% with no critical step
+          missed.
+        </p>
+      )}
+      {session.variations.length > 0 && (
+        <p className="muted small">
+          This patient's variation: {session.variations.map((v) => v.label).join(', ')}.
+        </p>
+      )}
 
       <h3>Checklist</h3>
       <ul className="check">

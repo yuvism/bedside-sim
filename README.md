@@ -8,7 +8,7 @@ An open-source virtual patient simulator that runs in the browser. You talk to t
 
 ## Status
 
-Phases 0–4 of 10 are built. See [PROGRESS.md](PROGRESS.md) for what's done and what's next.
+Phases 0–5 of 10 are built. See [PROGRESS.md](PROGRESS.md) for what's done and what's next.
 
 ## Features
 
@@ -25,7 +25,11 @@ Phases 0–4 of 10 are built. See [PROGRESS.md](PROGRESS.md) for what's done and
 - **Scoring and debrief:** rule-based scoring with critical fails, and a debrief with a checklist, a vitals timeline with action markers and teaching points. Runs can be exported as JSON or CSV, or replayed from any minute.
 - **Ten cases written as plain JSON:** anaphylaxis, acute severe asthma, STEMI with VF, septic shock, DKA, hypoglycaemia, opioid overdose, tension pneumothorax, pelvic haemorrhage and hyperkalaemia. Each has an automated ideal-run test and a do-nothing test.
 
-Still to come: a nurse with order delays, Guided and Exam modes, free-text patient conversation, an optional 3D view, a case editor, video validation mode and a Unity port pack.
+- **A nurse at the bedside:** she reads back your orders, carries them out after realistic delays, and challenges unsafe ones (allergies, contraindications, overdoses, no IV access).
+- **Guided mode:** prompts and teaching notes as you go. **Exam mode:** silent, with an OSCE-style breakdown and pass mark at the end.
+- **Seeded patient variations:** age, weight, allergies, comorbidities and where the key clue hides, so each run is a little different.
+
+Still to come: free-text patient conversation, an optional 3D view, a case editor, video validation mode and a Unity port pack.
 
 ## Cases
 

@@ -17,7 +17,7 @@
     "persona": "Stoic, minimises his symptoms, worried about missing work. Clutches his chest and is clearly in pain."
   },
   "brief": [
-    "David, 58, walked into the emergency department with 40 minutes of crushing central chest pain going into his jaw. He is grey and sweaty. He smokes and takes tablets for blood pressure.",
+    "David, {age}, walked into the emergency department with 40 minutes of crushing central chest pain going into his jaw. He is grey and sweaty. He smokes and takes tablets for blood pressure.",
     "Time is muscle. Make the diagnosis, start treatment, get him to the right place — and be ready if his heart rhythm changes."
   ],
   "openingLine": "It's like an elephant sitting on my chest, doc.",
@@ -56,21 +56,59 @@
       "arrestAt": 100,
       "arrestRhythm": "vf",
       "effects": [
-        { "target": "hr", "perPoint": 0.35 },
-        { "target": "sbp", "perPoint": -0.7, "above": 40 },
-        { "target": "rr", "perPoint": 0.1 },
-        { "target": "shunt", "perPoint": 0.003, "above": 65 },
-        { "target": "lab:troponin", "perPoint": 3 },
-        { "target": "lab:lactate", "perPoint": 0.04, "above": 60 },
-        { "target": "sign:sweating", "perPoint": 0.012 },
-        { "target": "sign:pain", "perPoint": 0.014, "group": "pain" },
-        { "target": "sign:ecg_st", "perPoint": 0.014, "above": 10 },
-        { "target": "sign:anxiety", "perPoint": 0.01 }
+        {
+          "target": "hr",
+          "perPoint": 0.35
+        },
+        {
+          "target": "sbp",
+          "perPoint": -0.7,
+          "above": 40
+        },
+        {
+          "target": "rr",
+          "perPoint": 0.1
+        },
+        {
+          "target": "shunt",
+          "perPoint": 0.003,
+          "above": 65
+        },
+        {
+          "target": "lab:troponin",
+          "perPoint": 3
+        },
+        {
+          "target": "lab:lactate",
+          "perPoint": 0.04,
+          "above": 60
+        },
+        {
+          "target": "sign:sweating",
+          "perPoint": 0.012
+        },
+        {
+          "target": "sign:pain",
+          "perPoint": 0.014,
+          "group": "pain"
+        },
+        {
+          "target": "sign:ecg_st",
+          "perPoint": 0.014,
+          "above": 10
+        },
+        {
+          "target": "sign:anxiety",
+          "perPoint": 0.01
+        }
       ],
       "treatments": [
         {
           "id": "reperfusion",
-          "when": { "procedure": "pci", "forSec": 1200 },
+          "when": {
+            "procedure": "pci",
+            "forSec": 1200
+          },
           "ratePerMin": -6,
           "source": "Primary PCI reperfuses the artery; the cath lab takes about 20 minutes to be ready in this case. Rate is a teaching parameter.",
           "reviewNeeded": true
@@ -85,13 +123,19 @@
       "id": "ischaemic-vf",
       "from": ["sinus", "sinus_tachy", "sinus_brady"],
       "to": "vf",
-      "when": { "severity": "ischaemia", "gte": 55 },
+      "when": {
+        "severity": "ischaemia",
+        "gte": 55
+      },
       "probPerMin": 0.04,
       "source": "Teaching parameter: risk of ischaemic VF while the artery stays occluded.",
       "reviewNeeded": true
     }
   ],
-  "bands": { "process": "ischaemia", "cutoffs": [30, 75] },
+  "bands": {
+    "process": "ischaemia",
+    "cutoffs": [30, 75]
+  },
   "dialogue": [
     {
       "id": "pain",
@@ -179,8 +223,15 @@
       "label": "Airway",
       "kind": "abcde",
       "findings": [
-        { "when": { "arrest": true }, "text": "No airway noises. Not breathing." },
-        { "text": "Airway patent, talking." }
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "No airway noises. Not breathing."
+        },
+        {
+          "text": "Airway patent, talking."
+        }
       ]
     },
     {
@@ -188,12 +239,22 @@
       "label": "Breathing",
       "kind": "abcde",
       "findings": [
-        { "when": { "arrest": true }, "text": "No respiratory effort." },
         {
-          "when": { "severity": "ischaemia", "gte": 65 },
+          "when": {
+            "arrest": true
+          },
+          "text": "No respiratory effort."
+        },
+        {
+          "when": {
+            "severity": "ischaemia",
+            "gte": 65
+          },
           "text": "RR {rr}/min, SpO₂ {spo2}% on {o2}. Fine crackles at both bases."
         },
-        { "text": "RR {rr}/min, SpO₂ {spo2}% on {o2}. Chest clear." }
+        {
+          "text": "RR {rr}/min, SpO₂ {spo2}% on {o2}. Chest clear."
+        }
       ]
     },
     {
@@ -201,9 +262,17 @@
       "label": "Circulation",
       "kind": "abcde",
       "findings": [
-        { "when": { "arrest": true }, "text": "No central pulse." },
         {
-          "when": { "vital": "sbp", "lt": 100 },
+          "when": {
+            "arrest": true
+          },
+          "text": "No central pulse."
+        },
+        {
+          "when": {
+            "vital": "sbp",
+            "lt": 100
+          },
           "text": "HR {hr}, BP {sbp}/{dbp}. Cool, clammy, grey. Capillary refill 4 seconds. Heart sounds quiet."
         },
         {
@@ -216,15 +285,26 @@
       "label": "Disability",
       "kind": "abcde",
       "findings": [
-        { "when": { "arrest": true }, "text": "Unresponsive. GCS 3/15." },
-        { "text": "GCS {gcs}/15. Alert, in pain. Glucose {glucose:1} mmol/L." }
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "Unresponsive. GCS 3/15."
+        },
+        {
+          "text": "GCS {gcs}/15. Alert, in pain. Glucose {glucose:1} mmol/L."
+        }
       ]
     },
     {
       "id": "E",
       "label": "Exposure",
       "kind": "abcde",
-      "findings": [{ "text": "Temperature {temp:1} °C. No rash. Calves soft, no swelling." }]
+      "findings": [
+        {
+          "text": "Temperature {temp:1} °C. No rash. Calves soft, no swelling."
+        }
+      ]
     },
     {
       "id": "chest",
@@ -233,10 +313,15 @@
       "region": "chest",
       "findings": [
         {
-          "when": { "severity": "ischaemia", "gte": 65 },
+          "when": {
+            "severity": "ischaemia",
+            "gte": 65
+          },
           "text": "Quiet heart sounds, possible third heart sound. Bibasal crackles."
         },
-        { "text": "Heart sounds normal. Chest clear. Pain not reproducible on pressure." }
+        {
+          "text": "Heart sounds normal. Chest clear. Pain not reproducible on pressure."
+        }
       ]
     },
     {
@@ -244,16 +329,28 @@
       "label": "Neck",
       "kind": "region",
       "region": "neck",
-      "findings": [{ "text": "JVP not raised." }]
+      "findings": [
+        {
+          "text": "JVP not raised."
+        }
+      ]
     }
   ],
   "investigations": [
     {
       "id": "ecg",
       "results": [
-        { "when": { "arrest": true }, "text": "No organised rhythm." },
         {
-          "when": { "severity": "ischaemia", "gte": 25 },
+          "when": {
+            "arrest": true
+          },
+          "text": "No organised rhythm."
+        },
+        {
+          "when": {
+            "severity": "ischaemia",
+            "gte": 25
+          },
           "text": "Sinus rhythm, rate {hr}. 3–4 mm ST elevation in V1–V4 with reciprocal ST depression in II, III and aVF. Anterior STEMI."
         },
         {
@@ -264,18 +361,35 @@
     {
       "id": "troponin",
       "orderNote": "Don't wait for troponin: the ECG already makes the diagnosis.",
-      "results": [{ "text": "High-sensitivity troponin {troponin} ng/L (raised)." }]
+      "results": [
+        {
+          "text": "High-sensitivity troponin {troponin} ng/L (raised)."
+        }
+      ]
     },
-    { "id": "glu", "results": [{ "text": "Glucose {glucose:1} mmol/L." }] },
+    {
+      "id": "glu",
+      "results": [
+        {
+          "text": "Glucose {glucose:1} mmol/L."
+        }
+      ]
+    },
     {
       "id": "vbg",
       "results": [
-        { "text": "pH {ph:2}, HCO₃⁻ {hco3:1} mmol/L, K⁺ {k:1} mmol/L, lactate {lactate:1} mmol/L." }
+        {
+          "text": "pH {ph:2}, HCO₃⁻ {hco3:1} mmol/L, K⁺ {k:1} mmol/L, lactate {lactate:1} mmol/L."
+        }
       ]
     },
     {
       "id": "fbc",
-      "results": [{ "text": "Hb {hb} g/L, WCC {wcc:1} ×10⁹/L, platelets {plt} ×10⁹/L." }]
+      "results": [
+        {
+          "text": "Hb {hb} g/L, WCC {wcc:1} ×10⁹/L, platelets {plt} ×10⁹/L."
+        }
+      ]
     },
     {
       "id": "ue",
@@ -285,23 +399,46 @@
         }
       ]
     },
-    { "id": "cxr", "results": [{ "text": "Normal heart size. Clear lung fields." }] }
+    {
+      "id": "cxr",
+      "results": [
+        {
+          "text": "Normal heart size. Clear lung fields."
+        }
+      ]
+    }
   ],
   "patientLines": [
     {
       "id": "worse",
-      "when": { "severity": "ischaemia", "gte": 60 },
+      "when": {
+        "severity": "ischaemia",
+        "gte": 60
+      },
       "text": "It's getting worse… I feel awful."
     },
     {
       "id": "eased",
-      "when": { "severity": "ischaemia", "lt": 25 },
+      "when": {
+        "severity": "ischaemia",
+        "lt": 25
+      },
       "text": "The pain's nearly gone."
     }
   ],
   "outcomes": {
     "stabilised": {
-      "when": { "all": [{ "procedure": "pci" }, { "severity": "ischaemia", "lt": 25 }] },
+      "when": {
+        "all": [
+          {
+            "procedure": "pci"
+          },
+          {
+            "severity": "ischaemia",
+            "lt": 25
+          }
+        ]
+      },
       "forSec": 120,
       "text": "Artery opened in the cath lab. Pain gone, ST segments settling."
     }
@@ -309,11 +446,26 @@
   "diagnosis": {
     "correct": ["stemi"],
     "options": [
-      { "id": "stemi", "label": "Anterior STEMI" },
-      { "id": "nstemi", "label": "NSTEMI" },
-      { "id": "dissection", "label": "Aortic dissection" },
-      { "id": "pe", "label": "Pulmonary embolism" },
-      { "id": "pericarditis", "label": "Pericarditis" }
+      {
+        "id": "stemi",
+        "label": "Anterior STEMI"
+      },
+      {
+        "id": "nstemi",
+        "label": "NSTEMI"
+      },
+      {
+        "id": "dissection",
+        "label": "Aortic dissection"
+      },
+      {
+        "id": "pe",
+        "label": "Pulmonary embolism"
+      },
+      {
+        "id": "pericarditis",
+        "label": "Pericarditis"
+      }
     ]
   },
   "scoring": [
@@ -322,7 +474,10 @@
       "label": "Reperfused and stable",
       "weight": 20,
       "kind": "credit",
-      "test": { "type": "outcomeIs", "outcomes": ["stabilised"] }
+      "test": {
+        "type": "outcomeIs",
+        "outcomes": ["stabilised"]
+      }
     },
     {
       "id": "ecg",
@@ -330,7 +485,11 @@
       "weight": 15,
       "kind": "credit",
       "critical": true,
-      "test": { "type": "actionWithin", "codes": ["order:ecg"], "withinSec": 600 }
+      "test": {
+        "type": "actionWithin",
+        "codes": ["order:ecg"],
+        "withinSec": 600
+      }
     },
     {
       "id": "pci",
@@ -338,63 +497,91 @@
       "weight": 15,
       "kind": "credit",
       "critical": true,
-      "test": { "type": "actionWithin", "codes": ["procedure:pci"], "withinSec": 900 }
+      "test": {
+        "type": "actionWithin",
+        "codes": ["procedure:pci"],
+        "withinSec": 900
+      }
     },
     {
       "id": "aspirin",
       "label": "Aspirin 300 mg",
       "weight": 10,
       "kind": "credit",
-      "test": { "type": "actionDone", "codes": ["drug:aspirin:*"] }
+      "test": {
+        "type": "actionDone",
+        "codes": ["drug:aspirin:*"]
+      }
     },
     {
       "id": "p2y12",
       "label": "P2Y12 inhibitor loading dose",
       "weight": 5,
       "kind": "credit",
-      "test": { "type": "actionDone", "codes": ["drug:ticagrelor:*"] }
+      "test": {
+        "type": "actionDone",
+        "codes": ["drug:ticagrelor:*"]
+      }
     },
     {
       "id": "pads",
       "label": "Defibrillator pads on",
       "weight": 8,
       "kind": "credit",
-      "test": { "type": "actionDone", "codes": ["device:defib_pads:on"] }
+      "test": {
+        "type": "actionDone",
+        "codes": ["device:defib_pads:on"]
+      }
     },
     {
       "id": "access",
       "label": "IV access",
       "weight": 5,
       "kind": "credit",
-      "test": { "type": "actionDone", "codes": ["procedure:iv_access", "procedure:io_access"] }
+      "test": {
+        "type": "actionDone",
+        "codes": ["procedure:iv_access", "procedure:io_access"]
+      }
     },
     {
       "id": "analgesia",
       "label": "Pain treated (nitrate or opioid)",
       "weight": 6,
       "kind": "credit",
-      "test": { "type": "actionDone", "codes": ["drug:gtn:*", "drug:morphine:*"] }
+      "test": {
+        "type": "actionDone",
+        "codes": ["drug:gtn:*", "drug:morphine:*"]
+      }
     },
     {
       "id": "history",
       "label": "Characterised the pain",
       "weight": 4,
       "kind": "credit",
-      "test": { "type": "asked", "ids": ["pain"] }
+      "test": {
+        "type": "asked",
+        "ids": ["pain"]
+      }
     },
     {
       "id": "dx",
       "label": "Working diagnosis: STEMI",
       "weight": 5,
       "kind": "credit",
-      "test": { "type": "diagnosisIs", "ids": ["stemi"] }
+      "test": {
+        "type": "diagnosisIs",
+        "ids": ["stemi"]
+      }
     },
     {
       "id": "no-shock-harm",
       "label": "No inappropriate shocks",
       "weight": 15,
       "kind": "penalty",
-      "test": { "type": "actionNever", "codes": ["adverse:shock_*"] }
+      "test": {
+        "type": "actionNever",
+        "codes": ["adverse:shock_*"]
+      }
     },
     {
       "id": "rosc-if-vf",
@@ -404,8 +591,14 @@
       "test": {
         "type": "any",
         "tests": [
-          { "type": "actionNever", "codes": ["arrest"] },
-          { "type": "actionDone", "codes": ["rosc"] }
+          {
+            "type": "actionNever",
+            "codes": ["arrest"]
+          },
+          {
+            "type": "actionDone",
+            "codes": ["rosc"]
+          }
         ]
       }
     }
@@ -414,27 +607,42 @@
     {
       "id": "ecg-late",
       "text": "Record a 12-lead ECG within 10 minutes of arrival in anyone with chest pain. Here it shows the diagnosis.",
-      "showIf": { "type": "ruleFailed", "id": "ecg" }
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "ecg"
+      }
     },
     {
       "id": "pci-late",
       "text": "Once the ECG shows STEMI, activate primary PCI at once. Don't wait for troponin or other tests.",
-      "showIf": { "type": "ruleFailed", "id": "pci" }
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "pci"
+      }
     },
     {
       "id": "pads",
       "text": "A STEMI patient can go into VF at any moment. Put defibrillator pads on early so you can shock straight away.",
-      "showIf": { "type": "ruleFailed", "id": "pads" }
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "pads"
+      }
     },
     {
       "id": "vf",
       "text": "In monitored VF, the first shock is most likely to work when it is delivered within seconds. Each minute without CPR or a shock lowers survival.",
-      "showIf": { "type": "actionDone", "codes": ["arrest"] }
+      "showIf": {
+        "type": "actionDone",
+        "codes": ["arrest"]
+      }
     },
     {
       "id": "oxygen",
       "text": "Routine oxygen does not help in ACS when SpO₂ is 90% or above (ESC 2023). Give it for hypoxaemia.",
-      "showIf": { "type": "actionDone", "codes": ["device:o2_*:on"] }
+      "showIf": {
+        "type": "actionDone",
+        "codes": ["device:o2_*:on"]
+      }
     }
   ],
   "references": [
@@ -448,5 +656,44 @@
       "label": "Resuscitation Council UK. Adult advanced life support guidelines. 2021.",
       "url": "https://www.resus.org.uk/"
     }
-  ]
+  ],
+  "hints": [
+    {
+      "id": "ecg",
+      "text": "Shall I do a 12-lead ECG?"
+    },
+    {
+      "id": "pads",
+      "when": {
+        "not": {
+          "device": "defib_pads"
+        }
+      },
+      "text": "Do you want the defib pads on him?"
+    },
+    {
+      "id": "pci",
+      "when": {
+        "not": {
+          "procedure": "pci"
+        }
+      },
+      "text": "Do you want me to call the cath lab?"
+    }
+  ],
+  "variation": {
+    "ageRange": [50, 68],
+    "weightKgRange": [78, 105],
+    "options": [
+      {
+        "id": "diabetic",
+        "label": "Type 2 diabetes",
+        "chance": 0.3,
+        "baseline": {
+          "hr": 6
+        },
+        "severity": 4
+      }
+    ]
+  }
 }

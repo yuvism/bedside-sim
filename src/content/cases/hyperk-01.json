@@ -17,7 +17,7 @@
     "persona": "Tired and a bit sheepish about missing dialysis. Clear-headed, says his legs feel like jelly."
   },
   "brief": [
-    "Arthur, 66, has end-stage kidney disease on haemodialysis three times a week. He missed his last two sessions because of a family funeral. Today his legs feel weak and he feels dizzy. His GP's point-of-care test showed a high potassium and sent him straight in.",
+    "Arthur, {age}, has end-stage kidney disease on haemodialysis three times a week. He missed his last two sessions because of a family funeral. Today his legs feel weak and he feels dizzy. His GP's point-of-care test showed a high potassium and sent him straight in.",
     "Protect his heart first, then shift and remove the potassium. Watch for the side effects of treatment."
   ],
   "openingLine": "My legs feel like jelly, and I keep going dizzy.",
@@ -644,5 +644,47 @@
       "label": "Resuscitation Council UK. Adult advanced life support guidelines: special circumstances (hyperkalaemia). 2021.",
       "url": "https://www.resus.org.uk/"
     }
-  ]
+  ],
+  "hints": [
+    {
+      "id": "ecg",
+      "text": "His GP said his potassium's high. Shall I do an ECG?"
+    },
+    {
+      "id": "calcium",
+      "when": {
+        "not": {
+          "any": [
+            {
+              "drugGiven": "calcium_gluconate"
+            },
+            {
+              "drugGiven": "calcium_chloride"
+            }
+          ]
+        }
+      },
+      "text": "Do you want to protect his heart first?"
+    },
+    {
+      "id": "glucose",
+      "when": {
+        "drugGiven": "insulin"
+      },
+      "text": "Shall I check his sugar after the insulin?"
+    },
+    {
+      "id": "dialysis",
+      "when": {
+        "not": {
+          "procedure": "renal_referral"
+        }
+      },
+      "text": "Shall I bleep the renal team?"
+    }
+  ],
+  "variation": {
+    "ageRange": [55, 78],
+    "weightKgRange": [65, 95]
+  }
 }

@@ -35,7 +35,35 @@ test('cardiac arrest brings up the ALS panel with CPR and defibrillation', async
   await expect(page.getByText('CPR started, 30:2.')).toBeVisible();
   await expect(als.getByRole('button', { name: 'Shock' })).toBeDisabled();
   await als.getByRole('button', { name: 'Attach pads' }).click();
+  await page.clock.runFor(5_000);
   await expect(als.getByRole('button', { name: 'Shock' })).toBeEnabled();
   await als.getByRole('button', { name: 'Rhythm and pulse check' }).click();
   await expect(page.getByText(/^No pulse\./)).toBeVisible();
+});
+
+test('the nurse queries an IV drug with no access and offers a cannula first', async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.clock.install();
+  await page.goto('./#/case/anaphylaxis-01?seed=1');
+  await page.getByRole('button', { name: 'Start case' }).click();
+  await page.getByRole('tab', { name: 'Treat' }).click();
+  await page.getByRole('button', { name: /^Chlorphenamine/ }).click();
+  await page.getByRole('radio', { name: /^IV/ }).check();
+  await page.getByRole('button', { name: 'Give chlorphenamine' }).click();
+  const nurse = page.getByRole('region', { name: 'Nurse' });
+  await expect(nurse.getByText(/no IV access yet/)).toBeVisible();
+  await nurse.getByRole('button', { name: 'Yes, cannula first' }).click();
+  await expect(
+    nurse.getByRole('list', { name: 'Tasks in progress' }).getByRole('listitem'),
+  ).toHaveCount(2);
+  await page.clock.runFor(60_000);
+  await expect(page.getByText('IV cannula inserted, bloods sent.')).toBeVisible();
+  await expect(page.getByText('Chlorphenamine 10 mg IV given (dose 1).')).toBeVisible();
+});
+
+test('exam mode is chosen on the brief and shows the badge', async ({ page }) => {
+  await page.goto('./#/case/asthma-01?seed=3');
+  await page.getByRole('radio', { name: /^Exam/ }).check();
+  await page.getByRole('button', { name: 'Start case' }).click();
+  await expect(page.locator('.mode-badge')).toHaveText('Exam');
 });

@@ -97,6 +97,15 @@ export function validateCaseRefs(c: CaseDef, lib: EngineLibrary): string[] {
   c.patientLines.forEach((l) => walkCondition(l.when, checkCond(`patient line ${l.id}`)));
   (c.rhythmRules ?? []).forEach((r) => walkCondition(r.when, checkCond(`rhythm rule ${r.id}`)));
   walkCondition(c.outcomes.stabilised.when, checkCond('outcomes.stabilised'));
+  for (const h of c.hints ?? []) if (h.when) walkCondition(h.when, checkCond(`hint ${h.id}`));
+  for (const opt of c.variation?.options ?? []) {
+    for (const [qid, answers] of Object.entries(opt.answers ?? {})) {
+      if (!talkIds.has(qid)) errors.push(`variation ${opt.id}: unknown question "${qid}".`);
+      if (answers.length !== nBands) {
+        errors.push(`variation ${opt.id}: "${qid}" needs ${nBands} answers (one per band).`);
+      }
+    }
+  }
   for (const p of c.processes) {
     for (const tr of p.treatments ?? []) {
       walkCondition(tr.when, checkCond(`treatment ${p.id}.${tr.id}`));

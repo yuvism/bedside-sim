@@ -1,14 +1,17 @@
 /** Loads and validates the shared library and the bundled cases. */
+import type { TeamConfig } from '../engine/team.ts';
 import type { CaseDef, EngineLibrary } from '../engine/types.ts';
 import devicesJson from './devices.json';
 import formularyJson from './formulary.json';
 import investigationsJson from './investigations.json';
+import teamJson from './team.json';
 import {
-  CaseSchema,
   DeviceTableSchema,
   FormularySchema,
   InvestigationTableSchema,
-} from './schema.ts';
+  TeamSchema,
+} from './librarySchema.ts';
+import { CaseSchema } from './schema.ts';
 import { validateCaseRefs } from './validate.ts';
 
 export class ContentError extends Error {
@@ -38,6 +41,9 @@ export const LIBRARY: EngineLibrary = parseLibrary({
   devices: devicesJson,
   investigations: investigationsJson,
 });
+
+/** Nurse task delays and safety thresholds. */
+export const TEAM: TeamConfig = TeamSchema.parse(teamJson);
 
 /** Schema + cross-reference validation. Returns readable issues instead of throwing. */
 export function checkCase(

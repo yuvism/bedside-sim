@@ -23,12 +23,16 @@ test('anaphylaxis-01 can be played to a stabilised outcome', async ({ page }) =>
   await page.getByRole('radio', { name: /^IM/ }).check();
   await page.getByRole('button', { name: /^Standard dose/ }).click();
   await page.getByRole('button', { name: 'Give adrenaline' }).click();
+  // The nurse reads it back, then draws it up (30–60 sim seconds).
+  await expect(page.getByText(/Nurse: “Adrenaline 0.5 mg IM. Drawing it up now.”/)).toBeVisible();
+  await page.clock.runFor(10_000);
   await expect(page.getByText('Adrenaline 0.5 mg IM given (dose 1).')).toBeVisible();
   await page.getByRole('button', { name: /^Give 500 ml crystalloid/ }).click();
 
   // Five sim minutes at 8× is 37.5 real seconds.
   await page.clock.runFor(40_000);
   await page.getByRole('button', { name: 'Give adrenaline' }).click();
+  await page.clock.runFor(10_000);
   await expect(page.getByText('Adrenaline 0.5 mg IM given (dose 2).')).toBeVisible();
 
   await page.clock.runFor(150_000);

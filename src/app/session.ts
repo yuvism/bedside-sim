@@ -1,15 +1,29 @@
 /**
  * A single play-through of a case: the engine, the recorder, and the bits of
  * bedside state that belong to the monitor and the UI rather than the
- * patient (NIBP cycling, the results inbox, the speech bubble).
- * Framework-free, so it can be driven headlessly in tests.
+ * patient (NIBP cycling, the results inbox, the speech bubble), plus the
+ * team around the bed: the nurse who carries out orders and, in guided mode,
+ * the coaching prompts. Framework-free, so it can be driven headlessly.
  */
-import { LIBRARY } from '../content/library.ts';
+import { LIBRARY, TEAM } from '../content/library.ts';
+import type { VariationOption } from '../engine/caseTypes.ts';
+import { Coach, hiddenInExam, type Mode } from '../engine/coach.ts';
 import { SimpleEngine } from '../engine/engine.ts';
+import { Nurse, type NurseState } from '../engine/team.ts';
+import { materialiseCase } from '../engine/variation.ts';
 import { Recorder } from '../engine/recorder.ts';
 import type { Action, CaseDef, EngineLibrary, EngineState, SimEvent } from '../engine/types.ts';
 
 export const NIBP_CYCLE_SEC = 180;
+
+export interface SessionOptions {
+  /** Guided (nurse hints and teaching notes) or exam (silent). Default guided. */
+  mode?: Mode;
+  /** Orders go through the nurse with realistic delays. Default true. */
+  nurse?: boolean;
+  /** Apply the case's seeded variations. Default true. */
+  variation?: boolean;
+}
 
 export interface NibpReading {
   sbp: number;
@@ -40,14 +54,23 @@ interface Checkpoint {
   nibp: NibpReading | null;
   bubble: Bubble | null;
   nextNibp: number;
+  nurse: NurseState | null;
 }
 
 export class Session {
   readonly engine: SimpleEngine;
   readonly recorder: Recorder;
+  /** The case as authored. */
+  readonly baseCase: CaseDef;
+  /** The patient actually being treated (after seeded variation). */
   readonly caseDef: CaseDef;
+  readonly variations: VariationOption[];
   readonly seed: number;
   readonly lib: EngineLibrary;
+  readonly opts: SessionOptions;
+  readonly mode: Mode;
+  readonly nurse: Nurse | null;
+  readonly coach: Coach;
   nibp: NibpReading | null = null;
   results: ResultItem[] = [];
   bubble: Bubble | null = null;
@@ -61,8 +84,9 @@ export class Session {
     const m = keys.length ? Math.max(...keys) : 0;
     const cp = prev.snapshots.get(m);
     if (!cp) throw new Error('No checkpoint to replay from.');
-    const s = new Session(prev.caseDef, prev.seed, prev.lib);
+    const s = new Session(prev.baseCase, prev.seed, prev.lib, prev.opts);
     s.engine.restore(cp.engine);
+    if (cp.nurse) s.nurse?.restore(cp.nurse);
     s.recorder.add(prev.events.slice(0, cp.eventCount));
     s.recorder.trace.push(...prev.recorder.trace.slice(0, cp.traceCount));
     s.results = cp.results.map((r) => ({ ...r }));
@@ -87,15 +111,28 @@ export class Session {
       nibp: this.nibp,
       bubble: this.bubble,
       nextNibp: this.nextNibp,
+      nurse: this.nurse?.snapshot() ?? null,
     });
   }
 
-  constructor(caseDef: CaseDef, seed: number, lib: EngineLibrary = LIBRARY) {
-    this.caseDef = caseDef;
+  constructor(
+    caseDef: CaseDef,
+    seed: number,
+    lib: EngineLibrary = LIBRARY,
+    opts: SessionOptions = {},
+  ) {
+    this.baseCase = caseDef;
     this.seed = seed;
     this.lib = lib;
+    this.opts = opts;
+    this.mode = opts.mode ?? 'guided';
+    const m = opts.variation === false ? { caseDef, applied: [] } : materialiseCase(caseDef, seed);
+    this.caseDef = m.caseDef;
+    this.variations = m.applied;
     this.engine = new SimpleEngine(lib);
-    this.engine.load(caseDef, seed);
+    this.engine.load(this.caseDef, seed);
+    this.nurse = opts.nurse === false ? null : new Nurse(this.engine, lib, TEAM, seed);
+    this.coach = new Coach(this.caseDef, this.mode);
     this.recorder = new Recorder(15);
   }
 
@@ -127,6 +164,8 @@ export class Session {
   /** Advance sim time; returns the events that happened. */
   advance(dtSec: number): SimEvent[] {
     const evs = this.engine.step(dtSec);
+    if (this.nurse) evs.push(...this.nurse.tick());
+    evs.push(...this.coach.tick(this.engine));
     this.absorb(evs);
     this.recorder.sample(this.t, this.engine.vitals());
     if (this.t >= this.nextNibp) this.measureNibp(false);
@@ -136,7 +175,17 @@ export class Session {
   }
 
   act(action: Action): SimEvent[] {
-    const evs = this.engine.apply(action);
+    this.coach.noteAction(this.t);
+    const evs = this.nurse ? this.nurse.request(action) : this.engine.apply(action);
+    this.absorb(evs);
+    return evs;
+  }
+
+  /** Answer a nurse query: go ahead anyway, or cancel the order. */
+  answer(queryId: number, proceed: boolean): SimEvent[] {
+    if (!this.nurse) return [];
+    this.coach.noteAction(this.t);
+    const evs = proceed ? this.nurse.confirm(queryId) : this.nurse.cancel(queryId);
     this.absorb(evs);
     return evs;
   }
@@ -181,7 +230,8 @@ export class Session {
     }
   }
 
-  private absorb(evs: readonly SimEvent[]): void {
+  private absorb(all: readonly SimEvent[]): void {
+    const evs = this.mode === 'exam' ? all.filter((e) => !hiddenInExam(e.code)) : all;
     this.recorder.add(evs);
     for (const e of evs) {
       if (e.type === 'result') {

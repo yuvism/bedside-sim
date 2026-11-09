@@ -2,12 +2,26 @@
 import { bandFor, fillTemplate, isNonVerbal, pickVariant, templateValues } from './narrative.ts';
 import { pulseCheck, setCpr, shock } from './als.ts';
 import { addDose, findRoute, newDrugState, sinceLastDose } from './pharmacology.ts';
-import { context, event, o2Label, severityOf, type Model } from './model.ts';
+import { check, context, event, o2Label, severityOf, type Model } from './model.ts';
 import type { Action, AdverseRule, Route, SimEvent } from './types.ts';
 
 type Of<K extends Action['kind']> = Extract<Action, { kind: K }>;
 
 const NO_ACCESS = 'No IV access yet. Insert a cannula first.';
+
+/** Teaching parameters for a drug-allergy reaction (listed in docs/clinical-review.md). */
+export const ALLERGIC_REACTION = {
+  tauMin: 10,
+  amplitude: 1,
+  effects: [
+    { target: 'sbp', value: -40 },
+    { target: 'hr', value: 30 },
+    { target: 'rr', value: 6 },
+    { target: 'vq', value: 3 },
+    { target: 'sign:hives', value: 0.9 },
+    { target: 'sign:flush', value: 0.6 },
+  ],
+};
 
 export const fmtDose = (n: number) => String(Number(n.toPrecision(6)));
 
@@ -56,6 +70,8 @@ function giveDrug(m: Model, a: Of<'drug'>): SimEvent[] {
   }
   const since = sinceLastDose(state, a.route, s.t);
   const fired = (def.adverse ?? []).filter((r) => ruleFires(r, a.route, a.dose, since, s.arrest));
+  const contra = (def.contraindications ?? []).filter((ci) => check(m, ci.when));
+  const allergy = (def.allergyClasses ?? []).find((x) => (m.c.patient.allergies ?? []).includes(x));
   addDose(state, route, a.dose, s.t);
 
   const n = state.doses.length;
@@ -92,6 +108,25 @@ function giveDrug(m: Model, a: Of<'drug'>): SimEvent[] {
     out.push(event(m, rule.level, `adverse:${rule.id}`, rule.message, { harm: !!rule.harm }));
     if (rule.transient) s.transients.push({ ...rule.transient, sourceId: rule.id });
     if (rule.say) out.push(event(m, 'patient', `say:${rule.id}`, rule.say));
+  }
+  for (const ci of contra) {
+    out.push(
+      event(m, ci.harm ? 'danger' : 'warn', `contraindication:${ci.id}`, ci.message, {
+        harm: !!ci.harm,
+      }),
+    );
+  }
+  if (allergy) {
+    out.push(
+      event(
+        m,
+        'danger',
+        `allergy:${def.id}`,
+        `Allergic reaction to ${def.name.toLowerCase()} (documented ${allergy} allergy): flushing, wheeze and falling blood pressure.`,
+        { harm: true },
+      ),
+    );
+    s.transients.push({ ...ALLERGIC_REACTION, sourceId: `allergy:${def.id}` });
   }
   if (def.feedback) out.push(event(m, 'system', `note:drug:${def.id}`, def.feedback));
   return out;

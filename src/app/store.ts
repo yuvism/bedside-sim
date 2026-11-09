@@ -5,7 +5,9 @@
 import { create } from 'zustand';
 import type { EngineStatus } from '../engine/engine.ts';
 import type { Action, CaseDef, SimEvent, Signs, Vitals } from '../engine/types.ts';
+import type { Mode } from '../engine/coach.ts';
 import { lastDiagnosis, scoreRun, type ScoreResult } from '../engine/scoring.ts';
+import type { NurseQuery, PendingTask } from '../engine/team.ts';
 import { recordAttempt, type CaseProgress } from './progress.ts';
 import { Session, type Bubble, type NibpReading, type ResultItem } from './session.ts';
 
@@ -28,6 +30,19 @@ export interface SimView {
   unread: number;
   bubble: Bubble | null;
   events: SimEvent[];
+  tasks: PendingTask[];
+  queries: NurseQuery[];
+}
+
+const MODE_KEY = 'bedside-sim:mode';
+function readMode(): Mode {
+  try {
+    return typeof window !== 'undefined' && window.localStorage.getItem(MODE_KEY) === 'exam'
+      ? 'exam'
+      : 'guided';
+  } catch {
+    return 'guided';
+  }
 }
 
 interface SimState {
@@ -41,7 +56,12 @@ interface SimState {
   view: SimView | null;
   score: ScoreResult | null;
   progress: CaseProgress | null;
+  mode: Mode;
   load(caseDef: CaseDef, seed: number): void;
+  /** Switch guided/exam before starting (reloads the same patient). */
+  setMode(mode: Mode): void;
+  /** Answer the nurse's query about an order. */
+  answer(queryId: number, proceed: boolean): void;
   start(): void;
   togglePause(): void;
   setSpeed(s: Speed): void;
@@ -70,6 +90,8 @@ function viewOf(s: Session, prev: SimView | null): SimView {
     unread: s.unread,
     bubble: s.bubble,
     events,
+    tasks: [...(s.nurse?.pending ?? [])],
+    queries: [...(s.nurse?.queries ?? [])],
   };
 }
 
@@ -100,9 +122,10 @@ export const useSim = create<SimState>()((set, get) => {
     view: null,
     score: null,
     progress: null,
+    mode: readMode(),
 
     load(caseDef, seed) {
-      const session = new Session(caseDef, seed);
+      const session = new Session(caseDef, seed, undefined, { mode: get().mode });
       set({
         session,
         phase: 'brief',
@@ -114,6 +137,24 @@ export const useSim = create<SimState>()((set, get) => {
         progress: null,
         view: viewOf(session, null),
       });
+    },
+
+    setMode(mode) {
+      try {
+        window.localStorage.setItem(MODE_KEY, mode);
+      } catch {
+        /* storage unavailable */
+      }
+      set({ mode });
+      const { session, phase } = get();
+      if (session && phase === 'brief') get().load(session.baseCase, session.seed);
+    },
+
+    answer(queryId, proceed) {
+      const { session, phase } = get();
+      if (!session || phase !== 'running') return;
+      session.answer(queryId, proceed);
+      refresh();
     },
 
     start() {

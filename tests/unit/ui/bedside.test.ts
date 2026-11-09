@@ -88,7 +88,10 @@ describe('router', () => {
 
 describe('session', () => {
   it('opens with the patient’s first line and a cuff reading, then cycles NIBP', () => {
-    const s = new Session(caseById('anaphylaxis-01'), 1);
+    const s = new Session(caseById('anaphylaxis-01'), 1, undefined, {
+      nurse: false,
+      variation: false,
+    });
     s.start();
     expect(s.bubble?.text).toMatch(/^Doctor/);
     expect(s.nibp?.t).toBe(0);
@@ -100,7 +103,10 @@ describe('session', () => {
   });
 
   it('collects results into an inbox and tracks unread', () => {
-    const s = new Session(caseById('anaphylaxis-01'), 1);
+    const s = new Session(caseById('anaphylaxis-01'), 1, undefined, {
+      nurse: false,
+      variation: false,
+    });
     s.start();
     s.act({ kind: 'order', investigationId: 'glu' });
     s.act({ kind: 'order', investigationId: 'abg' });
@@ -115,7 +121,10 @@ describe('session', () => {
   });
 
   it('shows the latest patient words in the bubble', () => {
-    const s = new Session(caseById('anaphylaxis-01'), 1);
+    const s = new Session(caseById('anaphylaxis-01'), 1, undefined, {
+      nurse: false,
+      variation: false,
+    });
     s.start();
     s.act({ kind: 'talk', questionId: 'allergy' });
     expect(s.bubble?.text).toBe('I’m allergic to peanuts. They told me there weren’t any.');

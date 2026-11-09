@@ -183,6 +183,15 @@ export interface InfusionDef extends Sourced {
   amountPerMinPerRate: number;
 }
 
+/** A situation where the drug should not be given; the nurse queries it and the engine flags it. */
+export interface Contraindication extends Sourced {
+  id: string;
+  when: Condition;
+  message: string;
+  /** Counts as a harmful action if given anyway. */
+  harm?: boolean;
+}
+
 export interface DrugDef extends Sourced {
   id: string;
   name: string;
@@ -194,6 +203,9 @@ export interface DrugDef extends Sourced {
   infusion?: InfusionDef;
   effects: DrugEffect[];
   adverse?: AdverseRule[];
+  /** Matched against the patient's allergies (e.g. "penicillin", "beta-lactam"). */
+  allergyClasses?: string[];
+  contraindications?: Contraindication[];
   /** Shown after giving it (hidden in exam mode). */
   feedback?: string;
 }
@@ -298,7 +310,16 @@ export type Action =
   | { kind: 'call_help' };
 
 export type SimEventType =
-  'action' | 'patient' | 'finding' | 'result' | 'system' | 'warn' | 'danger' | 'outcome';
+  | 'action'
+  | 'patient'
+  | 'finding'
+  | 'result'
+  | 'system'
+  | 'warn'
+  | 'danger'
+  | 'outcome'
+  /** The nurse: read-backs, queries, completed tasks and prompts. */
+  | 'nurse';
 
 export interface SimEvent {
   /** Sim time in whole seconds. */

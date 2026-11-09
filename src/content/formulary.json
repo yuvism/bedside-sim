@@ -386,6 +386,18 @@
           "source": "Teaching rule.",
           "reviewNeeded": true
         }
+      ],
+      "contraindications": [
+        {
+          "id": "gtn_hypotension",
+          "when": {
+            "vital": "sbp",
+            "lt": 90
+          },
+          "message": "Systolic BP is below 90. Nitrates can drop it dangerously.",
+          "harm": true,
+          "source": "Avoid nitrates when SBP < 90 mmHg (ESC ACS guidelines, 2023)."
+        }
       ]
     },
     {
@@ -427,6 +439,18 @@
           "ec50": 10,
           "source": "Teaching parameter: adds to any existing opioid toxicity.",
           "reviewNeeded": true
+        }
+      ],
+      "contraindications": [
+        {
+          "id": "morphine_asthma",
+          "when": {
+            "severity": "asthma",
+            "gte": 1
+          },
+          "message": "Opioids depress breathing; sedation is contraindicated in acute asthma.",
+          "harm": true,
+          "source": "BTS/SIGN 158 (2019): sedation is contraindicated in acute asthma outside critical care."
         }
       ]
     },
@@ -739,6 +763,18 @@
           "harm": true,
           "source": "JBDS DKA guideline (2021): potassium goes in maintenance fluids, never as a bolus."
         }
+      ],
+      "contraindications": [
+        {
+          "id": "kcl_high_k",
+          "when": {
+            "lab": "k",
+            "gte": 5.5
+          },
+          "message": "Potassium is already 5.5 mmol/L or more.",
+          "harm": true,
+          "source": "No potassium replacement while K⁺ > 5.5 mmol/L (JBDS DKA guideline, 2021)."
+        }
       ]
     },
     {
@@ -930,7 +966,8 @@
           "source": "Teaching parameter.",
           "reviewNeeded": true
         }
-      ]
+      ],
+      "allergyClasses": ["penicillin", "beta-lactam"]
     },
     {
       "id": "noradrenaline",
@@ -1010,6 +1047,36 @@
           "emax": -0.8,
           "ec50": 0.4,
           "source": "Teaching parameter: reduces the bleeding rate.",
+          "reviewNeeded": true
+        }
+      ]
+    },
+    {
+      "id": "levofloxacin",
+      "name": "Levofloxacin",
+      "drugClass": "Fluoroquinolone antibiotic",
+      "unit": "mg",
+      "halfLifeMin": 420,
+      "source": "An option for high-severity community-acquired pneumonia with penicillin allergy; follow local antimicrobial policy and microbiology advice. Effect size is a teaching parameter.",
+      "reviewNeeded": true,
+      "routes": [
+        {
+          "route": "IV",
+          "label": "IV infusion",
+          "standardDose": 500,
+          "maxDose": 500,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 0,
+          "source": "Adult IV dose for severe pneumonia per local policy (check BNF and microbiology).",
+          "reviewNeeded": true
+        }
+      ],
+      "effects": [
+        {
+          "target": "process:sepsis",
+          "emax": -2.6,
+          "ec50": 160,
+          "source": "Teaching parameter, matched to the first-line antibiotic.",
           "reviewNeeded": true
         }
       ]

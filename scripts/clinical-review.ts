@@ -9,6 +9,7 @@
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { ALLERGIC_REACTION } from '../src/engine/actions.ts';
 import { ROSC } from '../src/engine/als.ts';
 import { COUPLING } from '../src/engine/coupling.ts';
 
@@ -28,7 +29,7 @@ const SKIP = new Set(['source', 'reviewNeeded']);
 
 export function collectContentFiles(root: string = ROOT): ContentFile[] {
   const dir = join(root, 'src', 'content');
-  const library = ['formulary.json', 'devices.json', 'investigations.json'].map((f) =>
+  const library = ['formulary.json', 'devices.json', 'investigations.json', 'team.json'].map((f) =>
     join(dir, f),
   );
   const cases = readdirSync(join(dir, 'cases'))
@@ -126,6 +127,15 @@ export function buildClinicalReview(files: readonly ContentFile[]): string {
     '| Constant | Value |',
     '| --- | --- |',
     ...rosc,
+    '',
+    '## Drug allergy reaction',
+    '',
+    'Giving a drug the patient is documented as allergic to adds this transient reaction',
+    `(decay time constant ${ALLERGIC_REACTION.tauMin} min) in \`src/engine/actions.ts\`. Teaching parameters.`,
+    '',
+    '| Target | Peak change |',
+    '| --- | --- |',
+    ...ALLERGIC_REACTION.effects.map((e) => `| \`${e.target}\` | ${e.value} |`),
     '',
   ].join('\n');
 }

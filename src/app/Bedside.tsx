@@ -7,6 +7,7 @@ import { monitorAudio } from '../ui/monitor/audio.ts';
 import { Monitor } from '../ui/monitor/Monitor.tsx';
 import { ActionPanels } from '../ui/panels/ActionPanels.tsx';
 import { AlsPanel } from '../ui/panels/AlsPanel.tsx';
+import { NursePanel } from '../ui/panels/NursePanel.tsx';
 import { PatientCard } from '../ui/patient/PatientCard.tsx';
 import { Footer } from './Footer.tsx';
 import { SPEEDS, useSim } from './store.ts';
@@ -55,14 +56,52 @@ function Controls() {
   );
 }
 
+function ModeBadge() {
+  const mode = useSim((s) => s.mode);
+  const phase = useSim((s) => s.phase);
+  if (phase === 'brief') return null;
+  return <span className={`mode-badge ${mode}`}>{mode === 'exam' ? 'Exam' : 'Guided'}</span>;
+}
+
 function BriefCard({ caseDef }: { caseDef: CaseDef }) {
   const start = useSim((s) => s.start);
+  const mode = useSim((s) => s.mode);
+  const setMode = useSim((s) => s.setMode);
+  // The varied patient's age, not the authored one.
+  const age = useSim((s) => s.session?.caseDef.patient.age ?? caseDef.patient.age);
   return (
     <section className="card brief" aria-labelledby="brief-h">
       <h2 id="brief-h">{caseDef.title}</h2>
       {caseDef.brief.map((p) => (
-        <p key={p.slice(0, 24)}>{p}</p>
+        <p key={p.slice(0, 24)}>{p.replaceAll('{age}', String(age))}</p>
       ))}
+      <fieldset className="mode-pick">
+        <legend>Mode</legend>
+        <label>
+          <input
+            type="radio"
+            name="mode"
+            checked={mode === 'guided'}
+            onChange={() => setMode('guided')}
+          />
+          <span>
+            <strong>Guided</strong>: the nurse prompts you when you stall, teaching notes appear as
+            you go, and a trend chip shows whether the patient is improving.
+          </span>
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="mode"
+            checked={mode === 'exam'}
+            onChange={() => setMode('exam')}
+          />
+          <span>
+            <strong>Exam</strong>: no prompts or hints, and an OSCE-style breakdown with a pass mark
+            at the end.
+          </span>
+        </label>
+      </fieldset>
       <button
         className="btn primary"
         onClick={() => {
@@ -94,6 +133,7 @@ export function Bedside({ caseDef, seed }: { caseDef: CaseDef; seed: number }) {
           </p>
         </div>
         <Controls />
+        <ModeBadge />
         <ThemeToggle />
       </header>
       <main className="page bedside">
@@ -104,6 +144,7 @@ export function Bedside({ caseDef, seed }: { caseDef: CaseDef; seed: number }) {
         </div>
         <div className="col">
           <AlsPanel />
+          <NursePanel />
           <ActionPanels />
           <EventLog />
         </div>

@@ -5,12 +5,21 @@
  * Credit rules add their weight when passed. Penalty rules subtract their
  * weight when failed. A failed critical rule caps the final percentage.
  */
-import type { CaseDef, RuleTest, ScoringRule, TeachingPoint } from './caseTypes.ts';
+import {
+  SCORE_DOMAINS,
+  type CaseDef,
+  type RuleTest,
+  type ScoreDomain,
+  type ScoringRule,
+  type TeachingPoint,
+} from './caseTypes.ts';
 import type { TraceRow } from './recorder.ts';
 import type { SimEvent, VitalKey } from './types.ts';
 
 /** A failed critical rule caps the percentage at this value. */
 export const CRITICAL_CAP = 40;
+/** Exam mode: pass needs at least this percentage and no failed critical rule. */
+export const PASS_MARK = 60;
 
 export interface RunRecord {
   events: readonly SimEvent[];
@@ -36,6 +45,7 @@ export interface RuleResult {
   firstT: number | null;
   /** e.g. "4/5" for examined/asked rules. */
   detail: string | null;
+  domain: ScoreDomain;
 }
 
 export interface ScoreResult {
@@ -46,6 +56,24 @@ export interface ScoreResult {
   capped: boolean;
   results: RuleResult[];
   teaching: TeachingPoint[];
+  /** OSCE-style breakdown: points earned out of available credit per domain. */
+  domains: Record<ScoreDomain, { earned: number; max: number }>;
+  pass: boolean;
+}
+
+const ASSESSMENT_PREFIXES = ['order:', 'talk:', 'exam:', 'monitor:'];
+
+/** The rule's domain, inferred from its test when the case doesn't set one. */
+export function domainOf(rule: ScoringRule): ScoreDomain {
+  if (rule.domain) return rule.domain;
+  if (rule.kind === 'penalty') return 'safety';
+  const t = rule.test;
+  if (t.type === 'examined' || t.type === 'asked') return 'assessment';
+  if (t.type === 'diagnosisIs') return 'diagnosis';
+  if ('codes' in t && t.codes.every((c) => ASSESSMENT_PREFIXES.some((p) => c.startsWith(p)))) {
+    return 'assessment';
+  }
+  return 'management';
 }
 
 /** Glob match for event codes: `*` matches any run of characters. */
@@ -187,6 +215,7 @@ export function scoreRun(c: Pick<CaseDef, 'scoring' | 'teaching'>, run: RunRecor
       status,
       firstT: firstT(run, r.test),
       detail: detail(run, r.test),
+      domain: domainOf(r),
     };
   });
   const max = c.scoring.filter((r) => r.kind === 'credit').reduce((s, r) => s + r.weight, 0);
@@ -198,7 +227,17 @@ export function scoreRun(c: Pick<CaseDef, 'scoring' | 'teaching'>, run: RunRecor
   const capped = results.some((r) => r.critical && !r.passed) && percent > CRITICAL_CAP;
   if (capped) percent = CRITICAL_CAP;
   const teaching = c.teaching.filter((tp) => !tp.showIf || ev.test(tp.showIf));
-  return { percent, raw, max, capped, results, teaching };
+  const domains = Object.fromEntries(
+    SCORE_DOMAINS.map((d) => [d, { earned: 0, max: 0 }]),
+  ) as ScoreResult['domains'];
+  for (const r of results) {
+    const d = domains[r.domain];
+    if (r.kind === 'credit') d.max += r.weight;
+    d.earned += r.points;
+  }
+  const criticalFail = results.some((r) => r.critical && !r.passed);
+  const pass = percent >= PASS_MARK && !criticalFail;
+  return { percent, raw, max, capped, results, teaching, domains, pass };
 }
 
 /** Final diagnosis = the last working diagnosis chosen during the run. */

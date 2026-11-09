@@ -73,7 +73,7 @@ describe('progress history', () => {
 
 describe('replay from minute', () => {
   it('resumes from a checkpoint with the earlier log intact and the same physiology', () => {
-    const s = new Session(CASE, 9);
+    const s = new Session(CASE, 9, undefined, { nurse: false, variation: false });
     s.start();
     s.act({ kind: 'device', deviceId: 'o2_nrb', on: true });
     for (let i = 0; i < 8 * 60; i++) s.advance(1);

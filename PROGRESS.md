@@ -81,9 +81,33 @@ The build brief is in [PROMPT.md](PROMPT.md). The single-file prototype is in `r
   - case list with specialty, difficulty and text filters plus best score and attempts
 - **Tests (93 unit, 5 e2e):** each case has an "ideal clinician" policy (`tests/unit/cases/policies.ts`) that stabilises the patient in 8/8 seeds with a mean score ≥ 80, plus a do-nothing run that ends in death. There are also ALS and infusion engine tests, and e2e tests for the case filters and the ALS panel.
 
+### Phase 5 — Team and realism
+
+- **Nurse** (`src/engine/team.ts`, pure TS):
+  - Orders go through the nurse. She reads back every order at once (closed loop), then carries it out after a seeded delay from `src/content/team.json`: IV access 60–120 s, drug draw-up 30–60 s (10–20 s in arrest), infusions 60–120 s, fluids 30–60 s, devices 10–20 s, referrals 15–30 s, chest drain 3–5 min.
+  - She queries unsafe orders until the clinician answers Cancel or Give it anyway: documented allergies, contraindications, doses more than twice the usual maximum, and IV orders with no access ("Shall I put a cannula in first?").
+  - Orders that need a line wait for a cannula that's going in.
+  - Talking, examining, diagnosing, CPR, shocks and pulse checks happen at once.
+- **Allergies and contraindications** in the data:
+  - Patients carry `allergies`, and drugs carry `allergyClasses` and `contraindications` (GTN with SBP < 90, KCl with K⁺ ≥ 5.5, opioids in acute asthma).
+  - Giving a drug the patient is allergic to triggers an allergic reaction and a harm event.
+  - Levofloxacin is added as the penicillin-allergy alternative in sepsis.
+- **Guided vs Exam** (`src/engine/coach.ts`), chosen on the brief:
+  - Guided: the nurse offers case hints after 60 s without an action and flags alarming vitals; teaching notes appear as you go, and a trend chip shows whether the patient is improving or worsening.
+  - Exam: silent, with teaching notes hidden from the log, and the debrief shows an OSCE-style breakdown (assessment, diagnosis, management, safety) with a pass mark of 60% and no failed critical rule. Scoring rules can set a `domain`; otherwise it's inferred from the test.
+- **Seeded case variations** (`src/engine/variation.ts`): age and weight ranges, plus optional variants that change allergies, baseline, starting severity, and which question reveals the key clue. Examples:
+  - anaphylaxis: the patient doesn't know about his allergy, and the clue moves to what he ate
+  - sepsis: a penicillin allergy in about 40% of runs
+  - STEMI: diabetic
+  - hypoglycaemia: worse kidney function
+
+  Briefs use an `{age}` placeholder so they match the varied patient. The debrief names the variation.
+
+- **Tests (107 unit, 7 e2e):** nurse delays (cannula 60–120 s, drug 30–60 s, arrest drugs 10–20 s), immediate clinician actions, allergy, contraindication, dose and access queries, confirm and cancel, cannula-first chaining and snapshot/restore; guided mode hints after idling, while exam mode shows no hints or teaching notes; variations are deterministic, in range and valid; OSCE domains. The e2e tests cover the nurse query flow and exam mode.
+
 ## Next
 
-- **Phase 5:** a nurse who executes orders after realistic delays with closed-loop read-back and refuses unsafe orders; allergies and contraindications; Guided vs Exam modes; seeded case variations; spontaneous patient lines
+- **Phase 6:** free-text "Ask the patient anything", with an offline keyword and intent matcher (works with no key), an optional Anthropic API patient built from the case file only, and every question mapped back to a dialogue id for scoring
 
 ## Design decisions to review
 
