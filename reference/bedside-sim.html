@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bedside sim — Collapse after lunch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Condensed:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E7EFED; --surface:#FFFFFF; --ink:#16262B; --muted:#56696D; --line:#C7D5D2;
+  --scrub:#1F6F6B; --scrub-ink:#FFFFFF; --scrub-soft:#D5E8E4;
+  --danger:#B3261E; --danger-soft:#F9E0DE; --ok:#22744A; --warn:#8A5A00; --warn-soft:#FBEFD4;
+  --hr:#3CE07A; --spo2:#3FD0F0; --bp:#FF6B63; --rr:#F2D04A;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D191B; --surface:#142326; --ink:#E2ECEA; --muted:#93A7AA; --line:#2A3E42;
+    --scrub:#47A9A2; --scrub-ink:#05201E; --scrub-soft:#1B3837;
+    --danger:#FF8A80; --danger-soft:#3B1C1A; --ok:#7CD49C; --warn:#F2C76B; --warn-soft:#3A2E14;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D191B; --surface:#142326; --ink:#E2ECEA; --muted:#93A7AA; --line:#2A3E42;
+  --scrub:#47A9A2; --scrub-ink:#05201E; --scrub-soft:#1B3837;
+  --danger:#FF8A80; --danger-soft:#3B1C1A; --ok:#7CD49C; --warn:#F2C76B; --warn-soft:#3A2E14;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+button,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--scrub);outline-offset:2px}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:14px;padding:10px 20px;flex-wrap:wrap}
+.brand{margin-right:auto;min-width:0}
+.brand h1{font-size:1.1rem;margin:0;line-height:1.2}
+.brand p{margin:0;color:var(--muted);font-size:.875rem}
+.clock{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:600;font-size:1.9rem;line-height:1;font-variant-numeric:tabular-nums}
+.clock small{display:block;font-family:"Atkinson Hyperlegible",sans-serif;font-weight:400;font-size:.72rem;color:var(--muted);text-align:right}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 14px;cursor:pointer}
+.btn:hover{border-color:var(--scrub)}
+.btn.primary{background:var(--scrub);color:var(--scrub-ink);border-color:var(--scrub);font-weight:700}
+.speed{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.speed button{border:0;background:transparent;padding:8px 10px;cursor:pointer}
+.speed button[aria-pressed="true"]{background:var(--scrub-soft);font-weight:700}
+
+main{max-width:1260px;margin:0 auto;padding:18px 20px 40px;display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:920px){main{grid-template-columns:1fr;padding:14px}}
+.col{display:grid;gap:18px;min-width:0}
+
+/* the monitor is a device: black screen, bezel, standard trace colours */
+.monitor{background:#000;border:7px solid #29343A;border-radius:16px;padding:10px;display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:8px;box-shadow:inset 0 0 0 1px #3a474d}
+#trace{width:100%;height:230px;display:block}
+.nums{display:grid;gap:4px;align-content:start}
+.num{color:var(--c);font-family:"Barlow Condensed","Arial Narrow",sans-serif;border-top:1px solid #1d272b;padding-top:2px}
+.num:first-child{border-top:0}
+.num .l{font-size:.85rem;font-weight:500;opacity:.85;display:flex;justify-content:space-between}
+.num .v{font-size:2.5rem;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+.num .v small{font-size:1rem;margin-left:4px;opacity:.8}
+.num.alarm .v{animation:blink 1s steps(2,start) infinite}
+@keyframes blink{50%{color:#fff;background:#B3261E}}
+@media (prefers-reduced-motion:reduce){.num.alarm .v{animation:none;background:#B3261E;color:#fff}}
+@media (max-width:620px){
+  .monitor{grid-template-columns:1fr}
+  .nums{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .num{border-top:0}
+  .num .v{font-size:1.9rem}
+  #trace{height:170px}
+}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.patient{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;padding:16px;align-items:center}
+@media (max-width:480px){.patient{grid-template-columns:96px minmax(0,1fr);gap:12px}}
+.patient svg{width:100%;height:auto;display:block}
+.who{font-weight:700;margin:0}
+.who span{font-weight:400;color:var(--muted)}
+.bubble{position:relative;background:var(--scrub-soft);border-radius:4px 14px 14px 14px;padding:10px 14px;margin:8px 0 10px;min-height:2.6em}
+.bubble.silent{color:var(--muted);font-style:italic}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:.8rem;border:1px solid var(--line);border-radius:999px;padding:2px 10px;color:var(--muted)}
+.chip.on{border-color:var(--scrub);color:var(--ink);background:var(--scrub-soft)}
+
+.brief{padding:20px}
+.brief h2{margin:0 0 6px;font-size:1.25rem}
+.brief p{margin:0 0 14px;max-width:62ch}
+
+.tabs{display:flex;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs button{border:0;background:transparent;padding:12px 16px;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+.tabs button[aria-selected="true"]{border-bottom-color:var(--scrub);font-weight:700}
+.panel{padding:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
+.panel[hidden]{display:none}
+.act{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 12px;cursor:pointer;line-height:1.3}
+.act:hover:not(:disabled){border-color:var(--scrub);background:var(--scrub-soft)}
+.act:disabled{opacity:.45;cursor:not-allowed}
+.act small{display:block;color:var(--muted);font-size:.8rem;margin-top:2px}
+.act.is-on{border-color:var(--scrub);background:var(--scrub-soft)}
+.act .step{display:inline-block;width:1.5em;font-weight:700;color:var(--scrub)}
+.hint{grid-column:1/-1;margin:0;color:var(--muted);font-size:.85rem}
+
+.logwrap{padding:0}
+.logwrap h2{font-size:1rem;margin:0;padding:12px 16px;border-bottom:1px solid var(--line)}
+#log{list-style:none;margin:0;padding:6px 0;max-height:340px;overflow:auto}
+#log li{display:grid;grid-template-columns:3.4em minmax(0,1fr);gap:8px;padding:6px 16px;border-left:3px solid transparent;font-size:.92rem}
+#log time{color:var(--muted);font-variant-numeric:tabular-nums}
+#log li.patient{border-left-color:var(--scrub)}
+#log li.patient span{font-style:italic}
+#log li.finding span{color:var(--ink)}
+#log li.warn{border-left-color:var(--warn);background:var(--warn-soft)}
+#log li.danger{border-left-color:var(--danger);background:var(--danger-soft)}
+#log li.action span{font-weight:700}
+#log li.system span{color:var(--muted)}
+.empty{color:var(--muted);padding:10px 16px;margin:0}
+
+.wrap{padding:14px 16px;display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.wrap label{display:grid;gap:4px;flex:1 1 220px;font-size:.9rem;color:var(--muted)}
+.wrap select{padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+
+dialog{border:0;border-radius:14px;padding:0;max-width:640px;width:calc(100% - 28px);background:var(--surface);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(5,20,22,.55)}
+.dlg{padding:22px;max-height:85vh;overflow:auto}
+.dlg h2{margin:0 0 2px;font-size:1.35rem}
+.score{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-size:3.2rem;font-weight:600;line-height:1;margin:10px 0 2px}
+.score small{font-size:1.2rem;color:var(--muted)}
+.check{list-style:none;padding:0;margin:14px 0}
+.check li{display:grid;grid-template-columns:1.6em minmax(0,1fr) auto;gap:6px;padding:7px 0;border-top:1px solid var(--line)}
+.check .m{font-weight:700}
+.check .yes .m{color:var(--ok)} .check .no .m{color:var(--danger)}
+.check .pts{color:var(--muted);font-variant-numeric:tabular-nums}
+.notes{margin:0 0 14px;padding-left:1.1em}
+.notes li{margin-bottom:6px}
+textarea{width:100%;height:160px;border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:10px;font-size:.78rem}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.fine{color:var(--muted);font-size:.8rem;margin-top:14px}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="brand">
+    <h1>Bedside sim</h1>
+    <p>Case 1 · Collapse after lunch</p>
+  </div>
+  <div class="speed" role="group" aria-label="Simulation speed">
+    <button data-speed="1" aria-pressed="false">1×</button>
+    <button data-speed="4" aria-pressed="true">4×</button>
+    <button data-speed="8" aria-pressed="false">8×</button>
+  </div>
+  <button class="btn" id="pauseBtn" disabled>Pause</button>
+  <div class="clock" aria-live="off"><span id="clock">00:00</span><small>since arrival</small></div>
+</header>
+
+<main>
+  <div class="col">
+    <section class="monitor" aria-label="Patient monitor">
+      <canvas id="trace" aria-hidden="true"></canvas>
+      <div class="nums">
+        <div class="num" id="n-hr" style="--c:var(--hr)"><div class="l"><span>HR</span><span id="rhythm">sinus</span></div><div class="v" id="v-hr">--</div></div>
+        <div class="num" id="n-spo2" style="--c:var(--spo2)"><div class="l"><span>SpO₂</span><span id="o2lbl">air</span></div><div class="v" id="v-spo2">--<small>%</small></div></div>
+        <div class="num" id="n-bp" style="--c:var(--bp)"><div class="l"><span>NIBP</span><span id="v-map"></span></div><div class="v" id="v-bp">--</div></div>
+        <div class="num" id="n-rr" style="--c:var(--rr)"><div class="l"><span>RR</span><span>/min</span></div><div class="v" id="v-rr">--</div></div>
+      </div>
+    </section>
+
+    <section class="card patient" aria-label="Patient">
+      <svg viewBox="0 0 200 200" role="img" aria-label="Patient’s face">
+        <path d="M18 200 C 24 160, 60 150, 100 150 C 140 150, 176 160, 182 200 Z" fill="#6E9BB8"/>
+        <path d="M84 150 L100 172 L116 150 Z" fill="#5A86A3"/>
+        <rect x="86" y="128" width="28" height="26" fill="#BE8762"/>
+        <ellipse cx="100" cy="88" rx="54" ry="62" fill="#C99169"/>
+        <ellipse id="flush" cx="100" cy="92" rx="54" ry="58" fill="#E0463C" opacity="0"/>
+        <ellipse id="cyan" cx="100" cy="92" rx="54" ry="58" fill="#5C7FA8" opacity="0"/>
+        <path d="M46 78 C 44 34, 80 18, 104 22 C 136 24, 158 44, 154 80 C 148 58, 128 46, 100 46 C 76 46, 54 56, 46 78 Z" fill="#2B211C"/>
+        <g id="hives" fill="#D8524A" opacity="0">
+          <ellipse cx="66" cy="104" rx="6" ry="4"/><ellipse cx="136" cy="100" rx="7" ry="4"/>
+          <ellipse cx="78" cy="122" rx="5" ry="3"/><ellipse cx="124" cy="124" rx="5" ry="3"/>
+          <ellipse cx="96" cy="140" rx="6" ry="3"/><ellipse cx="60" cy="168" rx="7" ry="4"/>
+          <ellipse cx="140" cy="172" rx="8" ry="4"/><ellipse cx="112" cy="186" rx="6" ry="3"/>
+        </g>
+        <g id="eyesOpen" fill="#2B211C">
+          <ellipse cx="80" cy="84" rx="5" ry="5.5"/><ellipse cx="120" cy="84" rx="5" ry="5.5"/>
+        </g>
+        <g id="eyesShut" stroke="#2B211C" stroke-width="3" stroke-linecap="round" fill="none" opacity="0">
+          <path d="M73 86 Q80 90 87 86"/><path d="M113 86 Q120 90 127 86"/>
+        </g>
+        <path id="brows" d="M70 72 L88 70 M112 70 L130 72" stroke="#2B211C" stroke-width="3" stroke-linecap="round"/>
+        <path d="M100 90 Q96 104 100 108" stroke="#A86F4C" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <ellipse id="lips" cx="100" cy="124" rx="15" ry="5" fill="#A9524C"/>
+        <ellipse id="mouth" cx="100" cy="124" rx="7" ry="0" fill="#3A1414"/>
+      </svg>
+      <div>
+        <p class="who">Arjun Mehta <span>· 24 · student</span></p>
+        <div class="bubble silent" id="bubble" aria-live="polite">Waiting for you to start.</div>
+        <div class="chips" id="chips"></div>
+      </div>
+    </section>
+
+    <section class="card" id="briefCard">
+      <div class="brief">
+        <h2>Collapse after lunch</h2>
+        <p>Arjun, 24, is brought to the emergency department by a friend about 20 minutes after eating at the college canteen. He’s itchy all over, short of breath and says he feels faint. You’re the first doctor to see him.</p>
+        <p>Talk to him, examine him, order tests and treat. His body responds to what you do — and to what you don’t. The clock starts when you do.</p>
+        <button class="btn primary" id="startBtn">Start case</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="col">
+    <section class="card" aria-label="Actions">
+      <div class="tabs" role="tablist">
+        <button role="tab" aria-selected="true" data-tab="talk">Talk</button>
+        <button role="tab" aria-selected="false" data-tab="exam">Examine</button>
+        <button role="tab" aria-selected="false" data-tab="tests">Tests</button>
+        <button role="tab" aria-selected="false" data-tab="treat">Treat</button>
+      </div>
+      <div class="panel" id="p-talk" role="tabpanel"></div>
+      <div class="panel" id="p-exam" role="tabpanel" hidden></div>
+      <div class="panel" id="p-tests" role="tabpanel" hidden></div>
+      <div class="panel" id="p-treat" role="tabpanel" hidden></div>
+      <div class="wrap" style="border-top:1px solid var(--line)">
+        <label>Working diagnosis
+          <select id="dx">
+            <option value="">Not decided yet</option>
+            <option value="anaphylaxis">Anaphylaxis</option>
+            <option value="asthma">Acute severe asthma</option>
+            <option value="panic">Panic attack</option>
+            <option value="sepsis">Septic shock</option>
+            <option value="angioedema">Isolated angioedema</option>
+          </select>
+        </label>
+        <button class="btn" id="endBtn" disabled>End case and review</button>
+      </div>
+    </section>
+
+    <section class="card logwrap">
+      <h2>Event log</h2>
+      <ol id="log" aria-live="polite"></ol>
+      <p class="empty" id="logEmpty">Every question, finding and treatment lands here with a timestamp.</p>
+    </section>
+  </div>
+</main>
+
+<dialog id="debrief">
+  <div class="dlg">
+    <h2 id="dbTitle">Case review</h2>
+    <p id="dbSub" style="margin:0;color:var(--muted)"></p>
+    <div class="score" id="dbScore"></div>
+    <ul class="check" id="dbList"></ul>
+    <h3 style="margin:0 0 6px;font-size:1rem">Teaching points</h3>
+    <ul class="notes" id="dbNotes"></ul>
+    <details>
+      <summary style="cursor:pointer">Event log and vitals trace (JSON)</summary>
+      <p style="font-size:.85rem;color:var(--muted);margin:6px 0">Timestamped actions plus vitals every 15 seconds of sim time — the format you’d compare against a real recording.</p>
+      <textarea id="dbJson" readonly></textarea>
+      <div class="row"><button class="btn" id="copyBtn">Copy JSON</button></div>
+    </details>
+    <div class="row">
+      <button class="btn primary" id="restartBtn">Restart case</button>
+      <button class="btn" id="closeBtn">Close</button>
+    </div>
+    <p class="fine">Teaching prototype with a simplified physiology model. Not clinical guidance.</p>
+  </div>
+</dialog>
+
+<script>
+const $ = s => document.querySelector(s);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const fmt = s => { s = Math.max(0, Math.floor(s)); return String(Math.floor(s/60)).padStart(2,"0") + ":" + String(s%60).padStart(2,"0"); };
+
+let st;
+function fresh(){
+  return { t:0, started:false, running:false, ended:false, speed: st ? st.speed : 4,
+    S:40, A:0, V:0, fluids:0, spike:0, salb:0,
+    iv:false, o2:false, legs:false, help:false, arrest:false, stableFor:0,
+    o2Ever:false, fluidsEver:false, adrTimes:[], harm:[], adjuncts:[],
+    asked:new Set(), examined:new Set(), tests:new Set(),
+    said60:false, said80:false, saidBetter:false, events:[], trace:[], nextSample:0, outcome:null };
+}
+st = fresh();
+
+/* ---------- physiology model ----------
+   S = reaction severity 0–100 (100 = cardiac arrest)
+   A = adrenaline effect, decays with ~3 min half-life
+   V = extra circulating volume from IV fluids            */
+function step(dt){
+  const m = dt/60, tMin = st.t/60;
+  st.A *= Math.exp(-m/4.3);
+  st.spike *= Math.exp(-m/1.5);
+  if (st.fluids > 0){
+    const g = Math.min(100*m, st.fluids);
+    st.fluids -= g; st.V += g/500;
+    if (st.fluids <= 0.01){ st.fluids = 0; log("system", "Fluid bolus finished — 500 ml in."); }
+  }
+  st.V *= Math.exp(-m/25);
+  st.salb = Math.max(0, st.salb - m);
+  const drive = 6*Math.exp(-tMin/20);
+  st.S = clamp(st.S + (drive - 15*st.A - (st.salb>0 ? 0.6 : 0))*m, 0, 100);
+  st.t += dt;
+
+  if (!st.said60 && st.S >= 62){ st.said60 = true; say("I feel like I’m going to pass out…"); }
+  if (!st.said80 && st.S >= 82){ st.said80 = true; say("Can’t… breathe…"); }
+  if (!st.saidBetter && st.S <= 25 && st.adrTimes.length){ st.saidBetter = true; say("That’s easier… my throat’s opening up a bit."); }
+
+  if (st.t >= st.nextSample){ const v = vitals(); st.trace.push({ t:Math.round(st.t), hr:v.hr, sbp:v.sbp, dbp:v.dbp, spo2:v.spo2, rr:v.rr, gcs:v.gcs }); st.nextSample += 15; }
+
+  if (st.S >= 100 && !st.arrest){
+    st.arrest = true;
+    log("danger", "Cardiac arrest. Ventricular fibrillation on the monitor.");
+    setBubble("No response.", true);
+    setTimeout(() => endCase("arrest"), 1800);
+    return;
+  }
+  if (st.S <= 15 && st.adrTimes.length){
+    st.stableFor += dt;
+    if (st.stableFor >= 120){ log("system", "Observations stable for 2 minutes."); endCase("stabilised"); }
+  } else st.stableFor = 0;
+}
+
+function vitals(){
+  if (st.arrest) return { hr:null, sbp:null, dbp:null, spo2:null, rr:0, gcs:3, rhythm:"VF" };
+  const j = a => Math.sin(st.t/7 + a)*1.2, S = st.S;
+  const hr = 82 + 0.85*S + 22*st.A + 35*st.spike + j(1);
+  const sbp = 124 - 0.85*S + 14*Math.min(st.V,1.5) + (st.legs?6:0) + 8*st.A + 30*st.spike + j(2);
+  const spo2 = clamp(99 - 0.1*S - Math.max(0,S-50)*0.22 + (st.o2?6:0) + (st.salb>0?1:0), 60, 100);
+  const rr = 14 + 0.2*S + j(3)*0.5;
+  const gcs = sbp>85 ? 15 : sbp>70 ? 14 : sbp>55 ? 12 : 9;
+  return { hr:Math.round(hr), sbp:Math.round(sbp), dbp:Math.round(sbp*0.58), spo2:Math.round(spo2), rr:Math.round(rr), gcs, rhythm: st.spike>0.3 ? "ectopics" : "sinus" };
+}
+const band = () => st.S < 30 ? 0 : st.S < 65 ? 1 : 2;
+
+/* ---------- content ---------- */
+const TALK = [
+  { id:"what", q:"What’s happening to you?", a:["Loads better than before. Still a bit itchy.","My throat feels tight and I’m itching all over. It started after lunch.","Can’t… get… air…"] },
+  { id:"ate", q:"What did you eat?", a:["Dosa and chutney at the canteen, maybe half an hour ago.","Dosa at the canteen… I think the chutney had groundnut in it.","Chutney… groundnut…"] },
+  { id:"allergy", q:"Any allergies?", a:["Peanuts. I asked — they said it was only coconut chutney.","I’m allergic to peanuts. They told me there weren’t any.","Pea… nuts."] },
+  { id:"pen", q:"Do you carry an adrenaline pen?", a:["I have one, but it expired. I kept meaning to replace it.","It’s expired… I didn’t replace it.","(shakes his head)"] },
+  { id:"pmh", q:"Any medical problems?", a:["Mild asthma as a kid. Nothing since.","Bit of asthma when I was small. That’s it.","(shakes his head)"] },
+  { id:"meds", q:"Do you take any medicines?", a:["Just a salbutamol inhaler, hardly ever use it.","Only an inhaler. Haven’t needed it in years.","(no answer — too breathless)"] },
+  { id:"breath", q:"How’s your breathing?", a:["Much easier now.","Tight. Like breathing through a straw.","(gasping, can’t answer)"] }
+];
+
+const EXAM = [
+  { id:"A", label:"Airway", run:v => st.S>55 ? "Hoarse voice, audible inspiratory stridor. Lips and tongue swollen."
+      : st.S>25 ? "Talking in sentences. Voice slightly hoarse, lips swollen, no stridor."
+      : "Airway patent, voice normal. Lip swelling settling." },
+  { id:"B", label:"Breathing", run:v => `RR ${v.rr}/min, SpO₂ ${v.spo2}% on ${st.o2?"15 L O₂":"air"}. ` + (st.S>60 ? "Widespread wheeze, poor air entry, using accessory muscles." : st.S>25 ? "Widespread expiratory wheeze." : "Occasional wheeze, good air entry.") },
+  { id:"C", label:"Circulation", run:v => `HR ${v.hr}, BP ${v.sbp}/${v.dbp}. ` + (v.sbp<80 ? "Cool, clammy peripheries, capillary refill 5 seconds, weak pulse." : v.sbp<95 ? "Capillary refill 3 seconds, warm and flushed." : "Capillary refill under 2 seconds, warm.") },
+  { id:"D", label:"Disability", run:v => `GCS ${v.gcs}/15. ` + (v.gcs===15 ? "Alert, very anxious. Pupils equal and reactive." : v.gcs>=13 ? "Drowsy, confused about where he is." : "Responds only to pain.") },
+  { id:"E", label:"Exposure", run:v => st.S>25 ? "Raised itchy wheals across trunk and arms, flushed skin. No fever." : "Rash fading. Temperature 37.0 °C." }
+];
+
+const TESTS = [
+  { id:"glu", label:"Capillary glucose", sub:"Bedside", run:() => "Glucose 5.8 mmol/L." },
+  { id:"ecg", label:"12-lead ECG", sub:"Bedside", run:v => st.spike>0.3 ? `Sinus tachycardia ${v.hr}/min with frequent ventricular ectopics.` : `Sinus tachycardia, rate ${v.hr}. No ST changes.` },
+  { id:"pef", label:"Peak flow", sub:"Bedside", run:() => st.S>60 ? "Too breathless to perform." : `Peak flow ${Math.round(560 - st.S*5)} L/min (predicted about 580).` },
+  { id:"tryp", label:"Mast cell tryptase", sub:"Lab sample", run:() => "Sample sent. The result takes hours — it confirms the diagnosis later and won’t guide treatment now." },
+  { id:"abg", label:"Arterial blood gas", sub:"Bedside", run:() => {
+      const pao2 = Math.max(6, (st.o2 ? 24 : 12) - Math.max(0, st.S-50)*0.08);
+      return `pH ${(7.44 - Math.max(0,st.S-55)*0.006).toFixed(2)}, PaO₂ ${pao2.toFixed(1)} kPa, lactate ${(1.2 + Math.max(0,st.S-45)*0.06).toFixed(1)} mmol/L.`;
+    } }
+];
+
+const TREAT = [
+  { id:"help", label:"Call for help", sub:"Senior and crash team", on:() => st.help,
+    run(){ if (st.help) return log("system","Help is already on the way."); st.help = true; log("action","Called for help — senior and crash team on the way."); } },
+  { id:"adr", label:"Adrenaline 0.5 mg IM", sub:"1 mg/ml, outer thigh",
+    run(){
+      const last = st.adrTimes[st.adrTimes.length-1];
+      st.adrTimes.push(st.t); st.A += 1;
+      log("action", `Adrenaline 0.5 mg IM given (dose ${st.adrTimes.length}).`);
+      if (last !== undefined && st.t - last < 180){ st.spike += 0.3; log("warn","Repeat IM doses are usually given 5 minutes apart."); }
+    } },
+  { id:"o2", label:"High-flow oxygen", sub:"15 L/min, non-rebreather", on:() => st.o2,
+    run(){ st.o2 = !st.o2; if (st.o2) st.o2Ever = true; log("action", st.o2 ? "High-flow oxygen started, 15 L/min." : "Oxygen stopped."); } },
+  { id:"legs", label:"Lie flat, raise legs", sub:"Supports blood pressure", on:() => st.legs,
+    run(){ st.legs = !st.legs; log("action", st.legs ? "Laid flat with legs raised." : "Sat back up."); if (st.legs && st.S>55) say("I can’t breathe lying down…"); } },
+  { id:"iv", label:"IV cannula", sub:"Large bore, bloods sent", on:() => st.iv,
+    run(){ if (st.iv) return log("system","IV access already in."); st.iv = true; log("action","IV cannula inserted, bloods sent."); } },
+  { id:"fluid", label:"IV fluid bolus", sub:"500 ml crystalloid, fast", needIV:true,
+    run(){ if (st.fluids>0) return log("system","A bolus is already running."); st.fluids = 500; st.fluidsEver = true; log("action","500 ml crystalloid bolus started."); } },
+  { id:"salb", label:"Salbutamol 5 mg", sub:"Nebulised",
+    run(){ st.salb = 15; log("action","Salbutamol 5 mg nebuliser started."); } },
+  { id:"chlor", label:"Chlorphenamine 10 mg IV", sub:"Antihistamine", needIV:true,
+    run(){ st.adjuncts.push({d:"chlor",t:st.t}); log("action","Chlorphenamine 10 mg IV given."); log("system","Eases itch and rash only. No effect on airway or blood pressure."); } },
+  { id:"hydro", label:"Hydrocortisone 200 mg IV", sub:"Steroid", needIV:true,
+    run(){ st.adjuncts.push({d:"hydro",t:st.t}); log("action","Hydrocortisone 200 mg IV given."); log("system","No immediate effect."); } },
+  { id:"ivadr", label:"Adrenaline 1 mg IV bolus", sub:"Undiluted, push", needIV:true,
+    run(){ st.harm.push(st.t); st.spike += 1.2; st.A += 0.6; log("action","Adrenaline 1 mg IV bolus given."); log("danger","Severe hypertension and ventricular ectopics. Bolus IV adrenaline is for cardiac arrest only."); say("My chest… my heart’s pounding…"); } }
+];
+
+/* ---------- UI ---------- */
+function build(){
+  $("#p-talk").innerHTML = TALK.map(o => `<button class="act" data-talk="${o.id}">${o.q}</button>`).join("");
+  $("#p-exam").innerHTML = `<p class="hint">Work through it in order.</p>` + EXAM.map(o => `<button class="act" data-exam="${o.id}"><span class="step">${o.id}</span>${o.label}</button>`).join("");
+  $("#p-tests").innerHTML = TESTS.map(o => `<button class="act" data-test="${o.id}">${o.label}<small>${o.sub}</small></button>`).join("");
+  $("#p-treat").innerHTML = TREAT.map(o => `<button class="act" data-treat="${o.id}">${o.label}<small>${o.sub}${o.needIV?" · needs IV access":""}</small></button>`).join("");
+}
+build();
+
+function log(type, text){
+  st.events.push({ t:Math.round(st.t), type, text });
+  const li = document.createElement("li");
+  li.className = type;
+  li.innerHTML = `<time>${fmt(st.t)}</time><span></span>`;
+  li.querySelector("span").textContent = text;
+  $("#log").prepend(li);
+  $("#logEmpty").hidden = true;
+}
+function setBubble(text, silent){ const b = $("#bubble"); b.textContent = text; b.classList.toggle("silent", !!silent); }
+function say(text){ setBubble("“" + text + "”"); log("patient", "Patient: “" + text + "”"); }
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.tab){
+    document.querySelectorAll("[data-tab]").forEach(t => t.setAttribute("aria-selected", t === b ? "true" : "false"));
+    ["talk","exam","tests","treat"].forEach(k => $("#p-"+k).hidden = k !== b.dataset.tab);
+    return;
+  }
+  if (b.dataset.speed){
+    st.speed = +b.dataset.speed;
+    document.querySelectorAll("[data-speed]").forEach(s => s.setAttribute("aria-pressed", s === b ? "true" : "false"));
+    return;
+  }
+  if (!st.started || st.ended) return;
+  const v = vitals();
+  if (b.dataset.talk){
+    const o = TALK.find(x => x.id === b.dataset.talk); st.asked.add(o.id);
+    log("action", "You: " + o.q);
+    if (st.arrest) return setBubble("No response.", true);
+    const a = o.a[band()]; a.startsWith("(") ? (setBubble(a, true), log("patient", a)) : say(a);
+  } else if (b.dataset.exam){
+    const o = EXAM.find(x => x.id === b.dataset.exam); st.examined.add(o.id);
+    log("finding", `${o.label}: ${o.run(v)}`);
+  } else if (b.dataset.test){
+    const o = TESTS.find(x => x.id === b.dataset.test); st.tests.add(o.id);
+    log("finding", `${o.label}: ${o.run(v)}`);
+  } else if (b.dataset.treat){
+    const o = TREAT.find(x => x.id === b.dataset.treat);
+    if (o.needIV && !st.iv) return log("warn", "No IV access yet. Insert a cannula first.");
+    o.run();
+  }
+  render();
+});
+
+$("#startBtn").onclick = () => {
+  st.started = true; st.running = true;
+  $("#briefCard").hidden = true;
+  $("#pauseBtn").disabled = false; $("#endBtn").disabled = false;
+  log("system", "Arjun arrives in resus.");
+  say("Doctor… I can’t stop itching, and my throat feels weird.");
+};
+$("#pauseBtn").onclick = () => { if (st.ended) return; st.running = !st.running; $("#pauseBtn").textContent = st.running ? "Pause" : "Resume"; };
+$("#endBtn").onclick = () => endCase("ended");
+$("#restartBtn").onclick = () => location.reload();
+$("#closeBtn").onclick = () => $("#debrief").close();
+$("#copyBtn").onclick = async () => {
+  const ta = $("#dbJson");
+  try { await navigator.clipboard.writeText(ta.value); $("#copyBtn").textContent = "Copied"; }
+  catch { ta.select(); document.execCommand && document.execCommand("copy"); $("#copyBtn").textContent = "Selected — press Ctrl+C"; }
+};
+
+function render(){
+  const v = vitals();
+  $("#clock").textContent = fmt(st.t);
+  $("#v-hr").textContent = v.hr ?? "VF";
+  $("#rhythm").textContent = v.rhythm;
+  $("#v-spo2").innerHTML = (v.spo2 ?? "--") + "<small>%</small>";
+  $("#o2lbl").textContent = st.o2 ? "O₂ 15 L" : "air";
+  $("#v-bp").textContent = v.sbp ? `${v.sbp}/${v.dbp}` : "--/--";
+  $("#v-map").textContent = v.sbp ? `(${Math.round(v.dbp + (v.sbp - v.dbp)/3)})` : "";
+  $("#v-rr").textContent = v.rr;
+  const al = (id, on) => $(id).classList.toggle("alarm", st.started && on);
+  al("#n-hr", v.hr === null || v.hr > 120 || v.hr < 50);
+  al("#n-spo2", v.spo2 === null || v.spo2 < 92);
+  al("#n-bp", v.sbp === null || v.sbp < 90 || v.sbp > 180);
+  al("#n-rr", v.rr > 25 || v.rr < 8);
+
+  // patient face
+  const S = st.S;
+  $("#flush").setAttribute("opacity", st.arrest ? 0 : clamp(S/100*0.35, 0, 0.35));
+  $("#hives").setAttribute("opacity", clamp((S-15)/50, 0, 1));
+  $("#cyan").setAttribute("opacity", st.arrest ? 0.45 : clamp((92 - (v.spo2 ?? 70))/20, 0, 0.45));
+  $("#lips").setAttribute("ry", 5 + S*0.06);
+  $("#lips").setAttribute("rx", 15 + S*0.05);
+  $("#mouth").setAttribute("ry", st.arrest ? 0 : Math.max(0, (S-50)*0.12));
+  $("#eyesOpen").setAttribute("opacity", st.arrest || v.gcs < 12 ? 0 : 1);
+  $("#eyesShut").setAttribute("opacity", st.arrest || v.gcs < 12 ? 1 : 0);
+  $("#brows").setAttribute("d", S>40 ? "M70 70 L88 75 M112 75 L130 70" : "M70 72 L88 70 M112 70 L130 72");
+
+  // status chips
+  const lastAdr = st.adrTimes[st.adrTimes.length-1];
+  const chips = [
+    ["IV access", st.iv], ["Oxygen", st.o2], ["Legs raised", st.legs],
+    [st.fluids>0 ? `Fluids: ${Math.round(st.fluids)} ml left` : "Fluids", st.fluids>0],
+    [st.adrTimes.length ? `Adrenaline ×${st.adrTimes.length}, last ${fmt(st.t - lastAdr)} ago` : "No adrenaline yet", st.adrTimes.length>0],
+    ["Help called", st.help]
+  ];
+  $("#chips").innerHTML = chips.map(([t,on]) => `<span class="chip${on?" on":""}">${t}</span>`).join("");
+
+  // action buttons
+  const locked = !st.started || st.ended;
+  document.querySelectorAll(".act").forEach(b => b.disabled = locked);
+  TREAT.forEach(o => { if (o.on){ const b = document.querySelector(`[data-treat="${o.id}"]`); b.classList.toggle("is-on", !!o.on()); } });
+}
+
+setInterval(() => { if (st.running && !st.ended && !st.arrest) step(0.2*st.speed); render(); }, 200);
+render();
+
+/* ---------- debrief ---------- */
+function endCase(reason){
+  if (st.ended) return;
+  st.ended = true; st.running = false; st.outcome = reason;
+  $("#pauseBtn").disabled = true; $("#endBtn").disabled = true;
+  render();
+  const dx = $("#dx").value, first = st.adrTimes[0];
+  const items = [];
+  const add = (ok, text, pts) => items.push({ ok, text, pts: ok ? pts : 0, max: pts });
+  if (reason === "stabilised") add(true, "Patient stabilised", 30);
+  else if (reason === "arrest") add(false, "Patient went into cardiac arrest", 30);
+  else add(st.S < 30, st.S < 30 ? "Patient improving when you ended the case" : "Patient still unstable when you ended the case", 30);
+  add(first !== undefined, first !== undefined ? `IM adrenaline given (first dose at ${fmt(first)})` : "IM adrenaline never given", 20);
+  add(first !== undefined && first <= 180, "Adrenaline within 3 minutes of arrival", 10);
+  add(st.o2Ever, "High-flow oxygen", 8);
+  add(st.help, "Called for help", 8);
+  add(st.fluidsEver, "IV fluid bolus", 8);
+  add(st.examined.size === 5, `Full ABCDE assessment (${st.examined.size}/5 done)`, 8);
+  add(st.asked.has("allergy"), "Asked about allergies", 4);
+  add(dx === "anaphylaxis", dx ? `Working diagnosis: ${$("#dx").selectedOptions[0].text}` : "No working diagnosis chosen", 4);
+  let score = items.reduce((s,i) => s + i.pts, 0);
+  if (st.harm.length){ items.push({ ok:false, text:"Gave IV bolus adrenaline outside cardiac arrest", pts:-20, max:0 }); score -= 20; }
+  score = clamp(score, 0, 100);
+
+  const notes = [];
+  if (first === undefined) notes.push("IM adrenaline is the first-line treatment for anaphylaxis. Oxygen and fluids buy time but don’t reverse the reaction.");
+  else if (first > 180) notes.push("Adrenaline came late. Give it as soon as anaphylaxis is suspected — airway swelling and low blood pressure won’t wait for a full workup.");
+  if (st.adrTimes.length === 1 && reason !== "stabilised") notes.push("If there’s no improvement 5 minutes after IM adrenaline, give a second dose.");
+  if (st.adjuncts.length && (first === undefined || st.adjuncts[0].t < first)) notes.push("An antihistamine or steroid went in before adrenaline. Neither treats airway or circulation problems, so they shouldn’t delay it.");
+  if (st.adjuncts.some(a => a.d === "hydro")) notes.push("Steroids are no longer routinely recommended in the emergency treatment of anaphylaxis (Resuscitation Council UK, 2021).");
+  if (st.harm.length) notes.push("Undiluted IV adrenaline outside cardiac arrest can cause severe hypertension, arrhythmias and myocardial ischaemia. Refractory cases get a titrated infusion from a specialist.");
+  if (st.tests.has("tryp")) notes.push("Good call sending mast cell tryptase — it supports the diagnosis and the allergy referral later.");
+  if (!notes.length) notes.push("Clean run. Next time, try 8× speed and see whether your order of actions still holds up.");
+
+  $("#dbTitle").textContent = reason === "stabilised" ? "Arjun is stable" : reason === "arrest" ? "Arjun arrested" : "Case ended";
+  $("#dbSub").textContent = `Case time ${fmt(st.t)} · diagnosis: anaphylaxis to peanut`;
+  $("#dbScore").innerHTML = `${score}<small> / 100</small>`;
+  $("#dbList").innerHTML = items.map(i => `<li class="${i.ok?"yes":"no"}"><span class="m">${i.ok?"✓":"✗"}</span><span>${i.text}</span><span class="pts">${i.pts>0?"+":""}${i.pts}</span></li>`).join("");
+  $("#dbNotes").innerHTML = notes.map(n => `<li>${n}</li>`).join("");
+  $("#dbJson").value = JSON.stringify({ case:"anaphylaxis-01", outcome:reason, diagnosis:dx || null, score, duration_s:Math.round(st.t), events:st.events, vitals:st.trace }, null, 2);
+  $("#debrief").showModal();
+}
+
+/* ---------- monitor traces ---------- */
+const cv = $("#trace"), cx = cv.getContext("2d");
+let W = 0, H = 0, x = 0, phase = 0, last = performance.now(), pe = null, pp = null;
+function size(){
+  const dpr = window.devicePixelRatio || 1, r = cv.getBoundingClientRect();
+  W = r.width; H = r.height; cv.width = W*dpr; cv.height = H*dpr;
+  cx.setTransform(dpr,0,0,dpr,0,0); cx.fillStyle = "#000"; cx.fillRect(0,0,W,H);
+  x = 0; pe = pp = null;
+}
+window.addEventListener("resize", size); size();
+const gauss = (p,c,w,a) => a*Math.exp(-((p-c)**2)/(2*w*w));
+const ecg = p => gauss(p,.16,.025,.12) + gauss(p,.28,.008,-.12) + gauss(p,.31,.01,1) + gauss(p,.34,.01,-.28) + gauss(p,.58,.045,.25);
+const pleth = p => { const q = (p - .36 + 1) % 1; return Math.exp(-((q-.15)**2)/.008) + .35*Math.exp(-((q-.42)**2)/.006); };
+function frame(now){
+  const dt = Math.min(.05, (now - last)/1000); last = now;
+  const v = vitals(), hr = v.hr || 0, steps = 10, pxPerSec = 110;
+  const eMid = H*.34, eAmp = H*.24, pMid = H*.86, pAmp = H*.2;
+  cx.lineWidth = 2; cx.lineJoin = "round";
+  for (let i = 0; i < steps; i++){
+    const sdt = dt/steps; phase += sdt*hr/60;
+    const nx = x + pxPerSec*sdt;
+    let e, p;
+    if (st.arrest){ const t = now/1000 + i*sdt; e = .35*Math.sin(t*31) + .25*Math.sin(t*47+1) + .18*Math.sin(t*13); p = 0; }
+    else { const f = phase % 1; e = ecg(f); p = pleth(f)*((v.spo2||0) < 85 ? .5 : 1); }
+    cx.fillStyle = "#000"; cx.fillRect(nx, 0, 16, H);
+    const ey = eMid - e*eAmp, py = pMid - p*pAmp;
+    if (pe !== null){
+      cx.strokeStyle = "#3CE07A"; cx.beginPath(); cx.moveTo(x, pe); cx.lineTo(nx, ey); cx.stroke();
+      cx.strokeStyle = "#3FD0F0"; cx.beginPath(); cx.moveTo(x, pp); cx.lineTo(nx, py); cx.stroke();
+    }
+    pe = ey; pp = py; x = nx;
+    if (x > W){ x = 0; pe = pp = null; }
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
