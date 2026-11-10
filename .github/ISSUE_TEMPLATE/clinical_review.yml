@@ -1,0 +1,43 @@
+name: Clinical review
+description: Confirm or correct a value flagged in docs/clinical-review.md.
+labels: ['clinical review']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. Bedside sim is an educational simulation with simplified physiology, not clinical guidance, but its numbers should still be right or clearly marked as teaching parameters.
+  - type: input
+    id: item
+    attributes:
+      label: Item
+      description: The file and item from docs/clinical-review.md.
+      placeholder: 'src/content/formulary.json · drugs[adrenaline].routes[IM]'
+    validations:
+      required: true
+  - type: dropdown
+    id: verdict
+    attributes:
+      label: Your review
+      options:
+        - Confirmed as written
+        - Needs a correction
+        - Acceptable as a teaching simplification
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Correction and reasoning
+      description: The value you'd use and why.
+  - type: textarea
+    id: source
+    attributes:
+      label: Source
+      description: Guideline or reference, with year and section.
+    validations:
+      required: true
+  - type: input
+    id: role
+    attributes:
+      label: Your clinical background (optional)
+      placeholder: 'ED registrar, pharmacist, …'

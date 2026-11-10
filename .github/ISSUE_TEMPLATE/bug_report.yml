@@ -1,0 +1,42 @@
+name: Bug report
+description: Something in the simulator doesn't work as expected.
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. The same case, seed and actions give the same run, so the URL (it includes the seed) and the exported run usually let us reproduce it exactly.
+  - type: input
+    id: url
+    attributes:
+      label: Case URL
+      description: Copy it from the address bar, for example https://yuvism.github.io/bedside-sim/#/case/anaphylaxis-01?seed=42
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you saw, and what you expected instead.
+      placeholder: |
+        1. Started the case and gave IM adrenaline at about 1:00
+        2. …
+        Expected: …
+        Saw: …
+    validations:
+      required: true
+  - type: textarea
+    id: run
+    attributes:
+      label: Exported run (optional)
+      description: In the debrief, select Download JSON and attach the file here, or paste the relevant part.
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device
+      placeholder: Chrome 131 on Windows 11, Safari on iPhone 15…
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Screenshot (optional)
+      description: Drag an image in.

@@ -102,6 +102,12 @@
   background: #3a3005;
 }
 
+/* Keep units and timestamps at full contrast on the alarm backgrounds. */
+.num.alarm-medium .num-v small,
+.num.alarm-high .num-v small {
+  opacity: 1;
+}
+
 @keyframes blink-high {
   50% {
     color: #fff;

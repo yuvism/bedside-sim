@@ -169,9 +169,16 @@ The build brief is in [PROMPT.md](PROMPT.md). The single-file prototype is in `r
 - **Not ported yet:** scoring, the nurse, the coach, case variation, the free-text matcher (except its "I don't know" answer) and video validation. A Unity front end can add them on top of the engine.
 - **Not tested in the Unity Editor itself**: there is no Unity install here. The engine is verified by the .NET parity run; the Unity scripts are checked by compiling against stubs, so a first run in the Editor should confirm the scene setup.
 
+### Definition of done — finishing items
+
+- **Accessibility:** Lighthouse 13.5 accessibility scores **100** on the case screen, the case list, the case editor and the validation page. axe-core (WCAG 2.1 A/AA plus best practice) during play found two issues the static run can't see, both now fixed: the small timestamp under an alarming NIBP was 3.78:1 against the alarm background (now full contrast, about 4.7:1), and the scrolling event log wasn't reachable by keyboard (now focusable, labelled "Event log"). The re-run is clean while running, at a nurse query, in cardiac arrest and in the 3D view, in light and dark and at 375 px; the debrief, editor and validation results were already clean.
+- **README:** a hero screenshot and four feature screenshots (debrief, 3D view, case editor, validation) in `docs/images/`, "Add a case", a Mermaid architecture diagram, the full command list, accessibility results, and credits (Pulse, BioGears, Infirmary Integrated, three.js; no third-party assets per ASSETS.md).
+- **CONTRIBUTING.md:** ground rules (no invented citations, `reviewNeeded`, score safe options equally), set-up and checks, the case format, disease processes, the condition language, scoring rules, and how to test a case.
+- **Issue templates:** bug report (case URL with seed, exported run), new case (sources and every safe option required) and clinical review. Labels `new case` and `clinical review` were added on GitHub next to the default `bug` and `good first issue`.
+
 ## Next
 
-- All ten phases are built. Remaining from the brief's definition of done: deploy to GitHub Pages with green CI (waiting on the push), a Lighthouse accessibility check (≥ 90) on the case screen, the README's screenshot or GIF, architecture diagram and "how to add a case", `CONTRIBUTING.md`, issue templates and good-first-issue labels.
+- **Push, then go live:** the GitHub repo exists but is empty until the commits are pushed with a token that has the `workflow` scope. After that: enable GitHub Pages (source: GitHub Actions) and check that CI (web checks and the Unity parity job) and the deploy are green.
 
 ## Design decisions to review
 
@@ -187,7 +194,7 @@ The build brief is in [PROMPT.md](PROMPT.md). The single-file prototype is in `r
 ## Known issues
 
 - TypeScript is pinned to 6.0.x because typescript-eslint 8 supports only `<6.1`. Move to TS 7 once typescript-eslint supports it.
-- **Not pushed yet.** The repo github.com/yuvism/bedside-sim exists but is empty, because GitHub rejects workflow files from a token without the `workflow` scope. Commits are kept locally until a GitHub login with that scope pushes them: `gh auth login -h github.com -s workflow`, then `git push -u origin main` from the project folder.
+- **Not pushed yet.** The repo github.com/yuvism/bedside-sim exists but is empty, because GitHub rejects workflow files from a token without the `workflow` scope. Push with `gh auth login -h github.com -s workflow`, then `git push -u origin main` from the project folder.
 - Bundle sizes are under the 200 kB gzipped limit: the main bundle is about 147 kB (React, Zod and the ten bundled cases), and the lazy chunks are about 109 kB for the debrief (mostly Recharts), 84 kB for the Anthropic SDK and 147 kB for the 3D view (three.js). If the library grows much more, cases should load lazily.
 - The 3D view's frame rate was measured in headless Chromium only (60 fps), not yet on a mid-range laptop GPU.
 - `npm audit` reports 10 moderate advisories, all in the lint tooling (minimatch, through ESLint and typescript-eslint). None are in code shipped to the browser.

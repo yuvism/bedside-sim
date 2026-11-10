@@ -22,7 +22,14 @@ export function EventLog() {
       {list.length === 0 ? (
         <p className="empty">Every question, finding and treatment lands here with a timestamp.</p>
       ) : (
-        <ol className="log" aria-live="polite" aria-relevant="additions">
+        // Focusable so keyboard users can scroll the log.
+        <ol
+          className="log"
+          aria-live="polite"
+          aria-relevant="additions"
+          aria-labelledby="log-h"
+          tabIndex={0}
+        >
           {list.map((e, i) => (
             <li key={list.length - i} className={e.type}>
               <time>{fmtClock(e.t)}</time>

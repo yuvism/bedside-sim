@@ -1,0 +1,52 @@
+name: New case
+description: Propose a case, or tell us you're writing one.
+labels: ['new case']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        See CONTRIBUTING.md for the case format. The case editor (Case editor on the case list) is the quickest way to build one; attach the exported JSON if you have it.
+        **Never invent a citation:** every dose, threshold and timing needs a source, and anything tuned for teaching is flagged for clinical review.
+  - type: input
+    id: title
+    attributes:
+      label: Working title and specialty
+      placeholder: 'Breathless after a long flight (respiratory)'
+    validations:
+      required: true
+  - type: textarea
+    id: presentation
+    attributes:
+      label: Presentation
+      description: Who the patient is and how they present. No real patient details.
+    validations:
+      required: true
+  - type: textarea
+    id: objectives
+    attributes:
+      label: Learning objectives
+      description: What should a learner do, decide or avoid? List every safe option the guidelines allow, so they can be scored equally.
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Guidelines and sources
+      description: Named guidelines (with year) for the doses, thresholds and management steps.
+    validations:
+      required: true
+  - type: textarea
+    id: physiology
+    attributes:
+      label: Course and physiology
+      description: How the patient should deteriorate untreated, how treatments act, and what stabilised looks like.
+  - type: dropdown
+    id: building
+    attributes:
+      label: Will you build it?
+      options:
+        - Yes, I'm writing it (JSON attached or to follow)
+        - I'd like help
+        - Just suggesting it
+    validations:
+      required: true
