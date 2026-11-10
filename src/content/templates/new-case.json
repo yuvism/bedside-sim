@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "id": "my-case-01",
+  "version": 1,
+  "title": "Untitled case",
+  "summary": "A starter case. Replace this with a one-sentence summary of the patient.",
+  "specialty": "Acute medicine",
+  "difficulty": "foundation",
+  "estMinutes": 10,
+  "tags": ["template"],
+  "patient": {
+    "name": "Sam Taylor",
+    "age": 45,
+    "sex": "female",
+    "weightKg": 70,
+    "occupation": "teacher",
+    "persona": "Polite and a little anxious. Answers in short sentences when unwell."
+  },
+  "brief": [
+    "Sam, {age}, has become short of breath over the last hour. The nurse has asked you to review her.",
+    "Assess her with ABCDE and treat what you find."
+  ],
+  "openingLine": "I can't seem to catch my breath.",
+  "baseline": {
+    "hr": 82,
+    "sbp": 128,
+    "dbp": 78,
+    "rr": 16,
+    "temp": 37,
+    "glucose": 5.5,
+    "hrJitter": 4,
+    "sbpJitter": 4,
+    "source": "Template: replace with your own values and say where they come from."
+  },
+  "labs": {
+    "lactate": 1.2,
+    "hco3": 24,
+    "k": 4.2,
+    "na": 139,
+    "urea": 5,
+    "creatinine": 80,
+    "hb": 135,
+    "wcc": 7,
+    "plt": 250
+  },
+  "processes": [
+    {
+      "id": "illness",
+      "type": "illness",
+      "label": "Main problem",
+      "initial": 50,
+      "ratePerMin": 1.5,
+      "arrestAt": 100,
+      "arrestRhythm": "pea",
+      "effects": [
+        { "target": "hr", "perPoint": 0.6 },
+        { "target": "sbp", "perPoint": -0.5, "above": 30 },
+        { "target": "rr", "perPoint": 0.2 },
+        { "target": "vq", "perPoint": 0.3, "above": 20, "exponent": 0.7 },
+        { "target": "sign:effort", "perPoint": 0.01, "above": 20 },
+        { "target": "sign:anxiety", "perPoint": 0.008 }
+      ],
+      "treatments": [
+        {
+          "id": "oxygen",
+          "when": { "device": "o2_nrb" },
+          "ratePerMin": -4,
+          "source": "Template: high-flow oxygen reverses this made-up problem."
+        }
+      ],
+      "source": "Template teaching model. Replace with your own process and its source."
+    }
+  ],
+  "bands": { "process": "illness", "cutoffs": [30, 65] },
+  "dialogue": [
+    {
+      "id": "what",
+      "category": "presenting",
+      "q": "What's happening?",
+      "a": [
+        "I feel a lot better now, thanks.",
+        "I can't… catch my breath.",
+        "(gasps, can't speak)"
+      ],
+      "keywords": ["happening", "wrong", "feel", "problem"]
+    },
+    {
+      "id": "allergy",
+      "category": "allergies",
+      "q": "Any allergies?",
+      "a": ["No, none that I know of.", "No… none.", "(shakes her head)"],
+      "keywords": ["allergy", "allergies", "allergic"]
+    }
+  ],
+  "exam": [
+    { "id": "A", "label": "Airway", "kind": "abcde", "findings": [{ "text": "Airway patent." }] },
+    {
+      "id": "B",
+      "label": "Breathing",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": { "vital": "spo2", "lt": 94 },
+          "text": "RR {rr}, SpO₂ {spo2}%. Working hard to breathe."
+        },
+        { "text": "RR {rr}, SpO₂ {spo2}%. Breathing comfortably." }
+      ]
+    },
+    {
+      "id": "C",
+      "label": "Circulation",
+      "kind": "abcde",
+      "findings": [{ "text": "HR {hr}, BP {sbp}/{dbp}. Warm hands, capillary refill 2 s." }]
+    },
+    {
+      "id": "D",
+      "label": "Disability",
+      "kind": "abcde",
+      "findings": [{ "text": "Alert. Glucose {glucose:1} mmol/L." }]
+    },
+    {
+      "id": "E",
+      "label": "Exposure",
+      "kind": "abcde",
+      "findings": [{ "text": "Temperature {temp:1} °C. Nothing else of note." }]
+    }
+  ],
+  "investigations": [
+    { "id": "glu", "results": [{ "text": "Capillary glucose {glucose:1} mmol/L." }] }
+  ],
+  "patientLines": [
+    {
+      "id": "better",
+      "when": { "severity": "illness", "lt": 25 },
+      "text": "That's much easier. Thank you."
+    }
+  ],
+  "outcomes": {
+    "stabilised": {
+      "when": { "severity": "illness", "lt": 25 },
+      "forSec": 60,
+      "text": "Breathing settled for a minute."
+    }
+  },
+  "diagnosis": {
+    "correct": ["main"],
+    "options": [
+      { "id": "main", "label": "Main diagnosis" },
+      { "id": "other", "label": "Something else" }
+    ]
+  },
+  "scoring": [
+    {
+      "id": "stabilised",
+      "label": "Patient stabilised",
+      "weight": 40,
+      "kind": "credit",
+      "test": { "type": "outcomeIs", "outcomes": ["stabilised"] }
+    },
+    {
+      "id": "oxygen",
+      "label": "High-flow oxygen given",
+      "weight": 30,
+      "kind": "credit",
+      "critical": true,
+      "test": { "type": "actionDone", "codes": ["device:o2_nrb:on"] }
+    },
+    {
+      "id": "abcde",
+      "label": "Full ABCDE assessment",
+      "weight": 20,
+      "kind": "credit",
+      "test": { "type": "examined", "ids": ["A", "B", "C", "D", "E"] }
+    },
+    {
+      "id": "dx",
+      "label": "Correct working diagnosis",
+      "weight": 10,
+      "kind": "credit",
+      "test": { "type": "diagnosisIs", "ids": ["main"] }
+    }
+  ],
+  "teaching": [{ "id": "point", "text": "Write the main teaching point for this case here." }],
+  "references": []
+}

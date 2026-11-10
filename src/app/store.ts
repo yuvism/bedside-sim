@@ -73,6 +73,8 @@ interface SimState {
   score: ScoreResult | null;
   progress: CaseProgress | null;
   mode: Mode;
+  /** Playing an editor draft: the result isn't recorded as progress. */
+  testRun: boolean;
   /** Optional AI patient settings (key kept in localStorage only). */
   ai: AiSettings;
   /** Open action panel tab. */
@@ -83,7 +85,7 @@ interface SimState {
   asking: boolean;
   /** Why the last typed question fell back to the offline matcher. */
   askNotice: string | null;
-  load(caseDef: CaseDef, seed: number): void;
+  load(caseDef: CaseDef, seed: number, opts?: { testRun?: boolean }): void;
   /** Switch guided/exam before starting (reloads the same patient). */
   setMode(mode: Mode): void;
   /** Answer the nurse's query about an order. */
@@ -154,16 +156,18 @@ export const useSim = create<SimState>()((set, get) => {
     score: null,
     progress: null,
     mode: readMode(),
+    testRun: false,
     ai: loadAiSettings(),
     panel: 'talk',
     bayView: readView(),
     asking: false,
     askNotice: null,
 
-    load(caseDef, seed) {
+    load(caseDef, seed, opts) {
       const session = new Session(caseDef, seed, undefined, { mode: get().mode });
       set({
         session,
+        testRun: opts?.testRun ?? false,
         phase: 'brief',
         paused: false,
         diagnosis: '',
@@ -186,7 +190,9 @@ export const useSim = create<SimState>()((set, get) => {
       }
       set({ mode });
       const { session, phase } = get();
-      if (session && phase === 'brief') get().load(session.baseCase, session.seed);
+      if (session && phase === 'brief') {
+        get().load(session.baseCase, session.seed, { testRun: get().testRun });
+      }
     },
 
     answer(queryId, proceed) {
@@ -299,7 +305,9 @@ export const useSim = create<SimState>()((set, get) => {
         outcome,
         diagnosis: lastDiagnosis(session.events),
       });
-      const progress = recordAttempt(session.caseDef.id, score.percent, outcome);
+      const progress = get().testRun
+        ? null
+        : recordAttempt(session.caseDef.id, score.percent, outcome);
       set({ phase: 'ended', endReason: reason, paused: false, score, progress });
       refresh();
     },

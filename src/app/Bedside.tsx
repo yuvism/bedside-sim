@@ -10,6 +10,7 @@ import { AlsPanel } from '../ui/panels/AlsPanel.tsx';
 import { NursePanel } from '../ui/panels/NursePanel.tsx';
 import { PatientCard } from '../ui/patient/PatientCard.tsx';
 import { Footer } from './Footer.tsx';
+import { editorHref } from './router.ts';
 import { SPEEDS, useSim } from './store.ts';
 import { BayCard, ViewToggle } from '../ui/bay/BayView.tsx';
 import { SettingsButton } from '../ui/settings/SettingsButton.tsx';
@@ -117,11 +118,21 @@ function BriefCard({ caseDef }: { caseDef: CaseDef }) {
   );
 }
 
-export function Bedside({ caseDef, seed }: { caseDef: CaseDef; seed: number }) {
+export function Bedside({
+  caseDef,
+  seed,
+  draftId,
+}: {
+  caseDef: CaseDef;
+  seed: number;
+  /** Set when test-running an editor draft. */
+  draftId?: string;
+}) {
   const phase = useSim((s) => s.phase);
   const load = useSim((s) => s.load);
   const bayView = useSim((s) => s.bayView);
-  useEffect(() => load(caseDef, seed), [caseDef, seed, load]);
+  const testRun = draftId !== undefined;
+  useEffect(() => load(caseDef, seed, { testRun }), [caseDef, seed, load, testRun]);
   useSimLoop();
 
   return (
@@ -135,6 +146,11 @@ export function Bedside({ caseDef, seed }: { caseDef: CaseDef; seed: number }) {
             {caseDef.specialty} · {caseDef.title}
           </p>
         </div>
+        {draftId !== undefined && (
+          <a className="btn" href={editorHref(draftId)}>
+            Back to editor
+          </a>
+        )}
         <Controls />
         <ModeBadge />
         <SettingsButton />
@@ -146,6 +162,11 @@ export function Bedside({ caseDef, seed }: { caseDef: CaseDef; seed: number }) {
           <ViewToggle />
           {bayView === '3d' && <BayCard />}
           <PatientCard hideAvatar={bayView === '3d'} />
+          {phase === 'brief' && testRun && (
+            <p className="test-run-note" role="note">
+              Test run of an editor draft. The result isn’t saved to your progress.
+            </p>
+          )}
           {phase === 'brief' && <BriefCard caseDef={caseDef} />}
         </div>
         <div className="col">
@@ -155,7 +176,7 @@ export function Bedside({ caseDef, seed }: { caseDef: CaseDef; seed: number }) {
           <EventLog />
         </div>
       </main>
-      <EndDialog onRestart={() => load(caseDef, seed)} />
+      <EndDialog onRestart={() => load(caseDef, seed, { testRun })} />
       <Footer seed={seed} />
     </>
   );

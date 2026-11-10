@@ -442,3 +442,12 @@ a {
   border-color: var(--danger);
   color: var(--danger);
 }
+
+.test-run-note {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--warn-soft);
+  border-left: 4px solid var(--warn);
+  font-size: 0.9rem;
+}

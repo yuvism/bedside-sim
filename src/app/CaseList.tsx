@@ -47,6 +47,9 @@ export function CaseList() {
           <h1>Bedside sim</h1>
           <p>Virtual patient simulator</p>
         </div>
+        <a className="btn" href="#/editor">
+          Case editor
+        </a>
         <SettingsButton />
         <ThemeToggle />
       </header>

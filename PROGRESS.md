@@ -132,9 +132,24 @@ The build brief is in [PROMPT.md](PROMPT.md). The single-file prototype is in `r
 - If WebGL isn't available or the 3D chunk fails to download, a message asks you to switch back to 2D.
 - **Tests (178 unit, 11 e2e):** click targets and their panels, oxygen kinds, posture, eyes, drips, pads, skin colour mixing, breathing and compression timing, and the 3D monitor screen's numbers. The e2e tests check that 2D is the default; that the 3D canvas renders and reports a frame rate; that the object buttons open Treat, Examine and Talk; that a real click on the patient's torso and head in the scene opens Examine and Talk; that the choice is remembered; and that 3D fits a 375 px phone.
 
+### Phase 8 — Case editor
+
+- **Case editor** at `#/editor`, linked from the case list. Lazy-loaded, so it adds nothing to the main bundle (about 12 kB gzipped across two chunks).
+- **Forms built from the Zod schema** (`src/ui/editor/form/`):
+  - The editor reads `CaseSchema` at runtime and draws a form for whatever it finds: objects, lists (add, remove, reorder, duplicate), records (labs, variation answers), tuples (age range), enums, numbers with their bounds, and optional fields that can be added or removed.
+  - Conditions and scoring tests (recursive unions) get a type picker with plain names ("Drug given", "Asked", "Action done within a time"), and fields shared by the old and new type are kept when you switch.
+  - Every field in the schema is covered, and a unit test fails if a new top-level field isn't placed in a section.
+  - Sections: basics, patient, brief, baseline and labs, disease processes, talk, examine, investigations, patient lines, outcome and diagnosis, scoring, teaching and hints, variation, and raw JSON.
+- **Live validation:** the Zod schema runs on every change, and each problem shows under its field with a plain message ("Required.", "Needs at least 1."). Section tabs show problem counts, collapsed list items are marked, and a problems list jumps to the field. The cross-reference checks (unknown drug, device, process or question ids, one answer per band) run once the schema passes.
+- **Suggestions** for id-like fields: drug, device, procedure and investigation ids from the shared library; process, question, exam, diagnosis and rule ids from the case; and action codes such as `talk:<id>`, `order:<id>` and `device:o2_nrb:on`.
+- **Drafts** are saved automatically in localStorage, and a full storage is reported rather than failing silently. You can start from a new case, import a JSON file, duplicate a library case (saved as `<id>-copy`), duplicate a draft, export JSON or delete a draft.
+- **New case template** (`src/content/templates/new-case.json`): a generic patient whose single process worsens until treated with high-flow oxygen. It is valid and playable as it stands, so authors can test-run straight away.
+- **Test run** at `#/test/<draft>?seed=N` plays the draft at the bedside with a "Back to editor" link. Test runs aren't recorded in case progress.
+- **Tests (196 unit, 13 e2e):** sections cover the schema exactly once; introspection builds valid starting values and recognises every condition and scoring-test type; all library cases and the template pass the editor's validation; field paths and messages; suggestions; routes; draft storage, including a full storage. The template is valid, stabilises with oxygen and arrests without it. **Acceptance:** an e2e test builds a case in the forms only (title, id, patient name, a new question with three answers, a new "Asked" scoring rule), test-runs it, asks the new question, gives oxygen, reaches "Alex is stable" and sees the new rule passed in the debrief. A second e2e test covers duplicate, export, import and jumping from a problem to its field.
+
 ## Next
 
-- **Phase 8:** case editor.
+- **Phase 9:** video validation mode (research feature).
 
 ## Design decisions to review
 

@@ -8,7 +8,7 @@ An open-source virtual patient simulator that runs in the browser. You talk to t
 
 ## Status
 
-Phases 0–7 of 10 are built. See [PROGRESS.md](PROGRESS.md) for what's done and what's next.
+Phases 0–8 of 10 are built. See [PROGRESS.md](PROGRESS.md) for what's done and what's next.
 
 ## Features
 
@@ -30,8 +30,13 @@ Phases 0–7 of 10 are built. See [PROGRESS.md](PROGRESS.md) for what's done and
 - **Seeded patient variations:** age, weight, allergies, comorbidities and where the key clue hides, so each run is a little different.
 - **Ask the patient anything:** type a question in your own words. With no key, an offline matcher maps it to the case's scripted questions. With your own Anthropic API key (Settings), Claude plays the patient using only what's in the case file, and never reveals the diagnosis or results.
 - **Optional 3D bedside view:** a low-poly resus bay that follows the patient's state, with a live monitor screen and clickable objects that open the matching panel. 2D stays the default.
+- **Case editor:** build or change a case with forms generated from the case schema, with live validation, a test run at the bedside, and JSON import, export and duplication. Drafts stay in your browser.
 
-Still to come: a case editor, video validation mode and a Unity port pack.
+Still to come: video validation mode and a Unity port pack.
+
+## Write your own case
+
+Open **Case editor** from the case list, choose **New case** (a playable starter) or duplicate a library case, and edit it section by section. Problems show next to their fields. When it's valid, **Test run** plays it at the bedside. **Export JSON** gives you a file you can add to `src/content/cases/` and contribute back.
 
 ### About the optional AI patient
 
