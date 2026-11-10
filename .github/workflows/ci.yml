@@ -35,3 +35,16 @@ jobs:
           name: playwright-report
           path: playwright-report
           retention-days: 7
+
+  unity-parity:
+    # The C# engine in unity/ must reproduce the TypeScript engine's run.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 8.0.x
+      - name: Compile the Unity scripts against API stubs
+        run: dotnet build unity/ParityRunner/UnityCheck/UnityCheck.csproj -c Release
+      - name: Run the parity check
+        run: dotnet run --project unity/ParityRunner/ParityRunner.csproj -c Release

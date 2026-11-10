@@ -1,0 +1,724 @@
+{
+  "schemaVersion": 1,
+  "id": "asthma-01",
+  "version": 1,
+  "title": "Can't finish a sentence",
+  "summary": "A 27-year-old with known asthma, three days of a cold and an inhaler that has stopped working.",
+  "specialty": "Respiratory",
+  "difficulty": "core",
+  "estMinutes": 20,
+  "tags": ["asthma", "bronchospasm", "BTS/SIGN"],
+  "patient": {
+    "name": "Priya Shah",
+    "age": 27,
+    "sex": "female",
+    "weightKg": 60,
+    "occupation": "primary school teacher",
+    "persona": "Frightened and tiring. Answers in single words or short phrases because she cannot get enough breath to talk."
+  },
+  "brief": [
+    "Priya, {age}, has had a cold for three days. Since this morning her blue inhaler has stopped helping and she is sitting bolt upright on the trolley, working hard to breathe. Her partner drove her in.",
+    "Assess her severity quickly, treat in parallel, and decide who else needs to know."
+  ],
+  "openingLine": "Can't… get… my breath…",
+  "baseline": {
+    "hr": 84,
+    "sbp": 122,
+    "dbp": 74,
+    "rr": 16,
+    "temp": 37.4,
+    "glucose": 6,
+    "paco2": 5.3,
+    "shunt": 0.01,
+    "hrJitter": 4,
+    "sbpJitter": 4
+  },
+  "labs": {
+    "lactate": 1.1,
+    "hco3": 24,
+    "k": 4,
+    "na": 140,
+    "hb": 128,
+    "wcc": 9.8,
+    "plt": 280,
+    "crp": 12,
+    "pef": 450
+  },
+  "processes": [
+    {
+      "id": "asthma",
+      "type": "asthma",
+      "label": "Acute asthma",
+      "initial": 55,
+      "initialJitter": 4,
+      "ratePerMin": 2.2,
+      "rateJitterPct": 10,
+      "decayTauMin": 40,
+      "sensitivityJitterPct": 15,
+      "arrestAt": 100,
+      "arrestRhythm": "pea",
+      "effects": [
+        {
+          "target": "rr",
+          "perPoint": 0.25,
+          "group": "bronchospasm"
+        },
+        {
+          "target": "rr",
+          "perPoint": -0.6,
+          "above": 85
+        },
+        {
+          "target": "hr",
+          "perPoint": 0.6
+        },
+        {
+          "target": "vq",
+          "perPoint": 0.46,
+          "above": 20,
+          "exponent": 0.7,
+          "group": "bronchospasm"
+        },
+        {
+          "target": "ventLoss",
+          "perPoint": 0.008,
+          "above": 50,
+          "group": "bronchospasm"
+        },
+        {
+          "target": "ventLoss",
+          "perPoint": 0.012,
+          "above": 80
+        },
+        {
+          "target": "lab:pef",
+          "perPoint": -5.5,
+          "group": "bronchospasm"
+        },
+        {
+          "target": "gcs",
+          "perPoint": -0.15,
+          "above": 85
+        },
+        {
+          "target": "sbp",
+          "perPoint": -0.4,
+          "above": 75
+        },
+        {
+          "target": "sign:wheeze",
+          "perPoint": 0.015,
+          "above": 20,
+          "group": "bronchospasm"
+        },
+        {
+          "target": "sign:silentChest",
+          "perPoint": 0.05,
+          "above": 80
+        },
+        {
+          "target": "sign:effort",
+          "perPoint": 0.012,
+          "above": 20
+        },
+        {
+          "target": "sign:anxiety",
+          "perPoint": 0.012
+        }
+      ],
+      "source": "Teaching model. Severity bands follow BTS/SIGN 158 (2019): acute severe = PEF 33–50% predicted, RR ≥ 25, HR ≥ 110, can't complete sentences; life-threatening = PEF < 33%, SpO₂ < 92%, silent chest, exhaustion, normal or rising PaCO₂. Effect sizes are teaching parameters.",
+      "reviewNeeded": true
+    }
+  ],
+  "bands": {
+    "process": "asthma",
+    "cutoffs": [35, 72]
+  },
+  "dialogue": [
+    {
+      "id": "what",
+      "category": "presenting",
+      "q": "What's happening?",
+      "a": [
+        "Much easier now. Still a bit tight.",
+        "Asthma… inhaler… not working.",
+        "(can't speak, just shakes her head)"
+      ],
+      "keywords": ["happening", "wrong", "problem", "feel"]
+    },
+    {
+      "id": "onset",
+      "category": "history",
+      "q": "When did it get bad?",
+      "a": [
+        "This morning. I'd had a cold for three days first.",
+        "This… morning. Cold… three days.",
+        "(holds up three fingers)"
+      ],
+      "keywords": ["when", "start", "began", "long"]
+    },
+    {
+      "id": "inhaler",
+      "category": "meds",
+      "q": "How much of your blue inhaler have you used?",
+      "a": ["Loads. Probably twenty puffs since breakfast.", "Twenty… puffs.", "(nods weakly)"],
+      "keywords": ["inhaler", "salbutamol", "puffs", "ventolin", "blue"]
+    },
+    {
+      "id": "preventer",
+      "category": "meds",
+      "q": "Do you take a preventer inhaler?",
+      "a": [
+        "A brown one. I'm not great at remembering it.",
+        "Brown one… forget it.",
+        "(no answer)"
+      ],
+      "keywords": ["preventer", "steroid", "brown", "clenil", "regular"]
+    },
+    {
+      "id": "icu",
+      "category": "pmh",
+      "q": "Have you ever been in intensive care with your asthma?",
+      "a": [
+        "Once, when I was sixteen. They put me on a ventilator.",
+        "Once… ventilator… at sixteen.",
+        "(nods, eyes wide)"
+      ],
+      "keywords": ["intensive", "icu", "ventilator", "itu", "admitted", "admission"]
+    },
+    {
+      "id": "allergy",
+      "category": "allergies",
+      "q": "Any allergies?",
+      "a": ["No drug allergies. Cats set my asthma off.", "No… cats.", "(shakes her head)"],
+      "keywords": ["allergy", "allergies", "allergic"]
+    },
+    {
+      "id": "smoke",
+      "category": "social",
+      "q": "Do you smoke?",
+      "a": ["No, never.", "No.", "(shakes her head)"],
+      "keywords": ["smoke", "smoking", "cigarettes", "vape"]
+    },
+    {
+      "id": "worry",
+      "category": "ice",
+      "q": "What are you most worried about?",
+      "a": ["Ending up on a ventilator again.", "Don't… want… tube.", "(grips the trolley rail)"],
+      "keywords": ["worried", "worry", "concern", "scared", "afraid"]
+    }
+  ],
+  "exam": [
+    {
+      "id": "A",
+      "label": "Airway",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "No airway noises. Not breathing."
+        },
+        {
+          "text": "Airway patent. No stridor."
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "label": "Breathing",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "No respiratory effort."
+        },
+        {
+          "when": {
+            "severity": "asthma",
+            "gte": 80
+          },
+          "text": "RR {rr}/min, SpO₂ {spo2}% on {o2}. Silent chest: almost no air entry. Exhausted, barely moving air."
+        },
+        {
+          "when": {
+            "severity": "asthma",
+            "gte": 50
+          },
+          "text": "RR {rr}/min, SpO₂ {spo2}% on {o2}. Using accessory muscles. Widespread polyphonic wheeze, reduced air entry at both bases. Cannot complete sentences."
+        },
+        {
+          "when": {
+            "severity": "asthma",
+            "gte": 30
+          },
+          "text": "RR {rr}/min, SpO₂ {spo2}% on {o2}. Widespread expiratory wheeze, air entry improving. Talking in phrases."
+        },
+        {
+          "text": "RR {rr}/min, SpO₂ {spo2}% on {o2}. Scattered wheeze, good air entry. Talking in full sentences."
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "label": "Circulation",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "No central pulse."
+        },
+        {
+          "text": "HR {hr}, BP {sbp}/{dbp}. Capillary refill under 2 seconds. Warm peripheries."
+        }
+      ]
+    },
+    {
+      "id": "D",
+      "label": "Disability",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "Unresponsive. GCS 3/15."
+        },
+        {
+          "when": {
+            "vital": "gcs",
+            "lt": 14
+          },
+          "text": "GCS {gcs}/15. Drowsy and exhausted. A sign of life-threatening asthma."
+        },
+        {
+          "text": "GCS {gcs}/15. Alert, anxious. Glucose {glucose:1} mmol/L."
+        }
+      ]
+    },
+    {
+      "id": "E",
+      "label": "Exposure",
+      "kind": "abcde",
+      "findings": [
+        {
+          "text": "Temperature {temp:1} °C. No rash. Calves soft and non-tender."
+        }
+      ]
+    },
+    {
+      "id": "chest",
+      "label": "Chest",
+      "kind": "region",
+      "region": "chest",
+      "findings": [
+        {
+          "when": {
+            "severity": "asthma",
+            "gte": 80
+          },
+          "text": "Hyperexpanded, hardly moving. Silent on auscultation. Trachea central."
+        },
+        {
+          "when": {
+            "severity": "asthma",
+            "gte": 35
+          },
+          "text": "Hyperexpanded. Widespread wheeze both sides, equal air entry. Trachea central, no signs of pneumothorax."
+        },
+        {
+          "text": "Mild scattered wheeze, equal air entry. Trachea central."
+        }
+      ]
+    },
+    {
+      "id": "neck",
+      "label": "Neck",
+      "kind": "region",
+      "region": "neck",
+      "findings": [
+        {
+          "when": {
+            "severity": "asthma",
+            "gte": 45
+          },
+          "text": "Sternocleidomastoids working hard. Tracheal tug. No surgical emphysema."
+        },
+        {
+          "text": "No accessory muscle use now. No surgical emphysema."
+        }
+      ]
+    }
+  ],
+  "investigations": [
+    {
+      "id": "pef",
+      "results": [
+        {
+          "when": {
+            "severity": "asthma",
+            "gte": 75
+          },
+          "text": "Too breathless to perform."
+        },
+        {
+          "text": "Peak flow {pef} L/min (predicted 450)."
+        }
+      ]
+    },
+    {
+      "id": "abg",
+      "results": [
+        {
+          "text": "pH {ph:2}, PaO₂ {pao2:1} kPa, PaCO₂ {paco2:1} kPa, HCO₃⁻ {hco3:1} mmol/L, lactate {lactate:1} mmol/L (on {o2})."
+        }
+      ]
+    },
+    {
+      "id": "vbg",
+      "results": [
+        {
+          "text": "pH {ph:2}, PCO₂ {paco2:1} kPa, HCO₃⁻ {hco3:1} mmol/L, K⁺ {k:1} mmol/L, lactate {lactate:1} mmol/L."
+        }
+      ]
+    },
+    {
+      "id": "glu",
+      "results": [
+        {
+          "text": "Glucose {glucose:1} mmol/L."
+        }
+      ]
+    },
+    {
+      "id": "cxr",
+      "results": [
+        {
+          "text": "Hyperinflated lungs. No pneumothorax, consolidation or collapse."
+        }
+      ]
+    },
+    {
+      "id": "fbc",
+      "results": [
+        {
+          "text": "Hb {hb} g/L, WCC {wcc:1} ×10⁹/L, platelets {plt} ×10⁹/L."
+        }
+      ]
+    },
+    {
+      "id": "ue",
+      "results": [
+        {
+          "text": "Na {na} mmol/L, K {k:1} mmol/L. Normal renal function."
+        }
+      ]
+    },
+    {
+      "id": "ecg",
+      "results": [
+        {
+          "text": "Sinus tachycardia, rate {hr}. No other abnormality."
+        }
+      ]
+    }
+  ],
+  "patientLines": [
+    {
+      "id": "tired",
+      "when": {
+        "severity": "asthma",
+        "gte": 75
+      },
+      "text": "So… tired…"
+    },
+    {
+      "id": "better",
+      "when": {
+        "all": [
+          {
+            "severity": "asthma",
+            "lt": 35
+          },
+          {
+            "drugGiven": "salbutamol"
+          }
+        ]
+      },
+      "text": "That's… a bit easier. I can get a breath in now."
+    }
+  ],
+  "outcomes": {
+    "stabilised": {
+      "when": {
+        "all": [
+          {
+            "severity": "asthma",
+            "lt": 35
+          },
+          {
+            "vital": "spo2",
+            "gte": 94
+          },
+          {
+            "any": [
+              {
+                "drugGiven": "hydrocortisone"
+              },
+              {
+                "drugGiven": "prednisolone"
+              }
+            ]
+          }
+        ]
+      },
+      "forSec": 120,
+      "text": "Breathing settling: talking in sentences, SpO₂ on target for 2 minutes."
+    }
+  },
+  "diagnosis": {
+    "correct": ["asthma"],
+    "options": [
+      {
+        "id": "asthma",
+        "label": "Acute severe asthma"
+      },
+      {
+        "id": "anaphylaxis",
+        "label": "Anaphylaxis"
+      },
+      {
+        "id": "pneumothorax",
+        "label": "Pneumothorax"
+      },
+      {
+        "id": "pe",
+        "label": "Pulmonary embolism"
+      },
+      {
+        "id": "panic",
+        "label": "Panic attack"
+      }
+    ]
+  },
+  "scoring": [
+    {
+      "id": "stabilised",
+      "label": "Patient stabilised",
+      "weight": 25,
+      "kind": "credit",
+      "test": {
+        "type": "outcomeIs",
+        "outcomes": ["stabilised"]
+      }
+    },
+    {
+      "id": "oxygen",
+      "label": "Oxygen to keep SpO₂ 94–98%",
+      "weight": 8,
+      "kind": "credit",
+      "test": {
+        "type": "actionWithin",
+        "codes": ["device:o2_*:on"],
+        "withinSec": 300
+      }
+    },
+    {
+      "id": "salbutamol",
+      "label": "Nebulised salbutamol within 10 minutes",
+      "weight": 15,
+      "kind": "credit",
+      "critical": true,
+      "test": {
+        "type": "actionWithin",
+        "codes": ["drug:salbutamol:NEB"],
+        "withinSec": 600
+      }
+    },
+    {
+      "id": "ipratropium",
+      "label": "Nebulised ipratropium added",
+      "weight": 8,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["drug:ipratropium:NEB"]
+      }
+    },
+    {
+      "id": "steroid",
+      "label": "Steroid given (prednisolone or hydrocortisone)",
+      "weight": 12,
+      "kind": "credit",
+      "critical": true,
+      "test": {
+        "type": "actionDone",
+        "codes": ["drug:prednisolone:*", "drug:hydrocortisone:*"]
+      }
+    },
+    {
+      "id": "pef",
+      "label": "Peak flow measured",
+      "weight": 6,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["order:pef"]
+      }
+    },
+    {
+      "id": "gas",
+      "label": "Blood gas checked",
+      "weight": 6,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["order:abg", "order:vbg"]
+      }
+    },
+    {
+      "id": "icu-history",
+      "label": "Asked about previous ICU admission",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "asked",
+        "ids": ["icu"]
+      }
+    },
+    {
+      "id": "abcde",
+      "label": "ABCDE assessment",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "examined",
+        "ids": ["A", "B", "C", "D", "E"],
+        "min": 4
+      }
+    },
+    {
+      "id": "help",
+      "label": "Senior help or critical care involved",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["help", "procedure:critical_care"]
+      }
+    },
+    {
+      "id": "dx",
+      "label": "Working diagnosis: acute asthma",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "diagnosisIs",
+        "ids": ["asthma"]
+      }
+    },
+    {
+      "id": "no-sedation",
+      "label": "No sedating opioid given",
+      "weight": 15,
+      "kind": "penalty",
+      "test": {
+        "type": "actionNever",
+        "codes": ["drug:morphine:*"]
+      }
+    }
+  ],
+  "teaching": [
+    {
+      "id": "late-salbutamol",
+      "text": "Give nebulised salbutamol (oxygen-driven) straight away and repeat it, back to back if needed. Everything else can happen in parallel.",
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "salbutamol"
+      }
+    },
+    {
+      "id": "no-steroid",
+      "text": "Every acute asthma attack needs steroids early: prednisolone 40–50 mg orally, or hydrocortisone 100 mg IV if she can't swallow.",
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "steroid"
+      }
+    },
+    {
+      "id": "magnesium",
+      "text": "If she isn't responding to bronchodilators, a single dose of IV magnesium sulfate (1.2–2 g over 20 minutes) is the next step, alongside senior and ICU input.",
+      "showIf": {
+        "type": "actionNever",
+        "codes": ["drug:magnesium_sulfate:*"]
+      }
+    },
+    {
+      "id": "sedation",
+      "text": "Sedatives and opioids depress breathing and are contraindicated in acute asthma outside intensive care.",
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "no-sedation"
+      }
+    },
+    {
+      "id": "paco2",
+      "text": "A normal or rising PaCO₂ in a breathless asthmatic means she is tiring. That makes it life-threatening asthma: get ICU involved early."
+    }
+  ],
+  "references": [
+    {
+      "id": "bts-sign-158",
+      "label": "British Thoracic Society / Scottish Intercollegiate Guidelines Network. British guideline on the management of asthma (SIGN 158). 2019.",
+      "url": "https://www.sign.ac.uk/"
+    }
+  ],
+  "hints": [
+    {
+      "id": "severity",
+      "text": "She can't finish a sentence. Do you want a peak flow or a gas?"
+    },
+    {
+      "id": "neb",
+      "when": {
+        "not": {
+          "drugGiven": "salbutamol"
+        }
+      },
+      "text": "Shall I set up a nebuliser? Oxygen-driven?"
+    },
+    {
+      "id": "steroid",
+      "when": {
+        "not": {
+          "any": [
+            {
+              "drugGiven": "prednisolone"
+            },
+            {
+              "drugGiven": "hydrocortisone"
+            }
+          ]
+        }
+      },
+      "text": "Does she need steroids?"
+    },
+    {
+      "id": "escalate",
+      "when": {
+        "severity": "asthma",
+        "gte": 70
+      },
+      "text": "She's tiring. Should we call ICU?"
+    }
+  ],
+  "variation": {
+    "ageRange": [19, 35],
+    "weightKgRange": [52, 75]
+  }
+}

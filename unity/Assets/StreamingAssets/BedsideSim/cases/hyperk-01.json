@@ -1,0 +1,690 @@
+{
+  "schemaVersion": 1,
+  "id": "hyperk-01",
+  "version": 1,
+  "title": "Weak and dizzy on dialysis day",
+  "summary": "A 66-year-old on haemodialysis who has missed two sessions, now weak, dizzy and bradycardic.",
+  "specialty": "Renal",
+  "difficulty": "core",
+  "estMinutes": 20,
+  "tags": ["hyperkalaemia", "ECG changes", "dialysis", "calcium"],
+  "patient": {
+    "name": "Arthur Bennett",
+    "age": 66,
+    "sex": "male",
+    "weightKg": 80,
+    "occupation": "retired bus driver",
+    "persona": "Tired and a bit sheepish about missing dialysis. Clear-headed, says his legs feel like jelly."
+  },
+  "brief": [
+    "Arthur, {age}, has end-stage kidney disease on haemodialysis three times a week. He missed his last two sessions because of a family funeral. Today his legs feel weak and he feels dizzy. His GP's point-of-care test showed a high potassium and sent him straight in.",
+    "Protect his heart first, then shift and remove the potassium. Watch for the side effects of treatment."
+  ],
+  "openingLine": "My legs feel like jelly, and I keep going dizzy.",
+  "baseline": {
+    "hr": 72,
+    "sbp": 150,
+    "dbp": 84,
+    "rr": 16,
+    "temp": 36.7,
+    "glucose": 6.5,
+    "hrJitter": 3,
+    "sbpJitter": 5
+  },
+  "labs": {
+    "lactate": 1.1,
+    "hco3": 22,
+    "k": 4.5,
+    "na": 136,
+    "urea": 32,
+    "creatinine": 850,
+    "hb": 104,
+    "wcc": 7,
+    "plt": 190
+  },
+  "processes": [
+    {
+      "id": "hyperk",
+      "type": "hyperkalaemia",
+      "label": "Hyperkalaemia",
+      "initial": 60,
+      "initialJitter": 3,
+      "ratePerMin": 0.5,
+      "rateJitterPct": 10,
+      "sensitivityJitterPct": 15,
+      "arrestAt": 100,
+      "arrestRhythm": "asystole",
+      "effects": [
+        {
+          "target": "lab:k",
+          "perPoint": 0.045
+        },
+        {
+          "target": "lab:hco3",
+          "perPoint": -0.08
+        },
+        {
+          "target": "hr",
+          "perPoint": -0.3,
+          "above": 45,
+          "group": "ecg"
+        },
+        {
+          "target": "sign:ecg_peakedT",
+          "perPoint": 0.02,
+          "above": 35,
+          "group": "ecg"
+        },
+        {
+          "target": "sign:ecg_wide",
+          "perPoint": 0.025,
+          "above": 60,
+          "group": "ecg"
+        },
+        {
+          "target": "sign:weakness",
+          "perPoint": 0.012,
+          "above": 30
+        }
+      ],
+      "treatments": [
+        {
+          "id": "dialysis",
+          "when": {
+            "procedure": "renal_referral",
+            "forSec": 1800
+          },
+          "ratePerMin": -3,
+          "source": "Emergency dialysis removes potassium; started about 30 minutes after referral in this case. Rate is a teaching parameter.",
+          "reviewNeeded": true
+        }
+      ],
+      "source": "Teaching model: K⁺ about 7.2 mmol/L at presentation, rising after missed dialysis. ECG changes worsen with K⁺. Effect sizes and timing are teaching parameters.",
+      "reviewNeeded": true
+    }
+  ],
+  "rhythmRules": [
+    {
+      "id": "hyperk-vf",
+      "from": ["sinus", "sinus_tachy", "sinus_brady"],
+      "to": "vf",
+      "when": {
+        "all": [
+          {
+            "lab": "k",
+            "gte": 8
+          },
+          {
+            "effect": "block:membrane",
+            "lt": 0.5
+          }
+        ]
+      },
+      "probPerMin": 0.5,
+      "source": "Teaching parameter: arrhythmia risk at K⁺ ≥ 8 mmol/L without membrane stabilisation.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "hyperk-vf-protected",
+      "from": ["sinus", "sinus_tachy", "sinus_brady"],
+      "to": "vf",
+      "when": {
+        "all": [
+          {
+            "lab": "k",
+            "gte": 8.5
+          },
+          {
+            "effect": "block:membrane",
+            "gte": 0.5
+          }
+        ]
+      },
+      "probPerMin": 0.03,
+      "source": "Teaching parameter: calcium reduces but doesn't remove arrhythmia risk.",
+      "reviewNeeded": true
+    }
+  ],
+  "bands": {
+    "process": "hyperk",
+    "cutoffs": [40, 80]
+  },
+  "dialogue": [
+    {
+      "id": "what",
+      "category": "presenting",
+      "q": "What's brought you in?",
+      "a": [
+        "I feel much better now, thanks.",
+        "My legs are weak and I keep going dizzy. The GP said my potassium was high.",
+        "(slurring, very weak)"
+      ],
+      "keywords": ["brought", "happening", "wrong", "feel"]
+    },
+    {
+      "id": "dialysis",
+      "category": "history",
+      "q": "When was your last dialysis?",
+      "a": [
+        "Last Monday. I missed Wednesday and Friday for my brother's funeral.",
+        "A week ago. Missed two.",
+        "(holds up one finger)"
+      ],
+      "keywords": ["dialysis", "last", "session", "missed"]
+    },
+    {
+      "id": "chest",
+      "category": "presenting",
+      "q": "Any chest pain or palpitations?",
+      "a": ["No.", "My heart feels slow and thumpy.", "(no answer)"],
+      "keywords": ["chest", "palpitations", "heart"]
+    },
+    {
+      "id": "pmh",
+      "category": "pmh",
+      "q": "What caused your kidney failure?",
+      "a": ["Diabetes and blood pressure, the doctors said.", "Diabetes.", "(no answer)"],
+      "keywords": ["medical", "history", "kidney", "cause", "conditions"]
+    },
+    {
+      "id": "meds",
+      "category": "meds",
+      "q": "What medicines do you take?",
+      "a": [
+        "Insulin, amlodipine, calcium tablets and a binder with meals.",
+        "Insulin… lots of tablets.",
+        "(no answer)"
+      ],
+      "keywords": ["medicine", "medicines", "tablets", "insulin", "medication"]
+    },
+    {
+      "id": "diet",
+      "category": "history",
+      "q": "What have you been eating?",
+      "a": ["Bananas and fruit cake at the wake, if I'm honest.", "Bananas… cake.", "(no answer)"],
+      "keywords": ["eat", "eating", "diet", "food", "bananas"]
+    },
+    {
+      "id": "allergy",
+      "category": "allergies",
+      "q": "Any allergies?",
+      "a": ["None.", "No.", "(no answer)"],
+      "keywords": ["allergy", "allergies", "allergic"]
+    },
+    {
+      "id": "worry",
+      "category": "ice",
+      "q": "What worries you most?",
+      "a": ["Getting told off by the renal nurses.", "Is my heart going to stop?", "(no answer)"],
+      "keywords": ["worried", "worry", "concern", "scared"]
+    }
+  ],
+  "exam": [
+    {
+      "id": "A",
+      "label": "Airway",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "No airway noises."
+        },
+        {
+          "text": "Airway patent, talking."
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "label": "Breathing",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "No respiratory effort."
+        },
+        {
+          "text": "RR {rr}/min, SpO₂ {spo2}% on {o2}. Fine crackles at both bases."
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "label": "Circulation",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "No central pulse."
+        },
+        {
+          "text": "HR {hr}, BP {sbp}/{dbp}. Slow, regular pulse. Left forearm fistula with a good thrill. Mild ankle oedema."
+        }
+      ]
+    },
+    {
+      "id": "D",
+      "label": "Disability",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "Unresponsive. GCS 3/15."
+        },
+        {
+          "text": "GCS {gcs}/15. Power 4/5 in both legs, reflexes reduced. Glucose {glucose:1} mmol/L."
+        }
+      ]
+    },
+    {
+      "id": "E",
+      "label": "Exposure",
+      "kind": "abcde",
+      "findings": [
+        {
+          "text": "Temperature {temp:1} °C. Fistula site clean. No rash."
+        }
+      ]
+    },
+    {
+      "id": "arms",
+      "label": "Arms",
+      "kind": "region",
+      "region": "arms",
+      "findings": [
+        {
+          "text": "Left forearm arteriovenous fistula with a strong thrill and bruit. Don't cannulate this arm."
+        }
+      ]
+    }
+  ],
+  "investigations": [
+    {
+      "id": "ecg",
+      "results": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "No organised rhythm."
+        },
+        {
+          "when": {
+            "lab": "k",
+            "gte": 7.5
+          },
+          "text": "Rate {hr}. Absent P waves, broad QRS (160 ms), tall peaked T waves: severe hyperkalaemia."
+        },
+        {
+          "when": {
+            "lab": "k",
+            "gte": 6.5
+          },
+          "text": "Sinus rhythm {hr}/min. Tall peaked T waves, flattened P waves, QRS 120 ms."
+        },
+        {
+          "when": {
+            "lab": "k",
+            "gte": 5.5
+          },
+          "text": "Sinus rhythm {hr}/min. Peaked T waves."
+        },
+        {
+          "text": "Sinus rhythm {hr}/min. T waves normalising."
+        }
+      ]
+    },
+    {
+      "id": "vbg",
+      "results": [
+        {
+          "text": "K⁺ {k:1} mmol/L, pH {ph:2}, HCO₃⁻ {hco3:1} mmol/L, glucose {glucose:1} mmol/L."
+        }
+      ]
+    },
+    {
+      "id": "ue",
+      "results": [
+        {
+          "text": "K⁺ {k:1} mmol/L, Na {na} mmol/L, urea {urea:1} mmol/L, creatinine {creatinine} µmol/L."
+        }
+      ]
+    },
+    {
+      "id": "glu",
+      "results": [
+        {
+          "when": {
+            "vital": "glucose",
+            "lt": 4
+          },
+          "text": "Capillary glucose {glucose:1} mmol/L: hypoglycaemia."
+        },
+        {
+          "text": "Capillary glucose {glucose:1} mmol/L."
+        }
+      ]
+    },
+    {
+      "id": "fbc",
+      "results": [
+        {
+          "text": "Hb {hb} g/L, WCC {wcc:1} ×10⁹/L, platelets {plt} ×10⁹/L."
+        }
+      ]
+    },
+    {
+      "id": "cxr",
+      "results": [
+        {
+          "text": "Mild interstitial oedema. No consolidation."
+        }
+      ]
+    }
+  ],
+  "patientLines": [
+    {
+      "id": "dizzy",
+      "when": {
+        "lab": "k",
+        "gte": 7.8
+      },
+      "text": "Everything's going grey…"
+    },
+    {
+      "id": "hypo",
+      "when": {
+        "vital": "glucose",
+        "lt": 3.5
+      },
+      "text": "I've gone all sweaty and shaky…"
+    }
+  ],
+  "outcomes": {
+    "stabilised": {
+      "when": {
+        "all": [
+          {
+            "lab": "k",
+            "lt": 6
+          },
+          {
+            "procedure": "renal_referral",
+            "forSec": 1800
+          },
+          {
+            "vital": "glucose",
+            "gte": 4
+          },
+          {
+            "any": [
+              {
+                "drugGiven": "calcium_gluconate"
+              },
+              {
+                "drugGiven": "calcium_chloride"
+              }
+            ]
+          }
+        ]
+      },
+      "forSec": 120,
+      "text": "Dialysis under way, K⁺ below 6 mmol/L, heart protected and glucose safe."
+    }
+  },
+  "diagnosis": {
+    "correct": ["hyperkalaemia"],
+    "options": [
+      {
+        "id": "hyperkalaemia",
+        "label": "Hyperkalaemia with ECG changes"
+      },
+      {
+        "id": "heart-block",
+        "label": "Complete heart block"
+      },
+      {
+        "id": "stroke",
+        "label": "Stroke"
+      },
+      {
+        "id": "hypoglycaemia",
+        "label": "Hypoglycaemia"
+      },
+      {
+        "id": "uraemia",
+        "label": "Uraemic encephalopathy"
+      }
+    ]
+  },
+  "scoring": [
+    {
+      "id": "stabilised",
+      "label": "Potassium controlled and dialysis arranged",
+      "weight": 20,
+      "kind": "credit",
+      "test": {
+        "type": "outcomeIs",
+        "outcomes": ["stabilised"]
+      }
+    },
+    {
+      "id": "ecg",
+      "label": "12-lead ECG within 10 minutes",
+      "weight": 10,
+      "kind": "credit",
+      "test": {
+        "type": "actionWithin",
+        "codes": ["order:ecg"],
+        "withinSec": 600
+      }
+    },
+    {
+      "id": "calcium",
+      "label": "IV calcium within 15 minutes",
+      "weight": 18,
+      "kind": "credit",
+      "critical": true,
+      "test": {
+        "type": "actionWithin",
+        "codes": ["drug:calcium_gluconate:IV", "drug:calcium_chloride:IV"],
+        "withinSec": 900
+      }
+    },
+    {
+      "id": "insulin",
+      "label": "Insulin and glucose given",
+      "weight": 15,
+      "kind": "credit",
+      "critical": true,
+      "test": {
+        "type": "all",
+        "tests": [
+          {
+            "type": "actionDone",
+            "codes": ["drug:insulin:IV"]
+          },
+          {
+            "type": "actionDone",
+            "codes": ["drug:glucose_*:IV"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "salbutamol",
+      "label": "Nebulised salbutamol as an adjunct",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["drug:salbutamol:NEB"]
+      }
+    },
+    {
+      "id": "monitor",
+      "label": "Cardiac monitoring with pads",
+      "weight": 6,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["device:defib_pads:on"]
+      }
+    },
+    {
+      "id": "gas",
+      "label": "Potassium confirmed on a blood gas",
+      "weight": 6,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["order:vbg", "order:ue"]
+      }
+    },
+    {
+      "id": "glucose-monitoring",
+      "label": "Glucose monitored (checked at least twice)",
+      "weight": 6,
+      "kind": "credit",
+      "test": {
+        "type": "actionCount",
+        "codes": ["order:glu", "order:vbg"],
+        "min": 2
+      }
+    },
+    {
+      "id": "dialysis",
+      "label": "Renal team contacted for dialysis",
+      "weight": 10,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["procedure:renal_referral"]
+      }
+    },
+    {
+      "id": "dx",
+      "label": "Working diagnosis: hyperkalaemia",
+      "weight": 4,
+      "kind": "credit",
+      "test": {
+        "type": "diagnosisIs",
+        "ids": ["hyperkalaemia"]
+      }
+    },
+    {
+      "id": "no-naked-insulin",
+      "label": "Never insulin without glucose",
+      "weight": 15,
+      "kind": "penalty",
+      "test": {
+        "type": "not",
+        "test": {
+          "type": "all",
+          "tests": [
+            {
+              "type": "actionDone",
+              "codes": ["drug:insulin:IV"]
+            },
+            {
+              "type": "actionNever",
+              "codes": ["drug:glucose_*:IV"]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "teaching": [
+    {
+      "id": "calcium",
+      "text": "With ECG changes, give IV calcium first (10% calcium gluconate 30 ml, or 10% calcium chloride 10 ml). It protects the heart within minutes but doesn't lower the potassium (UK Kidney Association 2020).",
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "calcium"
+      }
+    },
+    {
+      "id": "insulin-glucose",
+      "text": "Insulin shifts potassium into cells: 10 units soluble insulin with 25 g glucose. Check capillary glucose regularly for 12 hours afterwards. Hypoglycaemia is common, especially in kidney failure.",
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "insulin"
+      }
+    },
+    {
+      "id": "naked-insulin",
+      "text": "Insulin without glucose caused hypoglycaemia. Always give them together.",
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "no-naked-insulin"
+      }
+    },
+    {
+      "id": "rebound",
+      "text": "Calcium, insulin and salbutamol are temporary: potassium rebounds within hours. Removal (dialysis, or binders and diuretics in other patients) is the definitive step."
+    }
+  ],
+  "references": [
+    {
+      "id": "ukka-hyperk",
+      "label": "UK Kidney Association. Clinical practice guidelines: treatment of acute hyperkalaemia in adults. 2020.",
+      "url": "https://ukkidney.org/"
+    },
+    {
+      "id": "rcuk-als-2021",
+      "label": "Resuscitation Council UK. Adult advanced life support guidelines: special circumstances (hyperkalaemia). 2021.",
+      "url": "https://www.resus.org.uk/"
+    }
+  ],
+  "hints": [
+    {
+      "id": "ecg",
+      "text": "His GP said his potassium's high. Shall I do an ECG?"
+    },
+    {
+      "id": "calcium",
+      "when": {
+        "not": {
+          "any": [
+            {
+              "drugGiven": "calcium_gluconate"
+            },
+            {
+              "drugGiven": "calcium_chloride"
+            }
+          ]
+        }
+      },
+      "text": "Do you want to protect his heart first?"
+    },
+    {
+      "id": "glucose",
+      "when": {
+        "drugGiven": "insulin"
+      },
+      "text": "Shall I check his sugar after the insulin?"
+    },
+    {
+      "id": "dialysis",
+      "when": {
+        "not": {
+          "procedure": "renal_referral"
+        }
+      },
+      "text": "Shall I bleep the renal team?"
+    }
+  ],
+  "variation": {
+    "ageRange": [55, 78],
+    "weightKgRange": [65, 95]
+  }
+}

@@ -1,0 +1,558 @@
+{
+  "schemaVersion": 1,
+  "id": "hypo-01",
+  "version": 1,
+  "title": "Found drowsy at home",
+  "summary": "A 71-year-old on gliclazide, off his food with a stomach bug, found sweaty and barely rousable.",
+  "specialty": "Endocrinology",
+  "difficulty": "foundation",
+  "estMinutes": 15,
+  "tags": ["hypoglycaemia", "reduced GCS", "sulfonylurea"],
+  "patient": {
+    "name": "Harold Jenkins",
+    "age": 71,
+    "sex": "male",
+    "weightKg": 78,
+    "occupation": "retired electrician",
+    "persona": "Normally chatty and good-humoured. Confused and slurring when his glucose is low, apologetic once he comes round."
+  },
+  "brief": [
+    "Harold, {age}, has type 2 diabetes on metformin and gliclazide. He's been off his food for two days with diarrhoea. His wife found him slumped in his chair, sweaty and mumbling, and called an ambulance.",
+    "Start with ABCDE. Don't forget the D: a quick bedside test changes everything."
+  ],
+  "openingLine": "(groans and mumbles something unintelligible)",
+  "baseline": {
+    "hr": 78,
+    "sbp": 140,
+    "dbp": 80,
+    "rr": 16,
+    "temp": 36.5,
+    "glucose": 6,
+    "hrJitter": 4,
+    "sbpJitter": 5
+  },
+  "labs": {
+    "lactate": 1.3,
+    "hco3": 23,
+    "k": 4.2,
+    "na": 137,
+    "urea": 8,
+    "creatinine": 105,
+    "hb": 139,
+    "wcc": 8.5,
+    "plt": 230
+  },
+  "processes": [
+    {
+      "id": "hypoglycaemia",
+      "type": "hypoglycaemia",
+      "label": "Sulfonylurea-induced hypoglycaemia",
+      "initial": 75,
+      "initialJitter": 4,
+      "ratePerMin": 0.6,
+      "rateJitterPct": 10,
+      "sensitivityJitterPct": 15,
+      "arrestAt": 100,
+      "arrestRhythm": "pea",
+      "effects": [
+        {
+          "target": "glucose",
+          "perPoint": -0.06
+        },
+        {
+          "target": "gcs",
+          "perPoint": -0.04,
+          "above": 60
+        },
+        {
+          "target": "hr",
+          "perPoint": 0.3
+        },
+        {
+          "target": "sbp",
+          "perPoint": 0.2
+        },
+        {
+          "target": "sign:sweating",
+          "perPoint": 0.012
+        },
+        {
+          "target": "sign:anxiety",
+          "perPoint": 0.004
+        }
+      ],
+      "source": "Teaching model: gliclazide keeps driving glucose down for many hours, so hypoglycaemia recurs after a single glucose dose. The arrest threshold makes prolonged untreated neuroglycopenia a bad outcome within the session; effect sizes and timing are teaching parameters.",
+      "reviewNeeded": true
+    }
+  ],
+  "bands": {
+    "process": "hypoglycaemia",
+    "cutoffs": [40, 65]
+  },
+  "dialogue": [
+    {
+      "id": "what",
+      "category": "presenting",
+      "q": "How are you feeling?",
+      "a": [
+        "Much better, thank you. I'm so sorry for the fuss.",
+        "Muddled… sweaty… where am I?",
+        "(groans, doesn't open his eyes)"
+      ],
+      "keywords": ["feel", "feeling", "happening", "wrong"]
+    },
+    {
+      "id": "eating",
+      "category": "history",
+      "q": "Have you been eating?",
+      "a": ["Hardly anything for two days. I've had the runs.", "Not… eating.", "(no answer)"],
+      "keywords": ["eat", "eating", "food", "meal", "appetite"]
+    },
+    {
+      "id": "meds",
+      "category": "meds",
+      "q": "What diabetes tablets do you take?",
+      "a": [
+        "Metformin and gliclazide. I took them as normal this morning.",
+        "Gliclazide…",
+        "(no answer)"
+      ],
+      "keywords": ["medicine", "tablets", "gliclazide", "metformin", "diabetes"]
+    },
+    {
+      "id": "pmh",
+      "category": "pmh",
+      "q": "Any other medical problems?",
+      "a": [
+        "Type 2 for ten years, blood pressure, and my kidneys aren't great.",
+        "Diabetes… kidneys.",
+        "(no answer)"
+      ],
+      "keywords": ["medical", "history", "conditions", "kidney"]
+    },
+    {
+      "id": "allergy",
+      "category": "allergies",
+      "q": "Any allergies?",
+      "a": ["None.", "No.", "(no answer)"],
+      "keywords": ["allergy", "allergies", "allergic"]
+    },
+    {
+      "id": "alcohol",
+      "category": "social",
+      "q": "Do you drink alcohol?",
+      "a": ["A pint on Fridays. None this week.", "No.", "(no answer)"],
+      "keywords": ["alcohol", "drink", "beer", "pint"]
+    },
+    {
+      "id": "eat-now",
+      "category": "ice",
+      "q": "Could you manage something to eat now?",
+      "a": ["Yes please, I'm starving. Toast would be lovely.", "Not yet…", "(no answer)"],
+      "keywords": ["eat now", "sandwich", "toast", "food now", "carbohydrate"]
+    }
+  ],
+  "exam": [
+    {
+      "id": "A",
+      "label": "Airway",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "No airway noises."
+        },
+        {
+          "when": {
+            "vital": "gcs",
+            "lt": 9
+          },
+          "text": "Snoring. Airway at risk; he needs an airway manoeuvre and the recovery position."
+        },
+        {
+          "text": "Airway patent, groaning."
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "label": "Breathing",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "No respiratory effort."
+        },
+        {
+          "text": "RR {rr}/min, SpO₂ {spo2}% on {o2}. Chest clear."
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "label": "Circulation",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "No central pulse."
+        },
+        {
+          "text": "HR {hr}, BP {sbp}/{dbp}. Clammy, sweaty skin. Capillary refill 2 seconds."
+        }
+      ]
+    },
+    {
+      "id": "D",
+      "label": "Disability",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "Unresponsive. GCS 3/15."
+        },
+        {
+          "when": {
+            "vital": "gcs",
+            "lt": 14
+          },
+          "text": "GCS {gcs}/15. Pupils equal and reactive. No focal weakness. Have you checked his glucose?"
+        },
+        {
+          "text": "GCS {gcs}/15. Alert and orientated."
+        }
+      ]
+    },
+    {
+      "id": "E",
+      "label": "Exposure",
+      "kind": "abcde",
+      "findings": [
+        {
+          "text": "Temperature {temp:1} °C. No injuries. No rash."
+        }
+      ]
+    },
+    {
+      "id": "head",
+      "label": "Head and pupils",
+      "kind": "region",
+      "region": "head",
+      "findings": [
+        {
+          "text": "No head injury. Pupils 4 mm, equal and reactive. No neck stiffness."
+        }
+      ]
+    }
+  ],
+  "investigations": [
+    {
+      "id": "glu",
+      "results": [
+        {
+          "when": {
+            "vital": "glucose",
+            "lt": 4
+          },
+          "text": "Capillary glucose {glucose:1} mmol/L: hypoglycaemia."
+        },
+        {
+          "text": "Capillary glucose {glucose:1} mmol/L."
+        }
+      ]
+    },
+    {
+      "id": "vbg",
+      "results": [
+        {
+          "text": "pH {ph:2}, HCO₃⁻ {hco3:1} mmol/L, K⁺ {k:1} mmol/L, glucose {glucose:1} mmol/L, lactate {lactate:1} mmol/L."
+        }
+      ]
+    },
+    {
+      "id": "ue",
+      "results": [
+        {
+          "text": "Na {na} mmol/L, K {k:1} mmol/L, urea {urea:1} mmol/L, creatinine {creatinine} µmol/L (reduced kidney function prolongs gliclazide's effect)."
+        }
+      ]
+    },
+    {
+      "id": "fbc",
+      "results": [
+        {
+          "text": "Hb {hb} g/L, WCC {wcc:1} ×10⁹/L, platelets {plt} ×10⁹/L."
+        }
+      ]
+    },
+    {
+      "id": "ecg",
+      "results": [
+        {
+          "text": "Sinus rhythm, rate {hr}. No acute changes."
+        }
+      ]
+    }
+  ],
+  "patientLines": [
+    {
+      "id": "waking",
+      "when": {
+        "all": [
+          {
+            "vital": "glucose",
+            "gte": 4
+          },
+          {
+            "vital": "gcs",
+            "gte": 13
+          }
+        ]
+      },
+      "text": "Oh dear… where am I? Was I having a hypo?"
+    },
+    {
+      "id": "relapse",
+      "when": {
+        "all": [
+          {
+            "drugGiven": "glucose_10"
+          },
+          {
+            "vital": "glucose",
+            "lt": 3.5
+          }
+        ]
+      },
+      "text": "I'm going all shaky again…"
+    }
+  ],
+  "outcomes": {
+    "stabilised": {
+      "when": {
+        "all": [
+          {
+            "vital": "glucose",
+            "gte": 4
+          },
+          {
+            "vital": "gcs",
+            "gte": 14
+          },
+          {
+            "severity": "hypoglycaemia",
+            "lt": 40
+          }
+        ]
+      },
+      "forSec": 120,
+      "text": "Glucose above 4 mmol/L and he's fully alert for 2 minutes."
+    }
+  },
+  "diagnosis": {
+    "correct": ["hypoglycaemia"],
+    "options": [
+      {
+        "id": "hypoglycaemia",
+        "label": "Hypoglycaemia (sulfonylurea)"
+      },
+      {
+        "id": "stroke",
+        "label": "Stroke"
+      },
+      {
+        "id": "sepsis",
+        "label": "Sepsis"
+      },
+      {
+        "id": "overdose",
+        "label": "Opioid overdose"
+      },
+      {
+        "id": "hhs",
+        "label": "Hyperosmolar hyperglycaemic state"
+      }
+    ]
+  },
+  "scoring": [
+    {
+      "id": "stabilised",
+      "label": "Patient awake with a safe glucose",
+      "weight": 20,
+      "kind": "credit",
+      "test": {
+        "type": "outcomeIs",
+        "outcomes": ["stabilised"]
+      }
+    },
+    {
+      "id": "glucose-check",
+      "label": "Capillary glucose within 5 minutes",
+      "weight": 20,
+      "kind": "credit",
+      "critical": true,
+      "test": {
+        "type": "actionWithin",
+        "codes": ["order:glu"],
+        "withinSec": 300
+      }
+    },
+    {
+      "id": "treat",
+      "label": "IV glucose (10% or 20%) or IM glucagon",
+      "weight": 15,
+      "kind": "credit",
+      "critical": true,
+      "test": {
+        "type": "actionDone",
+        "codes": [
+          "drug:glucose_10:*",
+          "drug:glucose_20:*",
+          "drug:glucagon:*",
+          "infusion:glucose_10"
+        ]
+      }
+    },
+    {
+      "id": "recheck",
+      "label": "Glucose rechecked after treatment",
+      "weight": 10,
+      "kind": "credit",
+      "test": {
+        "type": "actionCount",
+        "codes": ["order:glu"],
+        "min": 2
+      }
+    },
+    {
+      "id": "sustain",
+      "label": "Recurrence prevented (glucose infusion or food)",
+      "weight": 10,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["infusion:glucose_10", "talk:eat-now"]
+      }
+    },
+    {
+      "id": "airway",
+      "label": "Airway assessed",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "examined",
+        "ids": ["A"]
+      }
+    },
+    {
+      "id": "access",
+      "label": "IV access",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["procedure:iv_access", "procedure:io_access"]
+      }
+    },
+    {
+      "id": "cause",
+      "label": "Asked about his diabetes tablets",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "asked",
+        "ids": ["meds"]
+      }
+    },
+    {
+      "id": "dx",
+      "label": "Working diagnosis: hypoglycaemia",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "diagnosisIs",
+        "ids": ["hypoglycaemia"]
+      }
+    },
+    {
+      "id": "no-50",
+      "label": "Avoided 50% glucose",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "actionNever",
+        "codes": ["drug:glucose_50:*"]
+      }
+    }
+  ],
+  "teaching": [
+    {
+      "id": "dont-forget-glucose",
+      "text": "Check capillary glucose in every patient with reduced consciousness. It takes seconds, and the treatment works.",
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "glucose-check"
+      }
+    },
+    {
+      "id": "sulfonylurea",
+      "text": "Sulfonylureas (gliclazide) cause long-lasting hypoglycaemia, especially with poor kidney function. After the initial glucose, give a glucose 10% infusion and long-acting carbohydrate, and keep monitoring for 24 hours."
+    },
+    {
+      "id": "fifty",
+      "text": "50% glucose is irritant and damages veins if it extravasates. JBDS recommends 10% or 20% for hypoglycaemia.",
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "no-50"
+      }
+    },
+    {
+      "id": "recheck",
+      "text": "Recheck glucose 10–15 minutes after treating, and repeat treatment if it is still below 4 mmol/L.",
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "recheck"
+      }
+    }
+  ],
+  "references": [
+    {
+      "id": "jbds-hypo",
+      "label": "Joint British Diabetes Societies for Inpatient Care. The hospital management of hypoglycaemia in adults with diabetes mellitus. 2021."
+    }
+  ],
+  "hints": [
+    {
+      "id": "bm",
+      "text": "He's very sweaty and confused. Shall I do a BM?"
+    },
+    {
+      "id": "recurrence",
+      "when": {
+        "drugGiven": "glucose_10",
+        "forSec": 300
+      },
+      "text": "He's on gliclazide. Will it come back down?"
+    }
+  ],
+  "variation": {
+    "ageRange": [64, 82],
+    "weightKgRange": [62, 90],
+    "options": [
+      {
+        "id": "ckd",
+        "label": "Worse kidney function",
+        "chance": 0.4,
+        "severity": 5
+      }
+    ]
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "delays": {
+    "drug": {
+      "minSec": 30,
+      "maxSec": 60,
+      "source": "Time to check, draw up and give a drug. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    "drugArrest": {
+      "minSec": 10,
+      "maxSec": 20,
+      "source": "Pre-filled arrest drugs from the resus trolley. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    "infusion": {
+      "minSec": 60,
+      "maxSec": 120,
+      "source": "Making up an infusion and setting up the pump. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    "fluid": {
+      "minSec": 30,
+      "maxSec": 60,
+      "source": "Spiking a bag and priming a giving set. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    "device": {
+      "minSec": 10,
+      "maxSec": 20,
+      "source": "Applying an oxygen mask, pads or airway adjunct. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    "order": {
+      "minSec": 20,
+      "maxSec": 45,
+      "source": "Taking a sample or recording a bedside test. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    "procedure": {
+      "minSec": 30,
+      "maxSec": 60,
+      "source": "Default time to prepare and perform a procedure. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    "procedure:iv_access": {
+      "minSec": 60,
+      "maxSec": 120,
+      "source": "Peripheral IV cannulation. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    "procedure:io_access": {
+      "minSec": 30,
+      "maxSec": 60,
+      "source": "Intraosseous needle insertion. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    "procedure:art_line": {
+      "minSec": 120,
+      "maxSec": 240,
+      "source": "Radial arterial line. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    "procedure:needle_decompression": {
+      "minSec": 20,
+      "maxSec": 40,
+      "source": "Needle decompression. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    "procedure:chest_drain": {
+      "minSec": 180,
+      "maxSec": 300,
+      "source": "Chest drain insertion. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    "procedure:urinary_catheter": {
+      "minSec": 120,
+      "maxSec": 240,
+      "source": "Urinary catheter insertion. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    "team": {
+      "minSec": 15,
+      "maxSec": 30,
+      "source": "Making a referral phone call. Teaching estimate.",
+      "reviewNeeded": true
+    }
+  },
+  "doseQueryFactor": 2
+}

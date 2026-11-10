@@ -14,3 +14,7 @@ Thumbs.db
 .env
 .env.*
 .claude/
+
+# Unity parity runner build output
+unity/ParityRunner/**/bin/
+unity/ParityRunner/**/obj/

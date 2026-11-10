@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Compiles the Unity scripts against small API stubs (Stubs.cs) to catch
+       typos without Unity installed. The real check is the Unity Test Runner. -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Stubs.cs" />
+    <Compile Include="../../Assets/BedsideSim/Runtime/Unity/**/*.cs" />
+    <Compile Include="../../Assets/BedsideSim/Tests/Editor/**/*.cs" />
+    <ProjectReference Include="../Engine/BedsideSim.Engine.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,177 @@
+{
+  "version": 2,
+  "devices": [
+    {
+      "id": "o2_nrb",
+      "label": "High-flow oxygen",
+      "sub": "15 L/min, non-rebreather mask",
+      "category": "oxygen",
+      "short": "15 L O₂",
+      "fio2": 0.6,
+      "onText": "High-flow oxygen started, 15 L/min.",
+      "offText": "Oxygen stopped.",
+      "source": "Teaching estimate. The FiO₂ delivered by a reservoir mask at 15 L/min varies with fit and breathing pattern.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "o2_venturi",
+      "label": "Venturi mask",
+      "sub": "40%, 10 L/min",
+      "category": "oxygen",
+      "short": "40% O₂",
+      "fio2": 0.4,
+      "onText": "Venturi mask on, 40% oxygen.",
+      "offText": "Oxygen stopped.",
+      "source": "Fixed-performance device: FiO₂ set by the Venturi valve."
+    },
+    {
+      "id": "o2_nasal",
+      "label": "Nasal cannula",
+      "sub": "2–4 L/min",
+      "category": "oxygen",
+      "short": "nasal O₂",
+      "fio2": 0.3,
+      "onText": "Nasal cannula oxygen started, 3 L/min.",
+      "offText": "Oxygen stopped.",
+      "source": "Teaching estimate. Variable-performance device; FiO₂ depends on flow and breathing pattern.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "airway_manoeuvres",
+      "label": "Head tilt, chin lift",
+      "sub": "Or jaw thrust if trauma",
+      "category": "airway",
+      "ventilation": { "support": 0.08, "minRr": 0 },
+      "onText": "Airway opened with head tilt and chin lift.",
+      "offText": "Airway manoeuvre released.",
+      "source": "Teaching estimate of the benefit of opening an obstructed airway.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "bvm",
+      "label": "Bag-valve-mask ventilation",
+      "sub": "With oxygen, two-person technique",
+      "category": "airway",
+      "short": "BVM",
+      "fio2": 0.85,
+      "ventilation": { "support": 0.5, "minRr": 12 },
+      "onText": "Bag-valve-mask ventilation started, about 12 breaths a minute.",
+      "offText": "Bag-valve-mask ventilation stopped.",
+      "source": "Teaching estimate. Delivered FiO₂ and ventilation depend on mask seal and technique.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "legs_raised",
+      "label": "Lie flat, raise legs",
+      "sub": "Supports blood pressure",
+      "category": "position",
+      "effects": [{ "target": "sbp", "value": 6 }],
+      "onText": "Laid flat with legs raised.",
+      "offText": "Sat back up.",
+      "source": "Resuscitation Council UK (2021) anaphylaxis: lie flat, with or without legs raised, if hypotensive; sit up if breathing is difficult. Size of the BP effect is a teaching parameter.",
+      "reviewNeeded": true
+    },
+    {
+      "id": "defib_pads",
+      "label": "Defibrillator pads",
+      "sub": "Monitor and shock through pads",
+      "category": "monitoring",
+      "onText": "Defibrillator pads attached.",
+      "offText": "Defibrillator pads removed."
+    }
+  ],
+  "procedures": [
+    {
+      "id": "iv_access",
+      "label": "IV cannula",
+      "sub": "Large bore, bloods sent",
+      "category": "access",
+      "grants": "iv",
+      "doneText": "IV cannula inserted, bloods sent.",
+      "alreadyText": "IV access already in."
+    },
+    {
+      "id": "io_access",
+      "label": "IO access",
+      "sub": "Humeral or tibial needle",
+      "category": "access",
+      "grants": "io",
+      "doneText": "Intraosseous needle inserted.",
+      "alreadyText": "IO access already in."
+    },
+    {
+      "id": "art_line",
+      "label": "Arterial line",
+      "sub": "Radial, continuous BP",
+      "category": "access",
+      "grants": "art",
+      "doneText": "Radial arterial line placed. Continuous blood pressure on the monitor.",
+      "alreadyText": "Arterial line already in."
+    },
+    {
+      "id": "needle_decompression",
+      "label": "Needle decompression",
+      "sub": "4th/5th intercostal space, mid-axillary line",
+      "category": "breathing",
+      "doneText": "Needle decompression: a hiss of air.",
+      "source": "ATLS 10th edition (2018): in adults, needle decompression at the 4th/5th intercostal space just anterior to the mid-axillary line."
+    },
+    {
+      "id": "chest_drain",
+      "label": "Chest drain",
+      "sub": "5th intercostal space, safe triangle",
+      "category": "breathing",
+      "doneText": "Chest drain inserted. Swinging and bubbling.",
+      "source": "ATLS 10th edition (2018): tube thoracostomy is definitive management after decompression."
+    },
+    {
+      "id": "pelvic_binder",
+      "label": "Pelvic binder",
+      "sub": "At the greater trochanters",
+      "category": "circulation",
+      "doneText": "Pelvic binder applied at the level of the greater trochanters."
+    },
+    {
+      "id": "mhp",
+      "label": "Major haemorrhage protocol",
+      "sub": "Blood bank, products in balanced ratio",
+      "category": "team",
+      "doneText": "Major haemorrhage protocol activated. O-negative blood is in the fridge; packs follow."
+    },
+    {
+      "id": "haemorrhage_control",
+      "label": "Refer for haemorrhage control",
+      "sub": "Surgery or interventional radiology",
+      "category": "team",
+      "doneText": "Trauma surgeon and interventional radiology on their way for definitive haemorrhage control."
+    },
+    {
+      "id": "pci",
+      "label": "Activate primary PCI",
+      "sub": "Cath lab team",
+      "category": "team",
+      "doneText": "Cath lab activated. The team will take him in about 20 minutes."
+    },
+    {
+      "id": "critical_care",
+      "label": "Refer to critical care",
+      "sub": "ICU review",
+      "category": "team",
+      "doneText": "Critical care outreach called. ICU registrar coming to review."
+    },
+    {
+      "id": "renal_referral",
+      "label": "Refer for urgent dialysis",
+      "sub": "Renal team",
+      "category": "team",
+      "doneText": "Renal team contacted. Emergency dialysis being arranged."
+    },
+    {
+      "id": "urinary_catheter",
+      "label": "Urinary catheter",
+      "sub": "Hourly urine output",
+      "category": "circulation",
+      "doneText": "Urinary catheter inserted. Hourly urine output monitoring started."
+    }
+  ]
+}

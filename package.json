@@ -19,7 +19,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "review:build": "tsx scripts/clinical-review.ts"
+    "review:build": "tsx scripts/clinical-review.ts",
+    "unity:sync": "tsx scripts/unity-sync.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "1.7.0",

@@ -159,9 +159,19 @@ The build brief is in [PROMPT.md](PROMPT.md). The single-file prototype is in `r
 - **Sample:** `src/content/validation/anaphylaxis-01-sample.csv` is a **synthetic** example, labelled as such in the file, the page and the docs. It is built to differ from the sim in places so the flags and lag can be seen.
 - **Tests (215 unit, 16 e2e):** the CSV parser (quotes, metadata, blanks, warnings, errors); event mapping and its explanations; offset scripting; RMSE, MAE, bias, maximum deviation and within-tolerance on hand-computed values; divergence grouping; threshold crossings with interpolation; the full sample run (replayed events, per-vital counts, a 162 s reference crossing, a positive lag, determinism); the report builder; tick and time formatting. The e2e tests load the sample (six charts, metrics, lag), change a tolerance and see the flag and report update, download a valid JSON and PNG, import a CSV with problems, and check 375 px.
 
+### Phase 10 — Unity port pack
+
+- **C# engine** in `unity/Assets/BedsideSim/Runtime/Engine/`, mirroring `src/engine/` file by file: `PhysiologyEngine.cs` (the `IPhysiologyEngine` contract), `SimpleEngine.cs`, `Processes.cs`, `Pharmacology.cs`, `RhythmRules.cs`, `Recorder.cs`, `Replay.cs`, plus coupling, conditions, actions, ALS, model, narrative, RNG and the data model. It is pure C# with no UnityEngine (`noEngineReferences` asmdef) and no packages: `Json.cs` is a small JSON reader, and `JsMath.cs` reproduces JavaScript rounding and number formatting.
+- **Same JSON as the web app** in `unity/Assets/StreamingAssets/BedsideSim/` (library, ten cases and parity fixtures), kept in step by `npm run unity:sync`. A unit test fails when the copies or the fixtures are stale.
+- **Unity components:** `SimulationRunner` loads a case from StreamingAssets, advances the engine with `Time.deltaTime × speed`, applies actions and raises events. `MonitorUI` shows the uGUI numerics (HR, SpO₂, cycled NIBP, RR, EtCO₂, temp, rhythm, clock) in the standard trace colours, with an alarm flash. [unity/README.md](unity/README.md) covers setup in Unity 2022 LTS or newer, Android/WebGL StreamingAssets, and swapping in the free Pulse Physiology Engine Unity asset behind `IPhysiologyEngine`.
+- **Parity test:** `parity/anaphylaxis-01.json` is exported from the TypeScript engine with seed 1: the ideal-run script (stabilises at 12:19, 18 events, 740 one-second rows) and an untreated run (PEA arrest at 13:52, death at 28:52, 347 rows). The C# side replays both and requires every event (time, type, code and text) to match exactly and every sampled vital to match within 1 × 10⁻⁶. **Result: all 23 events and 9,783 values match, with the largest difference 1.4 × 10⁻¹⁴.** Corrupting one value or one character of an event makes it fail. It runs in Unity's Test Runner (Edit Mode) and as a .NET console app (`unity/ParityRunner`), which CI runs on every push. CI also compiles the Unity scripts against small API stubs.
+- The engine and runner are built as **.NET Standard 2.1 at C# 9** with warnings as errors, the same API surface and language level as Unity 2022, so code that builds here builds in Unity. All ten cases load and run in C#.
+- **Not ported yet:** scoring, the nurse, the coach, case variation, the free-text matcher (except its "I don't know" answer) and video validation. A Unity front end can add them on top of the engine.
+- **Not tested in the Unity Editor itself**: there is no Unity install here. The engine is verified by the .NET parity run; the Unity scripts are checked by compiling against stubs, so a first run in the Editor should confirm the scene setup.
+
 ## Next
 
-- **Phase 10:** Unity port pack.
+- All ten phases are built. Remaining from the brief's definition of done: deploy to GitHub Pages with green CI (waiting on the push), a Lighthouse accessibility check (≥ 90) on the case screen, the README's screenshot or GIF, architecture diagram and "how to add a case", `CONTRIBUTING.md`, issue templates and good-first-issue labels.
 
 ## Design decisions to review
 

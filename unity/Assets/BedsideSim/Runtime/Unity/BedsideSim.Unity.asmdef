@@ -1,0 +1,14 @@
+{
+  "name": "BedsideSim.Unity",
+  "rootNamespace": "BedsideSim.Unity",
+  "references": ["BedsideSim.Engine", "UnityEngine.UI"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

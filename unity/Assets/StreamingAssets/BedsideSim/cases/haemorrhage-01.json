@@ -1,0 +1,630 @@
+{
+  "schemaVersion": 1,
+  "id": "haemorrhage-01",
+  "version": 1,
+  "title": "Pelvic crush",
+  "summary": "A 45-year-old pedestrian hit by a van, with pelvic pain, cold and getting more tachycardic.",
+  "specialty": "Trauma",
+  "difficulty": "advanced",
+  "estMinutes": 25,
+  "tags": ["trauma", "haemorrhagic shock", "major haemorrhage", "TXA", "ATLS"],
+  "patient": {
+    "name": "Sarah Mitchell",
+    "age": 45,
+    "sex": "female",
+    "weightKg": 65,
+    "occupation": "nurse",
+    "persona": "Frightened and in severe pelvic pain. Becomes quieter and more confused as she bleeds."
+  },
+  "brief": [
+    "Sarah, {age}, was hit side-on by a reversing van and pinned against a wall. She is complaining of severe pain in her pelvis and lower back. The crew couldn't give tranexamic acid on scene. She has one cannula and arrived about 30 minutes after the injury.",
+    "Find the bleeding, stop it, and replace what she's losing, without making it worse."
+  ],
+  "openingLine": "My hips… the pain… please help me.",
+  "baseline": {
+    "hr": 82,
+    "sbp": 126,
+    "dbp": 76,
+    "rr": 16,
+    "temp": 36.2,
+    "glucose": 7.5,
+    "hrJitter": 4,
+    "sbpJitter": 4
+  },
+  "labs": {
+    "lactate": 1.4,
+    "hco3": 24,
+    "k": 4,
+    "na": 139,
+    "hb": 132,
+    "wcc": 11,
+    "plt": 260,
+    "fibrinogen": 3
+  },
+  "processes": [
+    {
+      "id": "haemorrhage",
+      "type": "hypovolaemia",
+      "label": "Pelvic haemorrhage",
+      "initial": 45,
+      "initialJitter": 4,
+      "ratePerMin": 2.5,
+      "rateJitterPct": 10,
+      "sensitivityJitterPct": 10,
+      "arrestAt": 100,
+      "arrestRhythm": "pea",
+      "effects": [
+        {
+          "target": "sbp",
+          "perPoint": -1,
+          "above": 15
+        },
+        {
+          "target": "hr",
+          "perPoint": 0.5
+        },
+        {
+          "target": "rr",
+          "perPoint": 0.15
+        },
+        {
+          "target": "lab:hb",
+          "perPoint": -0.6
+        },
+        {
+          "target": "lab:lactate",
+          "perPoint": 0.06,
+          "above": 20
+        },
+        {
+          "target": "lab:fibrinogen",
+          "perPoint": -0.02
+        },
+        {
+          "target": "gcs",
+          "perPoint": -0.05,
+          "above": 50
+        },
+        {
+          "target": "temp",
+          "perPoint": -0.012
+        },
+        {
+          "target": "sign:sweating",
+          "perPoint": 0.012,
+          "above": 30
+        },
+        {
+          "target": "sign:anxiety",
+          "perPoint": 0.01
+        }
+      ],
+      "treatments": [
+        {
+          "id": "binder",
+          "when": {
+            "procedure": "pelvic_binder"
+          },
+          "ratePerMin": -1.5,
+          "source": "A pelvic binder reduces pelvic volume and venous bleeding but doesn't stop arterial bleeding (ATLS 10th edition, 2018). Rate is a teaching parameter.",
+          "reviewNeeded": true
+        },
+        {
+          "id": "definitive",
+          "when": {
+            "procedure": "haemorrhage_control",
+            "forSec": 1200
+          },
+          "ratePerMin": -3.5,
+          "source": "Definitive control (angioembolisation or surgery), about 20 minutes after referral in this case. Rate is a teaching parameter.",
+          "reviewNeeded": true
+        }
+      ],
+      "source": "Teaching model of ongoing haemorrhage from a pelvic fracture. Volume replacement with blood products and definitive haemorrhage control reverse it. Effect sizes are teaching parameters.",
+      "reviewNeeded": true
+    }
+  ],
+  "bands": {
+    "process": "haemorrhage",
+    "cutoffs": [30, 65]
+  },
+  "dialogue": [
+    {
+      "id": "pain",
+      "category": "presenting",
+      "q": "Where does it hurt?",
+      "a": [
+        "My pelvis still aches, but it's bearable.",
+        "My hips and lower back. It's agony.",
+        "(moans, eyes half closed)"
+      ],
+      "keywords": ["hurt", "pain", "where"]
+    },
+    {
+      "id": "mechanism",
+      "category": "history",
+      "q": "What happened?",
+      "a": [
+        "A van reversed into me and pinned me against a wall.",
+        "Van… pinned me…",
+        "(no answer)"
+      ],
+      "keywords": ["happened", "accident", "mechanism", "van"]
+    },
+    {
+      "id": "head",
+      "category": "history",
+      "q": "Did you hit your head?",
+      "a": ["No, I remember it all.", "No…", "(no answer)"],
+      "keywords": ["head", "knocked", "blackout"]
+    },
+    {
+      "id": "meds",
+      "category": "meds",
+      "q": "Do you take blood thinners?",
+      "a": ["No. Just the pill.", "No.", "(no answer)"],
+      "keywords": ["blood thinners", "anticoagulant", "warfarin", "apixaban", "medicines"]
+    },
+    {
+      "id": "allergy",
+      "category": "allergies",
+      "q": "Any allergies?",
+      "a": ["None.", "No.", "(no answer)"],
+      "keywords": ["allergy", "allergies", "allergic"]
+    },
+    {
+      "id": "pmh",
+      "category": "pmh",
+      "q": "Any medical problems?",
+      "a": ["No, I'm fit and well.", "No.", "(no answer)"],
+      "keywords": ["medical", "history", "conditions"]
+    },
+    {
+      "id": "pregnant",
+      "category": "history",
+      "q": "Could you be pregnant?",
+      "a": ["No, definitely not.", "No.", "(no answer)"],
+      "keywords": ["pregnant", "pregnancy", "period"]
+    }
+  ],
+  "exam": [
+    {
+      "id": "A",
+      "label": "Catastrophic haemorrhage and airway",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "No airway noises."
+        },
+        {
+          "text": "No catastrophic external bleeding. Airway patent, talking. Collar on."
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "label": "Breathing",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "No respiratory effort."
+        },
+        {
+          "text": "RR {rr}/min, SpO₂ {spo2}% on {o2}. Chest moving equally, clear both sides."
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "label": "Circulation",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "No central pulse."
+        },
+        {
+          "when": {
+            "vital": "sbp",
+            "lt": 90
+          },
+          "text": "HR {hr}, BP {sbp}/{dbp}. Cold, pale, clammy. Capillary refill 5 seconds. Pelvis unstable and painful. Abdomen soft."
+        },
+        {
+          "text": "HR {hr}, BP {sbp}/{dbp}. Pale, capillary refill 3 seconds. Pelvic pain on gentle pressure; don't spring the pelvis. Abdomen soft."
+        }
+      ]
+    },
+    {
+      "id": "D",
+      "label": "Disability",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "arrest": true
+          },
+          "text": "Unresponsive. GCS 3/15."
+        },
+        {
+          "text": "GCS {gcs}/15. Pupils equal and reactive. Glucose {glucose:1} mmol/L."
+        }
+      ]
+    },
+    {
+      "id": "E",
+      "label": "Exposure",
+      "kind": "abcde",
+      "findings": [
+        {
+          "text": "Temperature {temp:1} °C: getting cold. Bruising over both iliac crests. Blood at the urethral meatus. Kept warm with blankets."
+        }
+      ]
+    },
+    {
+      "id": "abdomen",
+      "label": "Abdomen and pelvis",
+      "kind": "region",
+      "region": "abdomen",
+      "findings": [
+        {
+          "when": {
+            "procedure": "pelvic_binder"
+          },
+          "text": "Binder in place at the greater trochanters. Abdomen soft."
+        },
+        {
+          "text": "Abdomen soft. Pelvis tender with obvious bruising. Legs: left leg shortened and externally rotated."
+        }
+      ]
+    },
+    {
+      "id": "legs",
+      "label": "Legs",
+      "kind": "region",
+      "region": "legs",
+      "findings": [
+        {
+          "text": "Left leg slightly shortened. Distal pulses present. No open wounds."
+        }
+      ]
+    }
+  ],
+  "investigations": [
+    {
+      "id": "fast",
+      "results": [
+        {
+          "text": "eFAST: no free fluid in the abdomen. No pericardial fluid. Lungs sliding both sides. (Pelvic bleeding is retroperitoneal; FAST misses it.)"
+        }
+      ]
+    },
+    {
+      "id": "xray_pelvis",
+      "results": [
+        {
+          "text": "Open-book pelvic fracture with widened symphysis pubis and a left sacroiliac joint disruption."
+        }
+      ]
+    },
+    {
+      "id": "vbg",
+      "results": [
+        {
+          "text": "pH {ph:2}, BE low, lactate {lactate:1} mmol/L, Hb {hb} g/L, K⁺ {k:1} mmol/L."
+        }
+      ]
+    },
+    {
+      "id": "xmatch",
+      "results": [
+        {
+          "text": "Group A RhD positive. Crossmatched units available."
+        }
+      ]
+    },
+    {
+      "id": "coag",
+      "results": [
+        {
+          "text": "PT prolonged, fibrinogen {fibrinogen:1} g/L."
+        }
+      ]
+    },
+    {
+      "id": "fbc",
+      "results": [
+        {
+          "text": "Hb {hb} g/L, WCC {wcc:1} ×10⁹/L, platelets {plt} ×10⁹/L."
+        }
+      ]
+    },
+    {
+      "id": "glu",
+      "results": [
+        {
+          "text": "Glucose {glucose:1} mmol/L."
+        }
+      ]
+    }
+  ],
+  "patientLines": [
+    {
+      "id": "cold",
+      "when": {
+        "severity": "haemorrhage",
+        "gte": 60
+      },
+      "text": "I'm so cold… and thirsty…"
+    },
+    {
+      "id": "drowsy",
+      "when": {
+        "severity": "haemorrhage",
+        "gte": 80
+      },
+      "text": "(eyes closing, barely answering)"
+    }
+  ],
+  "outcomes": {
+    "stabilised": {
+      "when": {
+        "all": [
+          {
+            "procedure": "haemorrhage_control",
+            "forSec": 1200
+          },
+          {
+            "severity": "haemorrhage",
+            "lt": 30
+          },
+          {
+            "vital": "sbp",
+            "gte": 80
+          }
+        ]
+      },
+      "forSec": 120,
+      "text": "Bleeding controlled, blood pressure holding without more products."
+    }
+  },
+  "diagnosis": {
+    "correct": ["pelvic-haemorrhage"],
+    "options": [
+      {
+        "id": "pelvic-haemorrhage",
+        "label": "Haemorrhagic shock from pelvic fracture"
+      },
+      {
+        "id": "splenic",
+        "label": "Splenic rupture"
+      },
+      {
+        "id": "tension",
+        "label": "Tension pneumothorax"
+      },
+      {
+        "id": "neurogenic",
+        "label": "Neurogenic shock"
+      },
+      {
+        "id": "tamponade",
+        "label": "Cardiac tamponade"
+      }
+    ]
+  },
+  "scoring": [
+    {
+      "id": "stabilised",
+      "label": "Haemorrhage controlled and stable",
+      "weight": 20,
+      "kind": "credit",
+      "test": {
+        "type": "outcomeIs",
+        "outcomes": ["stabilised"]
+      }
+    },
+    {
+      "id": "binder",
+      "label": "Pelvic binder within 10 minutes",
+      "weight": 12,
+      "kind": "credit",
+      "critical": true,
+      "test": {
+        "type": "actionWithin",
+        "codes": ["procedure:pelvic_binder"],
+        "withinSec": 600
+      }
+    },
+    {
+      "id": "mhp",
+      "label": "Major haemorrhage protocol activated",
+      "weight": 10,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["procedure:mhp"]
+      }
+    },
+    {
+      "id": "blood",
+      "label": "Blood transfused",
+      "weight": 12,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["fluid:blood"]
+      }
+    },
+    {
+      "id": "plasma",
+      "label": "Plasma given with the red cells",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["fluid:ffp"]
+      }
+    },
+    {
+      "id": "txa",
+      "label": "Tranexamic acid given",
+      "weight": 10,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["drug:tranexamic_acid:*"]
+      }
+    },
+    {
+      "id": "control",
+      "label": "Referred for definitive haemorrhage control",
+      "weight": 15,
+      "kind": "credit",
+      "critical": true,
+      "test": {
+        "type": "actionDone",
+        "codes": ["procedure:haemorrhage_control"]
+      }
+    },
+    {
+      "id": "imaging",
+      "label": "Pelvic X-ray or eFAST",
+      "weight": 4,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["order:xray_pelvis", "order:fast"]
+      }
+    },
+    {
+      "id": "access",
+      "label": "Second large-bore IV access",
+      "weight": 4,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["procedure:iv_access", "procedure:io_access"]
+      }
+    },
+    {
+      "id": "dx",
+      "label": "Working diagnosis: haemorrhagic shock",
+      "weight": 4,
+      "kind": "credit",
+      "test": {
+        "type": "diagnosisIs",
+        "ids": ["pelvic-haemorrhage"]
+      }
+    },
+    {
+      "id": "limit-crystalloid",
+      "label": "Crystalloid limited (no more than two boluses)",
+      "weight": 8,
+      "kind": "penalty",
+      "test": {
+        "type": "actionCount",
+        "codes": ["fluid:crystalloid"],
+        "max": 2
+      }
+    },
+    {
+      "id": "no-pressor",
+      "label": "No vasopressor in haemorrhagic shock",
+      "weight": 10,
+      "kind": "penalty",
+      "test": {
+        "type": "actionNever",
+        "codes": ["infusion:noradrenaline"]
+      }
+    }
+  ],
+  "teaching": [
+    {
+      "id": "binder",
+      "text": "Put a pelvic binder on early, at the level of the greater trochanters, in anyone with high-energy injury and suspected pelvic fracture. Don't spring the pelvis.",
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "binder"
+      }
+    },
+    {
+      "id": "crystalloid",
+      "text": "Large volumes of crystalloid dilute clotting factors and worsen bleeding. Switch to blood and plasma early, and accept a lower blood pressure (permissive hypotension) until the bleeding is controlled, unless there's a head injury.",
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "limit-crystalloid"
+      }
+    },
+    {
+      "id": "txa",
+      "text": "Tranexamic acid 1 g over 10 minutes, then 1 g over 8 hours, reduces death from bleeding when given within 3 hours of injury (CRASH-2).",
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "txa"
+      }
+    },
+    {
+      "id": "definitive",
+      "text": "Blood buys time; only haemorrhage control (embolisation or surgery) stops pelvic bleeding. Call early.",
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "control"
+      }
+    },
+    {
+      "id": "pressor",
+      "text": "Vasopressors don't treat empty vessels. In haemorrhagic shock, give volume and get control.",
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "no-pressor"
+      }
+    }
+  ],
+  "references": [
+    {
+      "id": "atls-10",
+      "label": "American College of Surgeons. Advanced Trauma Life Support (ATLS) Student Course Manual. 10th edition. 2018.",
+      "url": "https://www.facs.org/"
+    },
+    {
+      "id": "crash-2",
+      "label": "CRASH-2 trial collaborators. Effects of tranexamic acid on death, vascular occlusive events, and blood transfusion in trauma patients with significant haemorrhage (CRASH-2). The Lancet. 2010;376:23–32."
+    }
+  ],
+  "hints": [
+    {
+      "id": "pelvis",
+      "text": "She's got bad pelvic pain. Do you want a binder?"
+    },
+    {
+      "id": "blood",
+      "when": {
+        "vital": "sbp",
+        "lt": 90
+      },
+      "text": "Shall I activate the major haemorrhage protocol?"
+    },
+    {
+      "id": "txa",
+      "when": {
+        "not": {
+          "drugGiven": "tranexamic_acid"
+        }
+      },
+      "text": "Has she had any tranexamic acid?"
+    }
+  ],
+  "variation": {
+    "ageRange": [30, 60],
+    "weightKgRange": [55, 85]
+  }
+}
