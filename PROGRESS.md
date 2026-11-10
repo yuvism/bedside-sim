@@ -176,9 +176,14 @@ The build brief is in [PROMPT.md](PROMPT.md). The single-file prototype is in `r
 - **CONTRIBUTING.md:** ground rules (no invented citations, `reviewNeeded`, score safe options equally), set-up and checks, the case format, disease processes, the condition language, scoring rules, and how to test a case.
 - **Issue templates:** bug report (case URL with seed, exported run), new case (sources and every safe option required) and clinical review. Labels `new case` and `clinical review` were added on GitHub next to the default `bug` and `good first issue`.
 
+### Live
+
+- **Deployed:** https://yuvism.github.io/bedside-sim/ (GitHub Pages, built by Actions). On the first push both workflows passed: **CI** (lint, format, typecheck, 217 unit tests, build, 16 Playwright tests) and **unity-parity** (Unity scripts compiled against API stubs; the C# parity check on Linux: all 23 events and 9,783 values match, max difference 1.4 × 10⁻¹⁴), plus **Deploy to GitHub Pages**.
+- A smoke test of the live site loaded all ten cases with the disclaimer, ran a case, rendered the 3D view (about 55 fps headless), loaded the validation sample (six charts), and created and test-ran a new case in the editor, with no console errors.
+
 ## Next
 
-- **Push, then go live:** the GitHub repo exists but is empty until the commits are pushed with a token that has the `workflow` scope. After that: enable GitHub Pages (source: GitHub Actions) and check that CI (web checks and the Unity parity job) and the deploy are green.
+- Every item in the brief's definition of done is met. Ideas for later: clinician review of the items in docs/clinical-review.md, more cases, and porting scoring and the nurse to the Unity pack.
 
 ## Design decisions to review
 
@@ -194,7 +199,6 @@ The build brief is in [PROMPT.md](PROMPT.md). The single-file prototype is in `r
 ## Known issues
 
 - TypeScript is pinned to 6.0.x because typescript-eslint 8 supports only `<6.1`. Move to TS 7 once typescript-eslint supports it.
-- **Not pushed yet.** The repo github.com/yuvism/bedside-sim exists but is empty, because GitHub rejects workflow files from a token without the `workflow` scope. Push with `gh auth login -h github.com -s workflow`, then `git push -u origin main` from the project folder.
 - Bundle sizes are under the 200 kB gzipped limit: the main bundle is about 147 kB (React, Zod and the ten bundled cases), and the lazy chunks are about 109 kB for the debrief (mostly Recharts), 84 kB for the Anthropic SDK and 147 kB for the 3D view (three.js). If the library grows much more, cases should load lazily.
 - The 3D view's frame rate was measured in headless Chromium only (60 fps), not yet on a mid-range laptop GPU.
 - `npm audit` reports 10 moderate advisories, all in the lint tooling (minimatch, through ESLint and typescript-eslint). None are in code shipped to the browser.
