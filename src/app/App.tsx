@@ -8,8 +8,9 @@ import { caseHref, editorHref, testHref, useRoute } from './router.ts';
 
 const EditorHome = lazy(() => import('../ui/editor/EditorHome.tsx'));
 const CaseEditor = lazy(() => import('../ui/editor/CaseEditor.tsx'));
+const ValidationPage = lazy(() => import('../ui/validation/ValidationPage.tsx'));
 
-const loading = <p className="page hint">Loading the case editor…</p>;
+const loading = <p className="page hint">Loading…</p>;
 
 function DraftProblem({ draftId, problem }: { draftId: string; problem: string }) {
   return (
@@ -48,6 +49,12 @@ export function App() {
   }, [needsSeed, route]);
 
   switch (route.name) {
+    case 'validate':
+      return (
+        <Suspense fallback={loading}>
+          <ValidationPage />
+        </Suspense>
+      );
     case 'editor':
       return (
         <Suspense fallback={loading}>

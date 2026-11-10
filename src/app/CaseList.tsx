@@ -50,6 +50,9 @@ export function CaseList() {
         <a className="btn" href="#/editor">
           Case editor
         </a>
+        <a className="btn" href="#/validate">
+          Validation
+        </a>
         <SettingsButton />
         <ThemeToggle />
       </header>

@@ -22,6 +22,7 @@
   --rr: #f2d04a;
   /* debrief chart line: validated categorical slot 1 (light) */
   --chart-line: #2a78d6;
+  --chart-ref: #eb6834;
   --font-text: 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-num: 'Barlow Condensed', 'Arial Narrow', sans-serif;
   color-scheme: light;
@@ -47,6 +48,7 @@
     --warn: #f2c76b;
     --warn-soft: #3a2e14;
     --chart-line: #3987e5;
+    --chart-ref: #d95926;
     color-scheme: dark;
   }
 }
@@ -68,6 +70,7 @@
   --warn: #f2c76b;
   --warn-soft: #3a2e14;
   --chart-line: #3987e5;
+  --chart-ref: #d95926;
   color-scheme: dark;
 }
 

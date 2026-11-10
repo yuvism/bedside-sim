@@ -6,7 +6,8 @@ export type AppRoute =
   | { name: 'case'; caseId: string; seed: number | null }
   | { name: 'editor' }
   | { name: 'edit'; draftId: string }
-  | { name: 'test'; draftId: string; seed: number | null };
+  | { name: 'test'; draftId: string; seed: number | null }
+  | { name: 'validate' };
 
 function seedOf(query: string): number | null {
   const s = new URLSearchParams(query).get('seed');
@@ -23,6 +24,7 @@ export function parseHash(hash: string): AppRoute {
   if (parts[0] === 'editor') {
     return parts[1] ? { name: 'edit', draftId: decodeURIComponent(parts[1]) } : { name: 'editor' };
   }
+  if (parts[0] === 'validate') return { name: 'validate' };
   if (parts[0] === 'test' && parts[1]) {
     return { name: 'test', draftId: decodeURIComponent(parts[1]), seed: seedOf(query) };
   }

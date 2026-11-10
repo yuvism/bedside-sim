@@ -1,0 +1,252 @@
+.validation .card {
+  padding: 14px 16px;
+  margin-top: 14px;
+}
+
+.validation h3 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+
+.validation h4 {
+  margin: 16px 0 6px;
+  font-size: 1rem;
+}
+
+.val-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  align-items: flex-end;
+  margin: 8px 0;
+}
+
+.val-row label,
+.tolerances label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.val-row select {
+  min-width: 240px;
+  max-width: 100%;
+}
+
+.validation .input.num {
+  width: 110px;
+}
+
+.tolerances {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 12px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin: 10px 0 0;
+}
+
+.tolerances legend {
+  font-weight: 700;
+  padding: 0 4px;
+}
+
+.tol-input {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  color: var(--ink);
+}
+
+.tol-input .input.num {
+  width: 80px;
+}
+
+.val-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.val-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cmp-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 0.85rem;
+  margin: 6px 0 4px;
+}
+
+.cmp-legend .key {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cmp-legend .key::before {
+  content: '';
+  display: inline-block;
+  width: 22px;
+  height: 0;
+  border-top: 2px solid var(--chart-line);
+}
+
+.cmp-legend .key.ref::before {
+  border-color: var(--chart-ref);
+  height: 8px;
+  width: 8px;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  background: var(--chart-ref);
+  box-shadow: 0 0 0 1px var(--chart-ref);
+}
+
+.cmp-legend .key.band::before {
+  border: 0;
+  height: 12px;
+  width: 16px;
+  background: var(--warn);
+  opacity: 0.25;
+}
+
+.cmp-legend .key.event::before {
+  border-top: 2px dashed var(--muted);
+}
+
+.cmp-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 18px;
+}
+
+.cmp-panel {
+  margin: 0;
+  min-width: 0;
+}
+
+.cmp-panel figcaption {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+  margin: 8px 0 0;
+}
+
+.cmp-title {
+  font-weight: 700;
+}
+
+.status {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status.warn {
+  color: var(--warn);
+}
+
+.status.ok {
+  color: var(--ok);
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.validation table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.validation th,
+.validation td {
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.validation thead th {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.validation tbody th {
+  font-weight: 600;
+}
+
+.events td:nth-child(2) {
+  white-space: normal;
+}
+
+.events tr.not-replayed td {
+  color: var(--muted);
+}
+
+.divergences {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+}
+
+.transitions {
+  display: grid;
+  gap: 8px;
+}
+
+.transitions .btn {
+  justify-self: start;
+}
+
+.card.transition {
+  margin: 0;
+  padding: 10px 12px;
+}
+
+.tr-def {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.tr-def label {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.tr-result {
+  margin: 8px 0 0;
+}
+
+@media (max-width: 760px) {
+  .cmp-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .val-row select {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .val-row label {
+    flex: 1 1 100%;
+  }
+}

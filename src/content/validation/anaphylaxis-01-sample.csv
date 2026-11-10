@@ -1,0 +1,40 @@
+# Bedside sim reference timeline (format: see docs/validation.md)
+# source: Synthetic example written for the documentation. Not from a real patient or video.
+# case: anaphylaxis-01
+# seed: 1
+# offset: 0
+t_sec,hr,sbp,dbp,spo2,rr,etco2,event
+0,118,84,50,92,26,,"Patient on trolley, wheeze and widespread hives"
+20,120,,,92,27,,help
+40,121,,,93,27,,device:o2_nrb:on
+60,124,,,95,26,,
+90,126,82,48,96,26,,
+95,,,,,,,drug:adrenaline:IM
+120,128,,,96,25,,
+150,126,,,97,25,,procedure:iv_access
+180,124,92,54,97,24,,
+200,,,,,,,fluid:crystalloid
+210,121,,,97,24,,
+240,119,,,98,23,,Says throat feels less tight
+270,118,96,56,98,22,,
+300,118,,,98,22,,
+330,117,,,98,22,,
+360,116,98,58,98,21,,
+390,116,,,98,21,,
+420,115,,,98,21,,drug:adrenaline:IM
+450,113,,,98,20,,
+480,110,108,64,99,20,,
+510,108,,,99,19,,
+540,106,,,99,19,,
+570,104,114,68,99,18,,
+600,102,,,99,18,,
+630,100,,,99,17,,
+660,98,120,70,99,17,,
+690,97,,,99,16,,
+720,95,,,99,16,,Hives fading
+750,94,124,72,99,16,,
+780,92,,,99,15,,
+810,92,,,99,15,,
+840,90,126,74,99,15,,
+870,90,,,99,15,,
+900,88,128,75,99,15,,
