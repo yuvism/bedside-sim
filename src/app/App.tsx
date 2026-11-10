@@ -9,6 +9,7 @@ import { caseHref, editorHref, testHref, useRoute } from './router.ts';
 const EditorHome = lazy(() => import('../ui/editor/EditorHome.tsx'));
 const CaseEditor = lazy(() => import('../ui/editor/CaseEditor.tsx'));
 const ValidationPage = lazy(() => import('../ui/validation/ValidationPage.tsx'));
+const LearnPage = lazy(() => import('../ui/learn/LearnPage.tsx'));
 
 const loading = <p className="page hint">Loading…</p>;
 
@@ -49,6 +50,12 @@ export function App() {
   }, [needsSeed, route]);
 
   switch (route.name) {
+    case 'learn':
+      return (
+        <Suspense fallback={loading}>
+          <LearnPage />
+        </Suspense>
+      );
     case 'validate':
       return (
         <Suspense fallback={loading}>

@@ -13,8 +13,8 @@ const MAX = 120 * 60;
 const IDLE_MAX = 180 * 60;
 
 describe('case library', () => {
-  it('has ten cases, each with an ideal-run policy', () => {
-    expect(CASES.length).toBe(10);
+  it('has eleven cases, each with an ideal-run policy', () => {
+    expect(CASES.length).toBe(11);
     for (const c of CASES) expect(IDEAL[c.id], c.id).toBeDefined();
   });
 

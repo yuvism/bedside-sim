@@ -181,9 +181,66 @@ The build brief is in [PROMPT.md](PROMPT.md). The single-file prototype is in `r
 - **Deployed:** https://yuvism.github.io/bedside-sim/ (GitHub Pages, built by Actions). On the first push both workflows passed: **CI** (lint, format, typecheck, 217 unit tests, build, 16 Playwright tests) and **unity-parity** (Unity scripts compiled against API stubs; the C# parity check on Linux: all 23 events and 9,783 values match, max difference 1.4 × 10⁻¹⁴), plus **Deploy to GitHub Pages**.
 - A smoke test of the live site loaded all ten cases with the disclaimer, ran a case, rendered the 3D view (about 55 fps headless), loaded the validation sample (six charts), and created and test-ran a new case in the editor, with no console errors.
 
+### After launch — Learn from a video, a new case and a friendlier landing page
+
+**Learn from a video** (`#/learn`, lazy, about 10 kB gzipped). A case can now update itself from an annotated treatment video and propose what's missing. Nothing is applied directly: every change goes into an editor draft for review.
+
+- **Annotate** (`src/ui/learn/`): play a local video file, mark "scenario starts now", and add readings (time, vitals, events) with a code list taken from the case. Import or export the timeline as the validation CSV. Optionally, **Read monitor with Claude** sends one frame to Claude with the user's own key (`src/app/claudeVision.ts`). Claude returns structured JSON with `null` for anything it can't clearly read, implausible values are dropped, and a person checks every reading. The page shows a privacy note: patient videos are confidential, de-identified and approved use only, and the video stays on the device.
+- **Update itself** (`src/engine/learning/fit.ts`, pure engine code). The fitter looks only at the case's bounded **tunables** (`tunables.ts`): process start severity, progression and decay, treatment strengths, effects on the vitals the video shows, and baseline HR/SBP/RR, up to 18 of them. A deterministic pattern search (step halving, with expansion while it improves) minimises the mean squared error in tolerance units, replaying the video's own actions with the chosen seed. Missing sim values are penalised.
+- **Add what's missing** (`propose.ts`):
+  - scoring credit for actions the team did that the case doesn't score;
+  - guided-mode prompts and patient lines from the annotation notes, tied to the severity at that moment;
+  - result templates for tests the case can't answer;
+  - a list of **library gaps**: drugs, routes, devices or procedures the shared library doesn't have yet. These need a sourced library edit, so they are reported but never added automatically.
+
+  Texts the case already has aren't proposed again.
+
+- **Review**: a before/after error table per vital, checkboxes for every fitted value and addition, **Create a draft for review** (a new `<id>-video` case whose changed values get a dated source note and `reviewNeeded`), a test run, and a downloadable JSON update pack.
+
+**From the AMAX4 video.** "AMAX4 Simulation MASTER" (Live to the MAX!, YouTube) is a manikin simulation of a teenager in life-threatening asthma with failing bag-mask ventilation. It was annotated **in our own words**, from the on-screen monitor overlay and captions, into `src/content/validation/amax4-simulation-annotation.csv`. There is no verbatim transcript, because the video is copyrighted and its caption track isn't available. Running it through the pipeline against the existing asthma case flagged:
+
+- the library gaps: no front-of-neck access, no intubation, no IV route for salbutamol;
+- missing scoring for bag-mask ventilation and IV magnesium.
+
+These led to the following changes:
+
+- **Library:** procedures `tracheal_intubation` and `front_of_neck_access` (DAS 2015) with team delays, and salbutamol **IV 250 micrograms** (BNF). All are marked `reviewNeeded`.
+- **New case `asthma-02` "Can't ventilate"** (Emergency medicine, advanced). A teenager arrives with paramedics bag-masking. Without a definitive airway the hypoxic spiral continues, even if drugs are given. A critical scoring rule requires a definitive airway within 4 minutes, following the AMAX4 teaching. It has ideal-run and untreated tests:
+  - ideal treatment stabilises at about 6–7 minutes across seeds;
+  - doing nothing arrests at about 4 minutes;
+  - drugs without an airway arrest by about 6–8 minutes.
+- **Fitted to the video:** 7 values changed and 1 prompt was accepted. The overall error fell from 8.57 to 0.82. Root-mean-square error by vital:
+
+  | Vital        | Before | After |
+  | ------------ | ------ | ----- |
+  | HR           | 41.9   | 11.0  |
+  | Systolic BP  | 9.6    | 7.6   |
+  | Diastolic BP | 5.7    | 4.0   |
+  | SpO₂         | 5.2    | 2.7   |
+
+  The C# engine loads and runs the case, and parity still matches (23 events, 9,783 values).
+
+**Landing page and onboarding.**
+
+- A hero with an animated monitor trace and a "Start with Collapse after lunch" button.
+- Four "how a case works" steps.
+- Case cards with a colour stripe per specialty, difficulty dots, tags and time.
+- A "For teachers and researchers" section linking the editor, validation and Learn from a video.
+- A **How to play** panel on the brief, open until dismissed once.
+- Keyboard shortcuts at the bedside: Space to pause or resume, 1–4 for the Talk, Examine, Investigate and Treat tabs.
+
+**Tests (228 unit, 17 e2e):**
+
+- Unit tests:
+  - the fit recovers a known start severity from a synthetic video;
+  - each kind of proposal, and the drafts it produces, validate;
+  - Claude monitor reading with a mocked client: request shape, range checks, refusal, bad key.
+- E2E test: load the AMAX4 example, analyse it, create a draft and test-run it.
+
 ## Next
 
 - Every item in the brief's definition of done is met. Ideas for later: clinician review of the items in docs/clinical-review.md, more cases, and porting scoring and the nurse to the Unity pack.
+- Learn from a video: annotate real (consented, de-identified) hospital videos, and have two people annotate each video and compare. Fitting several videos at once, so one case isn't tuned to a single patient, is the natural next step.
 
 ## Design decisions to review
 
@@ -199,7 +256,7 @@ The build brief is in [PROMPT.md](PROMPT.md). The single-file prototype is in `r
 ## Known issues
 
 - TypeScript is pinned to 6.0.x because typescript-eslint 8 supports only `<6.1`. Move to TS 7 once typescript-eslint supports it.
-- Bundle sizes are under the 200 kB gzipped limit: the main bundle is about 147 kB (React, Zod and the ten bundled cases), and the lazy chunks are about 109 kB for the debrief (mostly Recharts), 84 kB for the Anthropic SDK and 147 kB for the 3D view (three.js). If the library grows much more, cases should load lazily.
+- Bundle sizes are under the 200 kB gzipped limit: the main bundle is about 154 kB (React, Zod and the eleven bundled cases), and the lazy chunks are about 109 kB for the debrief (mostly Recharts), 84 kB for the Anthropic SDK and 147 kB for the 3D view (three.js). If the library grows much more, cases should load lazily.
 - The 3D view's frame rate was measured in headless Chromium only (60 fps), not yet on a mid-range laptop GPU.
 - `npm audit` reports 10 moderate advisories, all in the lint tooling (minimatch, through ESLint and typescript-eslint). None are in code shipped to the browser.
 - The AI patient was tested with a mocked client only. A live call needs a real key, which the project never stores.

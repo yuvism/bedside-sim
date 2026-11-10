@@ -11,12 +11,44 @@ import { NursePanel } from '../ui/panels/NursePanel.tsx';
 import { PatientCard } from '../ui/patient/PatientCard.tsx';
 import { Footer } from './Footer.tsx';
 import { editorHref } from './router.ts';
-import { SPEEDS, useSim } from './store.ts';
+import { SPEEDS, useSim, type PanelTab } from './store.ts';
 import { BayCard, ViewToggle } from '../ui/bay/BayView.tsx';
+import { HowToPlay } from '../ui/HowToPlay.tsx';
 import { SettingsButton } from '../ui/settings/SettingsButton.tsx';
 import { ThemeToggle } from './ThemeToggle.tsx';
 
 const TICK_MS = 250;
+
+const PANEL_KEYS: Record<string, PanelTab> = {
+  '1': 'talk',
+  '2': 'exam',
+  '3': 'tests',
+  '4': 'treat',
+};
+
+/** Space pauses or resumes; 1–4 switch panels. Ignored while typing. */
+function useShortcuts() {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement | null;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (
+        el &&
+        (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT|BUTTON|SUMMARY|A)$/.test(el.tagName))
+      )
+        return;
+      const st = useSim.getState();
+      if (e.key === ' ' && st.phase === 'running') {
+        e.preventDefault();
+        st.togglePause();
+      } else if (PANEL_KEYS[e.key]) {
+        st.setPanel(PANEL_KEYS[e.key] as PanelTab);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+}
 
 /** Drives sim time from real time while the case runs. */
 function useSimLoop() {
@@ -134,6 +166,7 @@ export function Bedside({
   const testRun = draftId !== undefined;
   useEffect(() => load(caseDef, seed, { testRun }), [caseDef, seed, load, testRun]);
   useSimLoop();
+  useShortcuts();
 
   return (
     <>
@@ -168,6 +201,7 @@ export function Bedside({
             </p>
           )}
           {phase === 'brief' && <BriefCard caseDef={caseDef} />}
+          {phase === 'brief' && <HowToPlay />}
         </div>
         <div className="col">
           <AlsPanel />

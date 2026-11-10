@@ -86,6 +86,20 @@ export const IDEAL: Record<string, () => Policy> = {
     ...at(360, drug('adrenaline', 'IM', 0.5)),
   ]),
 
+  'asthma-02': build([
+    ...at(0, { kind: 'call_help' }, dev('bvm')),
+    ...at(5, proc('iv_access')),
+    ...['A', 'B', 'C'].flatMap((id, i) => at(10 + i * 3, exam(id))),
+    ...at(30, drug('salbutamol', 'NEB', 5)),
+    ...at(60, proc('tracheal_intubation')),
+    ...at(120, drug('magnesium_sulfate', 'IV', 2)),
+    ...at(130, drug('hydrocortisone', 'IV', 100)),
+    ...at(140, drug('salbutamol', 'IV', 0.25)),
+    ...at(150, order('abg')),
+    ...at(160, dx('asthma')),
+    ...at(600, drug('salbutamol', 'NEB', 5)),
+  ]),
+
   'asthma-01': build(
     [
       ...at(5, { kind: 'call_help' }),

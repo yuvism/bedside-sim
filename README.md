@@ -25,10 +25,11 @@ An open-source virtual patient simulator that runs in the browser. You talk to t
 - **Seeded patient variations:** age, weight, allergies, comorbidities and where the key clue hides, so each run is a little different.
 - **Ask the patient anything:** type a question in your own words. With no key, an offline matcher maps it to the case's scripted questions. With your own Anthropic API key (Settings), Claude plays the patient using only what's in the case file, and never reveals the diagnosis or results.
 - **Scoring and debrief:** rule-based scoring with critical fails, and a debrief with a checklist, a vitals timeline with action markers and teaching points. Runs can be exported as JSON or CSV, or replayed from any minute.
-- **Ten cases written as plain JSON**, each with an automated ideal-run test and a do-nothing test.
+- **Eleven cases written as plain JSON**, each with an automated ideal-run test and a do-nothing test.
 - **Optional 3D bedside view:** a low-poly resus bay that follows the patient's state, with a live monitor screen and clickable objects that open the matching panel. 2D stays the default.
 - **Case editor:** build or change a case with forms generated from the case schema, with live validation, a test run at the bedside, and JSON import, export and duplication.
 - **Video validation mode (research):** compare a simulated run with a timeline annotated from a real treatment video (RMSE, MAE, maximum deviation, divergence flags and response lags), with JSON and PNG reports. See [docs/validation.md](docs/validation.md).
+- **Learn from a video:** annotate a treatment video (or let Claude read the monitor in a frame, with your own key). The case then **updates itself**: a deterministic fit of its bounded values makes the vitals follow the video. It also **proposes what's missing**: scoring, prompts, patient lines, test results and library gaps. Every change goes into an editor draft for review first. The AMAX4 simulation video is included as a worked example. See [docs/validation.md](docs/validation.md#learn-from-a-video).
 - **Unity port pack:** a C# port of the engine for Unity 2022 LTS or newer, reading the same JSON, with a parity test that requires it to reproduce the TypeScript engine's run. See [unity/README.md](unity/README.md).
 
 | Debrief                                                                                 | Optional 3D view                                                                      |
@@ -43,6 +44,7 @@ An open-source virtual patient simulator that runs in the browser. You talk to t
 | ------------------------------ | -------------- | ------------------------------ |
 | Collapse after lunch           | Emergency      | Resuscitation Council UK 2021  |
 | Can't finish a sentence        | Respiratory    | BTS/SIGN 158                   |
+| Can't ventilate                | Emergency      | BTS/SIGN 158, AMAX4, DAS 2015  |
 | Crushing chest pain            | Cardiology     | ESC ACS 2023, RCUK ALS 2021    |
 | Feverish and muddled           | Acute medicine | Surviving Sepsis Campaign 2021 |
 | Vomiting and breathing fast    | Endocrinology  | JBDS DKA                       |
@@ -74,11 +76,11 @@ flowchart LR
     simple["SimpleEngine<br/>1 s fixed ticks, seeded RNG"]
     model["processes · pharmacology ·<br/>coupling · rhythms · ALS"]
     team["nurse · coach · variation"]
-    replay["replay · recorder ·<br/>scoring · validation"]
+    replay["replay · recorder · scoring ·<br/>validation · learning (fit)"]
   end
   subgraph app["src/app + src/ui (React)"]
     session["Session + Zustand store"]
-    ui["monitor · panels · debrief ·<br/>3D bay · editor · validation"]
+    ui["monitor · panels · debrief ·<br/>3D bay · editor · validation ·<br/>learn from a video"]
   end
   unity["unity/ (C# port)<br/>same JSON, parity test"]
 

@@ -1,20 +1,20 @@
 import { expect, test } from '@playwright/test';
 
-test('case list shows ten cases and filters by specialty, difficulty and text', async ({
+test('case list shows eleven cases and filters by specialty, difficulty and text', async ({
   page,
 }) => {
   await page.goto('./');
   const cards = page.locator('.case-card');
-  await expect(cards).toHaveCount(10);
+  await expect(cards).toHaveCount(11);
   await page.getByLabel('Specialty').selectOption('Trauma');
   await expect(cards).toHaveCount(2);
   await page.getByLabel('Difficulty').selectOption('advanced');
   await expect(cards).toHaveCount(2);
   await page.getByLabel('Specialty').selectOption('');
   await page.getByLabel('Difficulty').selectOption('');
-  await page.getByLabel('Search').fill('ketoacidosis');
+  await page.getByLabel('Search', { exact: true }).fill('ketoacidosis');
   await expect(cards).toHaveCount(0);
-  await page.getByLabel('Search').fill('DKA');
+  await page.getByLabel('Search', { exact: true }).fill('DKA');
   await expect(cards).toHaveCount(1);
   await cards.first().getByRole('link').click();
   await expect(page).toHaveURL(/#\/case\/dka-01\?seed=\d+/);

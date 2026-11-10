@@ -222,6 +222,16 @@
           "absorptionHalfLifeMin": 1.5,
           "source": "5 mg nebulised for acute asthma in adults (BTS/SIGN 158, 2019); 10–20 mg nebulised as an adjunct in hyperkalaemia (UK Kidney Association, 2020). Absorption half-life is a teaching parameter.",
           "reviewNeeded": true
+        },
+        {
+          "route": "IV",
+          "label": "IV, slow injection over 1 minute",
+          "standardDose": 0.25,
+          "maxDose": 0.25,
+          "bioavailability": 1,
+          "absorptionHalfLifeMin": 0,
+          "source": "BNF: salbutamol injection for severe bronchospasm, 250 micrograms by slow IV injection (adult). Given as a loading dose in the AMAX4 simulation video. Effect size in this model is a teaching parameter.",
+          "reviewNeeded": true
         }
       ],
       "effects": [

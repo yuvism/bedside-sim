@@ -101,3 +101,44 @@ For each vital, the simulated value is taken at the same second as each referenc
 ## Sample file
 
 [`src/content/validation/anaphylaxis-01-sample.csv`](../src/content/validation/anaphylaxis-01-sample.csv) is a **synthetic example written for this documentation, not an annotation of a real patient or video**. It's meant for the `anaphylaxis-01` case with seed 1, and it deliberately differs from the simulation in places (lower SpO₂ before oxygen, a faster blood-pressure response to the first adrenaline dose), so you can see divergence flags and a transition lag. Load it with **Load sample**.
+
+## Learn from a video
+
+**Learn from a video** (`#/learn`, or **Learn from a video** on the case list) goes one step further than validation. It **updates the case itself** so its vitals follow the video, and it **proposes what's missing**. Nothing is applied directly: every change lands in an editor draft for a person to review.
+
+### The simplest way to update the simulation from a real hospital video
+
+1. **Permission and privacy first.** Use a video only if you have consent and approval to use it for teaching or research. Remove identifiers before annotating. The video never leaves your device; the CSV must contain no names, faces, dates of birth or hospital numbers.
+2. **Open Learn from a video** and choose **Open a video file**. Press **Scenario starts now** at the moment the case should start, for example when the patient arrives on the monitor.
+3. **Annotate as you watch.** Every 10–30 seconds, pause and **Add a reading**: type the monitor values, or press **Read monitor with Claude** to fill them in from the current frame. That option needs your own key in Settings and sends that one frame to Anthropic, so use it only where your approvals allow. Check every value it fills in. Add each action when it happens, using the suggested codes, for example `drug:adrenaline:IM`. Anything else becomes a note.
+4. **Pick the closest case** and press **Analyse the video**. In a few seconds you get:
+   - **Update: fitted values.** These are the case's numbers (how severe it starts, how fast it worsens, how strongly treatments work, baseline vitals) that make the simulation track the video. A table shows the error before and after for each vital.
+   - **Add what's missing.** This covers scoring for actions the team took that the case doesn't credit yet, prompts and patient lines from your notes, and test results the case can't answer yet.
+   - **Needs a library change.** These are drugs, routes, devices or procedures the shared library doesn't have yet. They need a sourced edit to `src/content/` (see CONTRIBUTING.md), and then you analyse again.
+5. **Tick what makes clinical sense**, then choose **Create a draft for review**. The draft is a new case `<case-id>-video`. Every fitted value gets a dated source note and `reviewNeeded`, so it appears in the clinical review list.
+6. **Test-run the draft** at the bedside. Then **Export JSON** from the editor, and open a pull request with the case, the timeline CSV (**Download timeline CSV**) and the update pack (**Download update pack**). A clinician reviews the pull request before it is merged.
+
+### How it works
+
+- **Fitting** (`src/engine/learning/fit.ts`):
+  - It adjusts only bounded, case-level **tunables** (`tunables.ts`), each within a set range, for example 0.25–4× for rates and 0.7–1.3× for baselines.
+  - It replays the video's own actions at their times with the chosen seed, and minimises the squared difference from the video's vitals in tolerance units. Missing simulated values count as a fixed penalty.
+  - The search is a deterministic pattern search, so the same video, case and seed always give the same proposal.
+- **Proposals** (`propose.ts`):
+  - Notes become guided-mode prompts tied to the case's severity at that moment.
+  - Notes that start with "Patient", "Says" or a quotation mark become patient lines.
+  - Talking and examining aren't scored automatically.
+- **Limits:** one video is one patient. Fitting to a single video can over-fit, so treat the result as a suggestion, compare several seeds, and prefer several videos of the same condition.
+
+### Worked example: the AMAX4 simulation video
+
+[`src/content/validation/amax4-simulation-annotation.csv`](../src/content/validation/amax4-simulation-annotation.csv) is an annotation of the publicly available **"AMAX4 Simulation MASTER"** video (Live to the MAX!, YouTube, https://www.youtube.com/watch?v=o3NDS3snnxc). That video is a **manikin simulation, not a real patient**.
+
+- Vitals come from the on-screen monitor overlay, and events come from the captions and visible actions, described in our own words. No transcript or captions are reproduced.
+- Analysing it against the existing asthma case flagged several library gaps: no front-of-neck access, no intubation and no IV salbutamol. It also flagged missing scoring for bag-mask ventilation and IV magnesium.
+- Those findings led to:
+  - the new library entries;
+  - the new case **asthma-02 "Can't ventilate"**;
+  - a fit that cut the heart-rate error from 41.9 to 11.0 beats per minute.
+
+Load it with **Load the AMAX4 example**.

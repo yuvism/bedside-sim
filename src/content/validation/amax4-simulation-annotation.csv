@@ -1,0 +1,36 @@
+# Bedside sim reference timeline (format: see docs/validation.md)
+# source: Annotated for Bedside sim from "AMAX4 Simulation MASTER" (Live to the MAX!, YouTube, https://www.youtube.com/watch?v=o3NDS3snnxc). A simulated emergency department resuscitation on a manikin, not a real patient. Vital signs read from the on-screen monitor overlay; events from the on-screen captions and visible actions, described in our own words. t_sec is the scenario clock shown in the video (0 = patient arrives, about 14:14 into the video).
+# case: asthma-02
+# seed: 1
+# offset: 0
+t_sec,hr,sbp,dbp,spo2,rr,etco2,event
+0,140,160,80,,,,"Arrives with paramedics bag-mask ventilating, saturation not reading, initial BP 160/80 with a strong pulse (caption)"
+0,,,,,,,help; device:bvm:on; procedure:iv_access; IV access assumed from arrival because IV drugs are given at 4:01 and 4:11
+51,140,,,,,,
+61,140,,,,,,
+71,139,,,,,,
+81,138,,,,,,
+91,138,,,,,,
+101,136,,,,,,
+111,121,,,,,,Bag-mask ventilation failing: heart rate starting to fall
+121,103,,,,,,"Team leader calls for a surgical airway now (caption, 2:01)"
+131,91,,,,,,
+141,80,,,,,,
+150,,,,,,,procedure:front_of_neck_access
+151,71,,,,,,
+161,64,,,,,,
+171,61,,,,,,Ventilating through the neck with the heart rate at its lowest
+181,68,,,,,,
+191,76,,,,,,
+201,86,,,,,,
+211,96,165,90,78,,,"First saturation reading since arrival (BP digits flickering, approximate)"
+221,112,161,88,80,,,
+231,133,161,88,82,,,"Airway secured before 4 minutes (caption)"
+241,136,154,85,83,,,drug:magnesium_sulfate:IV; Caption: magnesium sulfate 10 mmol over 10 minutes
+251,140,149,83,83,,,drug:salbutamol:IV:0.25; Caption: IV salbutamol 250 micrograms loading dose over 1 minute
+261,144,146,81,82,,,
+271,144,147,81,82,,,
+281,142,149,80,81,,,
+291,139,149,80,81,,,
+301,139,150,80,80,,,
+311,139,150,80,80,,,

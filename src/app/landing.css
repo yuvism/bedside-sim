@@ -1,0 +1,321 @@
+/* Case list / landing page */
+
+.landing {
+  display: block;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 28px;
+  align-items: center;
+  padding: 26px 26px;
+  margin: 4px 0 18px;
+  border-radius: 16px;
+  background:
+    radial-gradient(120% 140% at 0% 0%, var(--scrub-soft) 0%, transparent 60%), var(--surface);
+  border: 1px solid var(--line);
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--scrub);
+}
+
+.hero h2 {
+  margin: 0 0 10px;
+  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.2rem);
+  line-height: 1.15;
+}
+
+.hero-sub {
+  margin: 0 0 18px;
+  max-width: 46ch;
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.5;
+}
+
+.hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.btn.big {
+  padding: 11px 18px;
+  font-size: 1rem;
+}
+
+.hero-monitor {
+  background: #050b0a;
+  border-radius: 14px;
+  padding: 14px 16px 12px;
+  box-shadow:
+    inset 0 0 0 6px #1d2a2c,
+    0 10px 30px rgba(0, 0, 0, 0.18);
+}
+
+.hero-monitor svg {
+  width: 100%;
+  height: 90px;
+  display: block;
+}
+
+.hero-ecg {
+  fill: none;
+  stroke: var(--hr);
+  stroke-width: 2.2;
+  stroke-linejoin: round;
+  opacity: 0.45;
+}
+
+/* A bright sweep runs along the trace, like a monitor. */
+.hero-ecg.sweep {
+  opacity: 1;
+  stroke-dasharray: 90 900;
+  stroke-dashoffset: 990;
+  animation: ecg-sweep 2.6s linear infinite;
+}
+
+@keyframes ecg-sweep {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-ecg.sweep {
+    animation: none;
+    stroke-dasharray: none;
+  }
+}
+
+.hero-nums {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+  font-family: var(--font-num, 'Barlow Condensed', system-ui, sans-serif);
+}
+
+.hn {
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+}
+
+.hn b {
+  display: block;
+  font-size: 1.9rem;
+  line-height: 1;
+}
+
+.hn.hr {
+  color: var(--hr);
+}
+
+.hn.spo2 {
+  color: var(--spo2);
+}
+
+.hn.bp {
+  color: var(--bp);
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 26px;
+}
+
+.step {
+  padding: 14px 16px;
+  position: relative;
+}
+
+.step-n {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--scrub);
+  color: var(--scrub-ink);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.step h3 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+}
+
+.step p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+/* Case cards: a colour stripe per specialty (identity only, never status). */
+.case-grid .case-card {
+  border-top: 4px solid var(--spec, var(--scrub));
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.case-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.case-card[data-specialty='Emergency medicine'],
+.case-card[data-specialty='Emergency'] {
+  --spec: #2a78d6;
+}
+.case-card[data-specialty='Respiratory'] {
+  --spec: #1baf7a;
+}
+.case-card[data-specialty='Cardiology'] {
+  --spec: #e34948;
+}
+.case-card[data-specialty='Acute medicine'] {
+  --spec: #eb6834;
+}
+.case-card[data-specialty='Endocrinology'] {
+  --spec: #eda100;
+}
+.case-card[data-specialty='Toxicology'] {
+  --spec: #6250d6;
+}
+.case-card[data-specialty='Trauma'] {
+  --spec: #e87ba4;
+}
+.case-card[data-specialty='Renal'] {
+  --spec: #008300;
+}
+
+.case-card .meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.case-card .spec {
+  font-weight: 600;
+}
+
+.case-card .chip.diff {
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.case-card .dots {
+  letter-spacing: 1px;
+}
+
+.case-card h3 a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.case-card h3 a::after {
+  /* The whole card is the click target for the title link. */
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.case-card {
+  position: relative;
+}
+
+.case-card h3 a:focus-visible {
+  outline: none;
+}
+
+.case-card:focus-within {
+  outline: 3px solid var(--scrub);
+  outline-offset: 2px;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tag-chip {
+  font-size: 0.72rem;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--muted);
+  border: 1px solid var(--line);
+}
+
+.tools {
+  margin-top: 30px;
+}
+
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.tool-grid .tool {
+  display: flex;
+  flex-direction: column;
+  padding: 14px 16px;
+  color: var(--ink);
+  text-decoration: none;
+  border-left: 4px solid var(--scrub);
+}
+
+.tool:hover {
+  background: var(--scrub-soft);
+}
+
+.tool h3 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+}
+
+.tool p {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.tool-go {
+  margin-top: auto;
+  color: var(--scrub);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 20px 16px;
+  }
+
+  .steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

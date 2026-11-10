@@ -6,7 +6,7 @@ Each item below is a teaching parameter or an uncertain value marked `"reviewNee
 A clinician should check it against its source, then either confirm it (cite the guideline
 and remove the flag) or correct it.
 
-**130 flagged items.**
+**137 flagged items.**
 
 ## src/content/formulary.json
 
@@ -27,8 +27,9 @@ and remove the flag) or correct it.
 | `drugs[hydrocortisone].routes[IV]` | route IV; label Slow IV; standardDose 100; maxDose 200; bioavailability 1; absorptionHalfLifeMin 0 | 100 mg IV for acute severe asthma (BTS/SIGN 158, 2019); 200 mg was the adult anaphylaxis dose in the Resuscitation Council UK 2008 algorithm. |
 | `drugs[hydrocortisone].routes[IM]` | route IM; label IM; standardDose 200; maxDose 200; bioavailability 1; absorptionHalfLifeMin 15 | 200 mg adult dose as listed in the Resuscitation Council UK 2008 anaphylaxis algorithm. |
 | `drugs[hydrocortisone].effects[process:asthma]` | target process:asthma; emax -1.5; ec50 60 | Teaching parameter: slow anti-inflammatory effect in asthma. |
-| `drugs[salbutamol]` | id salbutamol; name Salbutamol; drugClass Short-acting β2 agonist; unit mg; halfLifeMin 20; 1 routes (see file); 4 effects (see file) | Effect duration is a teaching parameter for the acute bronchodilator effect, not the plasma half-life. |
+| `drugs[salbutamol]` | id salbutamol; name Salbutamol; drugClass Short-acting β2 agonist; unit mg; halfLifeMin 20; 2 routes (see file); 4 effects (see file) | Effect duration is a teaching parameter for the acute bronchodilator effect, not the plasma half-life. |
 | `drugs[salbutamol].routes[NEB]` | route NEB; label Nebulised, oxygen-driven; standardDose 5; maxDose 20; bioavailability 1; absorptionHalfLifeMin 1.5 | 5 mg nebulised for acute asthma in adults (BTS/SIGN 158, 2019); 10–20 mg nebulised as an adjunct in hyperkalaemia (UK Kidney Association, 2020). Absorption half-life is a teaching parameter. |
+| `drugs[salbutamol].routes[IV]` | route IV; label IV, slow injection over 1 minute; standardDose 0.25; maxDose 0.25; bioavailability 1; absorptionHalfLifeMin 0 | BNF: salbutamol injection for severe bronchospasm, 250 micrograms by slow IV injection (adult). Given as a loading dose in the AMAX4 simulation video. Effect size in this model is a teaching parameter. |
 | `drugs[salbutamol].effects[block:bronchospasm]` | target block:bronchospasm; emax 0.7; ec50 2 | Teaching parameter. |
 | `drugs[salbutamol].effects[hr]` | target hr; emax 15; ec50 4 | Teaching parameter (β2-agonist tachycardia). |
 | `drugs[salbutamol].effects[process:asthma]` | target process:asthma; emax -2.5; ec50 4 | Teaching parameter. |
@@ -130,6 +131,8 @@ and remove the flag) or correct it.
 | `delays.device` | minSec 10; maxSec 20 | Applying an oxygen mask, pads or airway adjunct. Teaching estimate. |
 | `delays.order` | minSec 20; maxSec 45 | Taking a sample or recording a bedside test. Teaching estimate. |
 | `delays.procedure` | minSec 30; maxSec 60 | Default time to prepare and perform a procedure. Teaching estimate. |
+| `delays.procedure:tracheal_intubation` | minSec 60; maxSec 120 | Rapid sequence induction and intubation by an experienced operator. Teaching estimate. |
+| `delays.procedure:front_of_neck_access` | minSec 30; maxSec 60 | Scalpel cricothyroidotomy. In the AMAX4 simulation video about 30 seconds passed from the call to ventilating through the neck. Teaching estimate. |
 | `delays.procedure:iv_access` | minSec 60; maxSec 120 | Peripheral IV cannulation. Teaching estimate. |
 | `delays.procedure:io_access` | minSec 30; maxSec 60 | Intraosseous needle insertion. Teaching estimate. |
 | `delays.procedure:art_line` | minSec 120; maxSec 240 | Radial arterial line. Teaching estimate. |
@@ -149,6 +152,15 @@ and remove the flag) or correct it.
 | Item | Values | Source |
 | --- | --- | --- |
 | `processes[asthma]` | id asthma; type asthma; label Acute asthma; initial 55; initialJitter 4; ratePerMin 2.2; rateJitterPct 10; decayTauMin 40; sensitivityJitterPct 15; arrestAt 100; arrestRhythm pea; 13 effects (see file) | Teaching model. Severity bands follow BTS/SIGN 158 (2019): acute severe = PEF 33–50% predicted, RR ≥ 25, HR ≥ 110, can't complete sentences; life-threatening = PEF < 33%, SpO₂ < 92%, silent chest, exhaustion, normal or rising PaCO₂. Effect sizes are teaching parameters. |
+
+## src/content/cases/asthma-02.json
+
+| Item | Values | Source |
+| --- | --- | --- |
+| `baseline` | hr 80; sbp 128; dbp 70; rr 16; temp 37; glucose 6.5; paco2 5.3; shunt 0.01; hrJitter 3; sbpJitter 3 | Healthy teenage baseline. Teaching values. |
+| `processes[bronchospasm]` | id bronchospasm; type asthma; label Life-threatening bronchospasm; initial 80; initialJitter 1; ratePerMin 2.473; rateJitterPct 5; sensitivityJitterPct 10; arrestAt 100; arrestRhythm pea; 14 effects (see file); 2 treatments (see file) | Teaching model of life-threatening asthma with failing bag-mask ventilation, shaped on the AMAX4 simulation video (tachycardia and hypertension on arrival, hypoxic bradycardia from about 1:50 until the surgical airway, recovery after it). Severity, rates and the bradycardia term are teaching parameters. Fitted to "AMAX4 Simulation MASTER (annotation)" on 2026-11-11 with Learn from a video. Check before use. |
+| `processes[bronchospasm].treatments[failing-bag]` | id failing-bag; ratePerMin 2.5 | Teaching model of the AMAX4 point that bag-mask ventilation fails in life-threatening bronchospasm: until there is a definitive airway, hypoxia keeps worsening even with drugs. |
+| `processes[bronchospasm].treatments[definitive-airway]` | id definitive-airway; ratePerMin -3.933 | Teaching model of the AMAX4 principle: oxygenating and ventilating through a definitive airway reverses the hypoxic spiral, while the bronchospasm itself still needs drugs. |
 
 ## src/content/cases/dka-01.json
 

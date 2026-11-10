@@ -172,6 +172,23 @@
       "sub": "Hourly urine output",
       "category": "circulation",
       "doneText": "Urinary catheter inserted. Hourly urine output monitoring started."
+    },
+    {
+      "id": "tracheal_intubation",
+      "label": "Tracheal intubation",
+      "sub": "Definitive airway by an experienced airway operator",
+      "category": "airway",
+      "doneText": "Tracheal tube placed and confirmed with waveform capnography. Ventilating through the tube.",
+      "source": "Early definitive airway control by an experienced operator in peri-arrest asthma or anaphylaxis: AMAX4 algorithm (B. McKenzie, amax4.com; summarised by S. Carley, St Emlyn’s, 13 June 2023). Added after the AMAX4 simulation video annotation."
+    },
+    {
+      "id": "front_of_neck_access",
+      "label": "Front-of-neck access",
+      "sub": "Surgical airway when you can’t intubate or oxygenate",
+      "category": "airway",
+      "doneText": "Scalpel–bougie–tube cricothyroidotomy done. Ventilating through the neck.",
+      "alreadyText": "There is already a surgical airway.",
+      "source": "Difficult Airway Society 2015 guidelines (Frerk C et al., Br J Anaesth 2015): scalpel cricothyroidotomy for can’t intubate, can’t oxygenate. Done at about 2:30 in the AMAX4 simulation video when bag-mask ventilation failed."
     }
   ]
 }

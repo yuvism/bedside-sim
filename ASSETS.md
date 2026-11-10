@@ -13,3 +13,9 @@ If CC0 assets are added later (for example from Kenney or Quaternius), list each
 ## Libraries
 
 - [three.js](https://threejs.org/) (MIT) renders the optional 3D view. It is loaded only when the 3D view is switched on.
+
+## Reference videos
+
+No video is included in or loaded by the app. Annotations of public videos are written in our own words, with the source named in the file:
+
+- `src/content/validation/amax4-simulation-annotation.csv`: annotated from "AMAX4 Simulation MASTER" by Live to the MAX! (YouTube, https://www.youtube.com/watch?v=o3NDS3snnxc), a manikin simulation. Vital signs and timings only; no frames, audio, captions or transcript are reproduced.

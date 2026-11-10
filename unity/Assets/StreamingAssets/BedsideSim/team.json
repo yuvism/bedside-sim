@@ -43,6 +43,18 @@
       "source": "Default time to prepare and perform a procedure. Teaching estimate.",
       "reviewNeeded": true
     },
+    "procedure:tracheal_intubation": {
+      "minSec": 60,
+      "maxSec": 120,
+      "source": "Rapid sequence induction and intubation by an experienced operator. Teaching estimate.",
+      "reviewNeeded": true
+    },
+    "procedure:front_of_neck_access": {
+      "minSec": 30,
+      "maxSec": 60,
+      "source": "Scalpel cricothyroidotomy. In the AMAX4 simulation video about 30 seconds passed from the call to ventilating through the neck. Teaching estimate.",
+      "reviewNeeded": true
+    },
     "procedure:iv_access": {
       "minSec": 60,
       "maxSec": 120,

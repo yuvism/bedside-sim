@@ -3,12 +3,11 @@
  * timeline annotated from a real treatment video.
  */
 import { useMemo, useRef, useState, type ChangeEvent } from 'react';
-import { draftTitle, listDrafts } from '../../app/drafts.ts';
 import { Footer } from '../../app/Footer.tsx';
 import { ThemeToggle } from '../../app/ThemeToggle.tsx';
-import { CASES, checkCase, LIBRARY } from '../../content/library.ts';
+import { LIBRARY } from '../../content/library.ts';
+import { caseOptions } from '../caseOptions.ts';
 import sampleCsv from '../../content/validation/anaphylaxis-01-sample.csv?raw';
-import type { CaseDef } from '../../engine/types.ts';
 import {
   DEFAULT_TOLERANCES,
   runValidation,
@@ -32,23 +31,6 @@ import { VITAL_INFO } from './vitals.ts';
 import './validation.css';
 
 const DOCS = 'https://github.com/yuvism/bedside-sim/blob/main/docs/validation.md';
-
-interface CaseOption {
-  key: string;
-  label: string;
-  caseDef: CaseDef;
-}
-
-function caseOptions(): CaseOption[] {
-  const lib = CASES.map((c) => ({ key: c.id, label: `${c.title} (${c.id})`, caseDef: c }));
-  const drafts = listDrafts().flatMap((d) => {
-    const r = checkCase(d.data);
-    return r.ok
-      ? [{ key: `draft:${d.id}`, label: `Draft: ${draftTitle(d)}`, caseDef: r.value }]
-      : [];
-  });
-  return [...lib, ...drafts];
-}
 
 const int = (s: string, fallback: number) => {
   const n = Number(s);

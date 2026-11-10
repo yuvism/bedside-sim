@@ -15,7 +15,7 @@ unity/
       Tests/Editor/     Edit Mode tests, including the parity test
     StreamingAssets/BedsideSim/
       formulary.json  devices.json  investigations.json  team.json
-      cases/*.json      the ten cases, copied from src/content
+      cases/*.json      the eleven cases, copied from src/content
       parity/*.json     traces exported from the TypeScript engine
   ParityRunner/         the same parity test as a .NET console app (used by CI)
 ```

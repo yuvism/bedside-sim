@@ -1,0 +1,166 @@
+.learn .card {
+  padding: 14px 16px;
+  margin-top: 14px;
+}
+
+.learn h3 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+
+.learn h4 {
+  margin: 16px 0 6px;
+  font-size: 1rem;
+}
+
+.privacy {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--warn-soft);
+  border-left: 4px solid var(--warn);
+  font-size: 0.9rem;
+}
+
+.learn-row,
+.anno-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+  margin: 8px 0;
+}
+
+.learn-row label:not(.btn),
+.anno-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.learn .input.num {
+  width: 96px;
+}
+
+.learn-row select {
+  min-width: 240px;
+  max-width: 100%;
+}
+
+.anno-video video {
+  width: 100%;
+  max-height: 360px;
+  border-radius: 8px;
+  background: #000;
+}
+
+.anno-form {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 12px 10px;
+  margin: 10px 0;
+}
+
+.anno-form legend {
+  font-weight: 700;
+  padding: 0 4px;
+}
+
+.anno-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+.anno-time {
+  display: flex;
+  gap: 6px;
+}
+
+.anno-event {
+  flex: 1 1 280px;
+}
+
+.anno-table,
+.fit-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.anno-table th,
+.anno-table td,
+.fit-table th,
+.fit-table td {
+  text-align: left;
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.anno-table .anno-ev {
+  white-space: normal;
+  min-width: 220px;
+}
+
+.anno-table thead th,
+.fit-table thead th {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.fit-progress {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 8px 0;
+}
+
+.check-list,
+.lib-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.check-list label {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.check-list input {
+  margin-top: 4px;
+}
+
+.tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--scrub-soft);
+  color: var(--ink);
+  margin-right: 4px;
+}
+
+.draft-ok {
+  margin: 10px 0 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--scrub-soft);
+}
+
+@media (max-width: 760px) {
+  .learn-row select {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .learn-row label:not(.btn) {
+    flex: 1 1 100%;
+  }
+}

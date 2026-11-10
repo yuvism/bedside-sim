@@ -1,0 +1,590 @@
+{
+  "schemaVersion": 1,
+  "id": "asthma-02",
+  "version": 1,
+  "title": "Can't ventilate",
+  "summary": "A teenager in life-threatening asthma arrives with paramedics bag-mask ventilating. Saturation won't read and the clock is running.",
+  "specialty": "Emergency medicine",
+  "difficulty": "advanced",
+  "estMinutes": 10,
+  "tags": ["asthma", "airway", "peri-arrest", "AMAX4"],
+  "patient": {
+    "name": "Leo Martin",
+    "age": 16,
+    "sex": "male",
+    "weightKg": 60,
+    "occupation": "school student",
+    "persona": "Exhausted and hypoxic. Can't speak; responds only with movements while he still can."
+  },
+  "brief": [
+    "Pre-alert: Leo, {age}, known asthmatic, collapsed at home with a severe attack. Paramedics are bag-mask ventilating with great difficulty. Heart rate 140, BP 160/80, saturation not reading. Four minutes away.",
+    "Brief your team and assign an airway operator before he arrives. Oxygen is the clock: you have about four minutes to secure oxygenation."
+  ],
+  "openingLine": "(no speech: eyes half closed, chest barely moving with each squeeze of the bag)",
+  "baseline": {
+    "hr": 80,
+    "sbp": 128,
+    "dbp": 70,
+    "rr": 16,
+    "temp": 37,
+    "glucose": 6.5,
+    "paco2": 5.3,
+    "shunt": 0.01,
+    "hrJitter": 3,
+    "sbpJitter": 3,
+    "source": "Healthy teenage baseline. Teaching values.",
+    "reviewNeeded": true
+  },
+  "labs": {
+    "lactate": 2.4,
+    "hco3": 22,
+    "k": 3.8,
+    "na": 139,
+    "urea": 4.2,
+    "creatinine": 70,
+    "hb": 142,
+    "wcc": 11.2,
+    "plt": 260,
+    "crp": 8
+  },
+  "processes": [
+    {
+      "id": "bronchospasm",
+      "type": "asthma",
+      "label": "Life-threatening bronchospasm",
+      "initial": 80,
+      "initialJitter": 1,
+      "ratePerMin": 2.473,
+      "rateJitterPct": 5,
+      "sensitivityJitterPct": 10,
+      "arrestAt": 100,
+      "arrestRhythm": "pea",
+      "effects": [
+        {
+          "target": "rr",
+          "perPoint": 0.25,
+          "group": "bronchospasm"
+        },
+        {
+          "target": "rr",
+          "perPoint": -0.6,
+          "above": 85
+        },
+        {
+          "target": "hr",
+          "perPoint": 0.63
+        },
+        {
+          "target": "hr",
+          "perPoint": -43.89,
+          "above": 90
+        },
+        {
+          "target": "sbp",
+          "perPoint": 0.3089
+        },
+        {
+          "target": "vq",
+          "perPoint": 0.46,
+          "above": 20,
+          "exponent": 0.7,
+          "group": "bronchospasm"
+        },
+        {
+          "target": "shunt",
+          "perPoint": 0.02473,
+          "above": 60,
+          "group": "bronchospasm"
+        },
+        {
+          "target": "ventLoss",
+          "perPoint": 0.008,
+          "above": 50,
+          "group": "bronchospasm"
+        },
+        {
+          "target": "ventLoss",
+          "perPoint": 0.012,
+          "above": 80
+        },
+        {
+          "target": "gcs",
+          "perPoint": -0.5,
+          "above": 80
+        },
+        {
+          "target": "sign:wheeze",
+          "perPoint": 0.015,
+          "above": 20,
+          "group": "bronchospasm"
+        },
+        {
+          "target": "sign:silentChest",
+          "perPoint": 0.05,
+          "above": 80
+        },
+        {
+          "target": "sign:effort",
+          "perPoint": 0.012,
+          "above": 20
+        },
+        {
+          "target": "sign:sweating",
+          "perPoint": 0.01,
+          "above": 60
+        }
+      ],
+      "treatments": [
+        {
+          "id": "failing-bag",
+          "when": {
+            "not": {
+              "any": [
+                {
+                  "procedure": "tracheal_intubation"
+                },
+                {
+                  "procedure": "front_of_neck_access"
+                }
+              ]
+            }
+          },
+          "ratePerMin": 2.5,
+          "source": "Teaching model of the AMAX4 point that bag-mask ventilation fails in life-threatening bronchospasm: until there is a definitive airway, hypoxia keeps worsening even with drugs.",
+          "reviewNeeded": true
+        },
+        {
+          "id": "definitive-airway",
+          "when": {
+            "any": [
+              {
+                "procedure": "tracheal_intubation"
+              },
+              {
+                "procedure": "front_of_neck_access"
+              }
+            ]
+          },
+          "ratePerMin": -3.933,
+          "source": "Teaching model of the AMAX4 principle: oxygenating and ventilating through a definitive airway reverses the hypoxic spiral, while the bronchospasm itself still needs drugs.",
+          "reviewNeeded": true
+        }
+      ],
+      "source": "Teaching model of life-threatening asthma with failing bag-mask ventilation, shaped on the AMAX4 simulation video (tachycardia and hypertension on arrival, hypoxic bradycardia from about 1:50 until the surgical airway, recovery after it). Severity, rates and the bradycardia term are teaching parameters. Fitted to \"AMAX4 Simulation MASTER (annotation)\" on 2026-11-11 with Learn from a video. Check before use.",
+      "reviewNeeded": true
+    }
+  ],
+  "bands": {
+    "process": "bronchospasm",
+    "cutoffs": [60, 85]
+  },
+  "dialogue": [
+    {
+      "id": "what",
+      "category": "presenting",
+      "q": "Leo, can you hear me?",
+      "a": ["(nods, still very breathless)", "(eyes flicker open, can't speak)", "(no response)"],
+      "keywords": ["hear", "happening", "wrong", "feel"]
+    },
+    {
+      "id": "inhaler",
+      "category": "meds",
+      "q": "Have you used your inhaler?",
+      "a": ["(nods, holds up ten fingers)", "(no response)", "(no response)"],
+      "keywords": ["inhaler", "salbutamol", "puffs", "blue"]
+    },
+    {
+      "id": "allergy",
+      "category": "allergies",
+      "q": "Any allergies?",
+      "a": ["(shakes his head)", "(no response)", "(no response)"],
+      "keywords": ["allergy", "allergies", "allergic"]
+    }
+  ],
+  "exam": [
+    {
+      "id": "A",
+      "label": "Airway",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "procedure": "front_of_neck_access"
+          },
+          "text": "Surgical airway in place and secured. Ventilating through the neck."
+        },
+        {
+          "when": {
+            "procedure": "tracheal_intubation"
+          },
+          "text": "Tracheal tube in place with an end-tidal CO₂ trace."
+        },
+        {
+          "text": "Paramedic bag-mask ventilation: the bag is very stiff to squeeze and the chest barely rises."
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "label": "Breathing",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "severity": "bronchospasm",
+            "gte": 90
+          },
+          "text": "Silent chest: almost no air entry. Saturation probe not reading reliably."
+        },
+        {
+          "when": {
+            "severity": "bronchospasm",
+            "gte": 70
+          },
+          "text": "Very quiet chest with widespread wheeze. SpO₂ {spo2}% on {o2}."
+        },
+        {
+          "text": "Wheeze improving, better air entry. SpO₂ {spo2}% on {o2}."
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "label": "Circulation",
+      "kind": "abcde",
+      "findings": [
+        {
+          "when": {
+            "vital": "hr",
+            "lt": 80
+          },
+          "text": "HR {hr}: bradycardic, BP {sbp}/{dbp}. Hypoxic bradycardia: arrest is close."
+        },
+        {
+          "text": "HR {hr}, BP {sbp}/{dbp}. Strong central pulse, warm peripheries."
+        }
+      ]
+    },
+    {
+      "id": "D",
+      "label": "Disability",
+      "kind": "abcde",
+      "findings": [
+        {
+          "text": "GCS {gcs}. Pupils equal and reactive. Glucose {glucose:1} mmol/L."
+        }
+      ]
+    },
+    {
+      "id": "E",
+      "label": "Exposure",
+      "kind": "abcde",
+      "findings": [
+        {
+          "text": "Temperature {temp:1} °C. No rash or swelling. Medical alert bracelet: asthma."
+        }
+      ]
+    }
+  ],
+  "investigations": [
+    {
+      "id": "abg",
+      "results": [
+        {
+          "text": "pH {ph:2}, PaO₂ {pao2:1} kPa on {o2}, PaCO₂ {paco2:1} kPa, HCO₃⁻ {hco3:1} mmol/L, lactate {lactate:1} mmol/L."
+        }
+      ]
+    },
+    {
+      "id": "vbg",
+      "results": [
+        {
+          "text": "pH {ph:2}, PCO₂ {paco2:1} kPa, HCO₃⁻ {hco3:1} mmol/L, K⁺ {k:1} mmol/L, lactate {lactate:1} mmol/L."
+        }
+      ]
+    },
+    {
+      "id": "glu",
+      "results": [
+        {
+          "text": "Capillary glucose {glucose:1} mmol/L."
+        }
+      ]
+    },
+    {
+      "id": "ecg",
+      "results": [
+        {
+          "text": "Sinus rhythm at {hr}. No other abnormality."
+        }
+      ]
+    },
+    {
+      "id": "cxr",
+      "results": [
+        {
+          "text": "Hyperinflated lungs. No pneumothorax."
+        }
+      ]
+    }
+  ],
+  "patientLines": [
+    {
+      "id": "squeeze",
+      "when": {
+        "severity": "bronchospasm",
+        "lt": 60
+      },
+      "text": "(squeezes your hand)"
+    }
+  ],
+  "outcomes": {
+    "stabilised": {
+      "when": {
+        "all": [
+          {
+            "severity": "bronchospasm",
+            "lt": 72
+          },
+          {
+            "vital": "spo2",
+            "gte": 90
+          },
+          {
+            "any": [
+              {
+                "procedure": "tracheal_intubation"
+              },
+              {
+                "procedure": "front_of_neck_access"
+              }
+            ]
+          }
+        ]
+      },
+      "forSec": 120,
+      "text": "Oxygenating through a definitive airway, bronchospasm easing, SpO₂ 90% or more for 2 minutes."
+    }
+  },
+  "diagnosis": {
+    "correct": ["asthma"],
+    "options": [
+      {
+        "id": "asthma",
+        "label": "Life-threatening asthma"
+      },
+      {
+        "id": "anaphylaxis",
+        "label": "Anaphylaxis"
+      },
+      {
+        "id": "pneumothorax",
+        "label": "Tension pneumothorax"
+      },
+      {
+        "id": "foreign-body",
+        "label": "Inhaled foreign body"
+      },
+      {
+        "id": "opioid",
+        "label": "Opioid overdose"
+      }
+    ]
+  },
+  "scoring": [
+    {
+      "id": "stabilised",
+      "label": "Oxygenation restored and patient stabilised",
+      "weight": 20,
+      "kind": "credit",
+      "test": {
+        "type": "outcomeIs",
+        "outcomes": ["stabilised"]
+      }
+    },
+    {
+      "id": "airway-4min",
+      "label": "Definitive airway within 4 minutes",
+      "weight": 25,
+      "kind": "credit",
+      "critical": true,
+      "domain": "management",
+      "test": {
+        "type": "actionWithin",
+        "codes": ["procedure:tracheal_intubation", "procedure:front_of_neck_access"],
+        "withinSec": 240
+      }
+    },
+    {
+      "id": "oxygen",
+      "label": "Oxygen and assisted ventilation",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["device:bvm:on", "device:o2_*:on"]
+      }
+    },
+    {
+      "id": "help",
+      "label": "Team called within a minute",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "actionWithin",
+        "codes": ["help"],
+        "withinSec": 60
+      }
+    },
+    {
+      "id": "bronchodilator",
+      "label": "Salbutamol (nebulised in the circuit or IV)",
+      "weight": 10,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["drug:salbutamol:*"]
+      }
+    },
+    {
+      "id": "magnesium",
+      "label": "IV magnesium sulfate",
+      "weight": 10,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["drug:magnesium_sulfate:*"]
+      }
+    },
+    {
+      "id": "steroid",
+      "label": "Steroids",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["drug:hydrocortisone:*", "drug:prednisolone:*"]
+      }
+    },
+    {
+      "id": "abcde",
+      "label": "ABCDE assessment",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "examined",
+        "ids": ["A", "B", "C", "D", "E"],
+        "min": 3
+      }
+    },
+    {
+      "id": "gas",
+      "label": "Blood gas",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "actionDone",
+        "codes": ["order:abg", "order:vbg"]
+      }
+    },
+    {
+      "id": "dx",
+      "label": "Working diagnosis: life-threatening asthma",
+      "weight": 5,
+      "kind": "credit",
+      "test": {
+        "type": "diagnosisIs",
+        "ids": ["asthma"]
+      }
+    },
+    {
+      "id": "no-sedation",
+      "label": "No opioid sedation",
+      "weight": 10,
+      "kind": "penalty",
+      "domain": "safety",
+      "test": {
+        "type": "actionNever",
+        "codes": ["drug:morphine:*"]
+      }
+    }
+  ],
+  "teaching": [
+    {
+      "id": "clock",
+      "text": "Oxygen is the clock: the brain tolerates only about four minutes without it. Name an airway operator before the patient arrives and secure a definitive airway while drugs go in.",
+      "showIf": {
+        "type": "ruleFailed",
+        "id": "airway-4min"
+      }
+    },
+    {
+      "id": "bag-fails",
+      "text": "Bag-mask and supraglottic airways often fail in life-threatening bronchospasm because the pressures needed are too high. If you can't oxygenate, move to front-of-neck access (scalpel–bougie–tube)."
+    },
+    {
+      "id": "brady",
+      "text": "A falling heart rate in a hypoxic patient is a pre-arrest sign. Oxygenate first: drugs for the heart rate won't fix it."
+    },
+    {
+      "id": "parallel",
+      "text": "Treat the bronchospasm in parallel: salbutamol (in the ventilation circuit or IV), IV magnesium sulfate and steroids, with critical care involved early."
+    }
+  ],
+  "references": [
+    {
+      "id": "bts-sign-158",
+      "label": "British Thoracic Society / Scottish Intercollegiate Guidelines Network. British guideline on the management of asthma (SIGN 158). 2019.",
+      "url": "https://www.sign.ac.uk/"
+    },
+    {
+      "id": "amax4",
+      "label": "McKenzie B. AMAX4: managing asthma and anaphylaxis in extremis.",
+      "url": "https://amax4.com/"
+    },
+    {
+      "id": "st-emlyns",
+      "label": "Carley S. Just a routine resuscitation. The AMAX4 algorithm for anaphylaxis/asthma. St Emlyn's, 13 June 2023.",
+      "url": "https://stemlynsblog.org/just-a-routine-resuscitation-the-amax4-algorithm-for-anaphylaxis-asthma-st-emlyns"
+    },
+    {
+      "id": "das-2015",
+      "label": "Frerk C, et al. Difficult Airway Society 2015 guidelines for management of unanticipated difficult intubation in adults. Br J Anaesth 2015."
+    },
+    {
+      "id": "amax4-video",
+      "label": "AMAX4 Simulation MASTER (Live to the MAX!, YouTube): the simulation this case was annotated from (src/content/validation/amax4-simulation-annotation.csv).",
+      "url": "https://www.youtube.com/watch?v=o3NDS3snnxc"
+    }
+  ],
+  "hints": [
+    {
+      "id": "operator",
+      "when": {
+        "not": {
+          "any": [
+            {
+              "procedure": "tracheal_intubation"
+            },
+            {
+              "procedure": "front_of_neck_access"
+            }
+          ]
+        }
+      },
+      "text": "The bag is really stiff. Who's our airway operator?"
+    },
+    {
+      "id": "video-hint-4",
+      "text": "Bag-mask ventilation failing: heart rate starting to fall",
+      "when": {
+        "severity": "bronchospasm",
+        "gte": 86
+      }
+    }
+  ],
+  "variation": {
+    "ageRange": [14, 19],
+    "weightKgRange": [50, 72]
+  }
+}
