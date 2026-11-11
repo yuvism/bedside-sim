@@ -6,10 +6,15 @@ An open-source virtual patient simulator that runs in the browser. You talk to t
 
 **Live demo:** https://yuvism.github.io/bedside-sim/
 
-![The bedside: a live monitor with a low blood pressure alarm, the patient, the nurse's task list and the ABCDE examination panel](docs/images/bedside.png)
+![The welcome screen: choose Learn by topic or Unknown patient](docs/images/home.png)
+
+![The bedside: a live monitor with low blood pressure and tachycardia alarms, the ABCDE examination panel, the patient and the event log](docs/images/bedside.png)
 
 ## Features
 
+- **Two ways to practise:**
+  - **Learn by topic:** pick a condition (anaphylaxis, DKA, sepsis…) and practise managing it.
+  - **Unknown patient:** pick a patient from a board of people waiting to be seen, by name, age and presenting complaint only. The specialty, diagnosis and topic tags stay hidden, even in the URL, until the debrief. **Surprise me** picks a random patient you haven't seen.
 - **A live bedside monitor:**
   - ECG that reflects the rhythm, ST elevation, peaked T waves and CPR artifact
   - SpO₂ pleth, capnography and an arterial line

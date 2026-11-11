@@ -6,6 +6,7 @@ import { fmtClock } from '../format.ts';
 import { buildChartData } from './chartData.ts';
 import { copyText, download, fileStem, runExport } from './exportRun.ts';
 import { VitalsChart } from './VitalsChart.tsx';
+import type { BackLink } from './EndDialog.tsx';
 
 const TITLES = {
   stabilised: (n: string) => `${n} is stable`,
@@ -38,9 +39,11 @@ function ruleNote(r: RuleResult): string {
 export default function Debrief({
   onRestart,
   onClose,
+  back,
 }: {
   onRestart: () => void;
   onClose: () => void;
+  back: BackLink;
 }) {
   const session = useSim((s) => s.session);
   const reason = useSim((s) => s.endReason);
@@ -270,8 +273,8 @@ export default function Debrief({
         <button className="btn primary" onClick={onRestart}>
           Restart case
         </button>
-        <a className="btn" href="#/">
-          Back to cases
+        <a className="btn" href={back.href}>
+          {back.label}
         </a>
         <button className="btn" onClick={onClose}>
           Close

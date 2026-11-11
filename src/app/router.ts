@@ -3,7 +3,13 @@ import { useSyncExternalStore } from 'react';
 
 export type AppRoute =
   | { name: 'home' }
+  | { name: 'topics' }
+  | { name: 'patients' }
+  | { name: 'how' }
+  | { name: 'teach' }
   | { name: 'case'; caseId: string; seed: number | null }
+  /** An "unknown patient": the case is named by an opaque code, not its id. */
+  | { name: 'patient'; code: string; seed: number | null }
   | { name: 'editor' }
   | { name: 'edit'; draftId: string }
   | { name: 'test'; draftId: string; seed: number | null }
@@ -22,6 +28,13 @@ export function parseHash(hash: string): AppRoute {
   if (parts[0] === 'case' && parts[1]) {
     return { name: 'case', caseId: decodeURIComponent(parts[1]), seed: seedOf(query) };
   }
+  if (parts[0] === 'patient' && parts[1]) {
+    return { name: 'patient', code: decodeURIComponent(parts[1]), seed: seedOf(query) };
+  }
+  if (parts[0] === 'topics') return { name: 'topics' };
+  if (parts[0] === 'patients') return { name: 'patients' };
+  if (parts[0] === 'how') return { name: 'how' };
+  if (parts[0] === 'teach') return { name: 'teach' };
   if (parts[0] === 'editor') {
     return parts[1] ? { name: 'edit', draftId: decodeURIComponent(parts[1]) } : { name: 'editor' };
   }
@@ -35,6 +48,9 @@ export function parseHash(hash: string): AppRoute {
 
 export const caseHref = (id: string, seed?: number) =>
   `#/case/${encodeURIComponent(id)}${seed !== undefined ? `?seed=${seed}` : ''}`;
+
+export const patientHref = (code: string, seed?: number) =>
+  `#/patient/${encodeURIComponent(code)}${seed !== undefined ? `?seed=${seed}` : ''}`;
 
 export const editorHref = (draftId?: string) =>
   draftId ? `#/editor/${encodeURIComponent(draftId)}` : '#/editor';

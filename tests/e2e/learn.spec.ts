@@ -2,8 +2,8 @@ import { expect, test } from '@playwright/test';
 
 test('learn from a video: the AMAX4 example analyses into a reviewable draft', async ({ page }) => {
   test.setTimeout(120_000);
-  await page.goto('./#/');
-  await page.getByRole('link', { name: /Learn from a video/ }).click();
+  await page.goto('./#/teach');
+  await page.getByRole('link', { name: /^Learn from a video/ }).click();
   await expect(page.getByRole('heading', { name: 'Learn from a video', level: 2 })).toBeVisible();
   await expect(page.getByText('Patient videos are confidential.')).toBeVisible();
 

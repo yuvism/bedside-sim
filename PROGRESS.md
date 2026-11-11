@@ -237,6 +237,31 @@ These led to the following changes:
   - Claude monitor reading with a mocked client: request shape, range checks, refusal, bad key.
 - E2E test: load the AMAX4 example, analyse it, create a draft and test-run it.
 
+### Redesign — two ways to practise and a cleaner interface
+
+- **Welcome screen instead of one long page.** The home page (`#/`) now fits on one screen. It has a dark, monitor-style stage with one question: **How do you want to practise?** Everything else moved to its own page, reached from a main navigation bar:
+  - `#/topics`: learn by topic
+  - `#/patients`: unknown patient
+  - `#/how`: how a case works, the two formats, guided and exam modes, shortcuts
+  - `#/teach`: the case editor, video validation and learn from a video
+- **Learn by topic** (`#/topics`): cards are named by condition (the correct diagnosis), with "Presents as …", specialty colour, tags, difficulty, time and best score. Filters cover specialty, difficulty and search, and the condition name is searchable.
+- **Unknown patient** (`#/patients`): a board of patients waiting to be seen (bay, name, age, presenting complaint and summary). It shows no specialty, tags or diagnosis, and no specialty colours.
+  - Each patient gets a seed for the visit, so the age on the card is the age you meet. An age written into a summary follows the varied age.
+  - Patients open at `#/patient/<code>`, a six-character code derived from the case id, so the address bar doesn't name the condition.
+  - At the bedside the header reads "Unknown patient · <complaint>", and the debrief returns to the board.
+  - **Surprise me** opens a random patient you haven't seen yet.
+- **Visual refresh across the app:**
+  - New design tokens: cooler background, softer borders, card shadows, 14 px radius.
+  - A teal ECG logo mark, which is also the new favicon.
+  - Plus Jakarta Sans for headings, with Atkinson Hyperlegible kept for body text.
+  - Polished buttons, and a navigation bar that scrolls sideways on phones.
+- **Bedside:** the brief now sits at the top until the case starts, so **Start case** is visible straight away.
+- **Tests (233 unit, 21 e2e):**
+  - Patient codes are unique, opaque and map back to their case; routes; random patient by code; summary age.
+  - E2E: the welcome screen's two choices and navigation, the topic list (11 conditions, filters, condition search), and the unknown patient board (no specialty or diagnosis text, opaque URL, header, Surprise me).
+  - E2E: 375 px with no sideways scroll on all five pages.
+  - The existing tests now go through the new pages.
+
 ## Next
 
 - Every item in the brief's definition of done is met. Ideas for later: clinician review of the items in docs/clinical-review.md, more cases, and porting scoring and the nurse to the Unity pack.
@@ -256,7 +281,7 @@ These led to the following changes:
 ## Known issues
 
 - TypeScript is pinned to 6.0.x because typescript-eslint 8 supports only `<6.1`. Move to TS 7 once typescript-eslint supports it.
-- Bundle sizes are under the 200 kB gzipped limit: the main bundle is about 154 kB (React, Zod and the eleven bundled cases), and the lazy chunks are about 109 kB for the debrief (mostly Recharts), 84 kB for the Anthropic SDK and 147 kB for the 3D view (three.js). If the library grows much more, cases should load lazily.
+- Bundle sizes are under the 200 kB gzipped limit: the main bundle is about 157 kB (React, Zod and the eleven bundled cases), and the lazy chunks are about 109 kB for the debrief (mostly Recharts), 84 kB for the Anthropic SDK and 147 kB for the 3D view (three.js). If the library grows much more, cases should load lazily.
 - The 3D view's frame rate was measured in headless Chromium only (60 fps), not yet on a mid-range laptop GPU.
 - `npm audit` reports 10 moderate advisories, all in the lint tooling (minimatch, through ESLint and typescript-eslint). None are in code shipped to the browser.
 - The AI patient was tested with a mocked client only. A live call needs a real key, which the project never stores.

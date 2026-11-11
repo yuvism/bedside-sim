@@ -16,8 +16,8 @@ const lastItem = (page: Page, legend: string): Locator =>
 test('a case built only in the editor is playable', async ({ page }) => {
   test.setTimeout(120_000);
   await page.clock.install();
-  await page.goto('./#/');
-  await page.getByRole('link', { name: 'Case editor' }).click();
+  await page.goto('./#/teach');
+  await page.getByRole('link', { name: /^Case editor/ }).click();
   await page.getByRole('button', { name: 'New case' }).click();
 
   await page.getByLabel('Title', { exact: true }).fill('Editor-built case');

@@ -1,20 +1,22 @@
 /* Design tokens — carried over from reference/bedside-sim.html */
 :root {
-  --bg: #e7efed;
+  --bg: #f1f5f6;
   --surface: #ffffff;
   --bay-top: #eef4f3;
   --bay-bottom: #d9e3e1;
-  --ink: #16262b;
-  --muted: #56696d;
-  --line: #c7d5d2;
-  --scrub: #1f6f6b;
+  --ink: #0f1f29;
+  --muted: #546673;
+  --line: #d9e2e6;
+  --scrub: #0b7a73;
   --scrub-ink: #ffffff;
-  --scrub-soft: #d5e8e4;
+  --scrub-soft: #e0f1ee;
   --danger: #b3261e;
   --danger-soft: #f9e0de;
   --ok: #22744a;
   --warn: #8a5a00;
   --warn-soft: #fbefd4;
+  --shadow-sm: 0 1px 2px rgba(15, 31, 41, 0.05), 0 1px 3px rgba(15, 31, 41, 0.07);
+  --shadow-md: 0 10px 30px rgba(15, 31, 41, 0.1), 0 2px 6px rgba(15, 31, 41, 0.06);
   /* monitor trace colours are fixed: the monitor is a device, not themed */
   --hr: #3ce07a;
   --spo2: #3fd0f0;
@@ -24,24 +26,25 @@
   --chart-line: #2a78d6;
   --chart-ref: #eb6834;
   --font-text: 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Plus Jakarta Sans', var(--font-text);
   --font-num: 'Barlow Condensed', 'Arial Narrow', sans-serif;
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --bg: #0d191b;
-    --surface: #142326;
+    --bg: #0b1418;
+    --surface: #121f24;
     --bay-top: #1f2e30;
     --bay-bottom: #2b3739;
-    --bay-top: #1f2e30;
-    --bay-bottom: #2b3739;
-    --ink: #e2ecea;
-    --muted: #93a7aa;
-    --line: #2a3e42;
-    --scrub: #47a9a2;
-    --scrub-ink: #05201e;
-    --scrub-soft: #1b3837;
+    --ink: #e4eef0;
+    --muted: #97abb0;
+    --line: #22363c;
+    --scrub: #3fb8ad;
+    --scrub-ink: #04201d;
+    --scrub-soft: #153734;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+    --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.45);
     --danger: #ff8a80;
     --danger-soft: #3b1c1a;
     --ok: #7cd49c;
@@ -54,16 +57,18 @@
 }
 
 :root[data-theme='dark'] {
-  --bg: #0d191b;
-  --surface: #142326;
+  --bg: #0b1418;
+  --surface: #121f24;
   --bay-top: #1f2e30;
   --bay-bottom: #2b3739;
-  --ink: #e2ecea;
-  --muted: #93a7aa;
-  --line: #2a3e42;
-  --scrub: #47a9a2;
-  --scrub-ink: #05201e;
-  --scrub-soft: #1b3837;
+  --ink: #e4eef0;
+  --muted: #97abb0;
+  --line: #22363c;
+  --scrub: #3fb8ad;
+  --scrub-ink: #04201d;
+  --scrub-soft: #153734;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.45);
   --danger: #ff8a80;
   --danger-soft: #3b1c1a;
   --ok: #7cd49c;
@@ -120,23 +125,43 @@ a {
   top: 0;
   z-index: 5;
   background: var(--surface);
+  box-shadow: var(--shadow-sm);
   border-bottom: 1px solid var(--line);
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 10px 20px;
+  padding: 10px 24px;
+  min-height: 64px;
   flex-wrap: wrap;
 }
 
 .brand {
   margin-right: auto;
   min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 10px;
+  align-items: center;
+}
+
+/* Logo mark: an ECG trace on a teal tile. */
+.brand::before {
+  content: '';
+  grid-row: span 2;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2316a99c'/%3E%3Cstop offset='1' stop-color='%230a5a61'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='9' fill='url(%23g)'/%3E%3Cpath d='M4 17h6l2-6 3 12 3-15 3 9h7' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / 100% no-repeat;
+  box-shadow: 0 2px 6px rgba(11, 90, 97, 0.3);
 }
 
 .brand h1 {
-  font-size: 1.1rem;
+  font-size: 1.12rem;
+  font-weight: 800;
   margin: 0;
   line-height: 1.2;
+  letter-spacing: -0.015em;
 }
 
 .brand p {
@@ -145,12 +170,29 @@ a {
   font-size: 0.875rem;
 }
 
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--scrub);
+}
+
 .page {
   flex: 1;
   width: 100%;
   max-width: 1260px;
   margin: 0 auto;
-  padding: 18px 20px 40px;
+  padding: 20px 24px 44px;
 }
 
 @media (max-width: 620px) {
@@ -162,11 +204,13 @@ a {
 .card {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
 }
 
-.brief {
-  padding: 20px;
+.card.brief {
+  padding: 20px 22px;
+  border-top: 4px solid var(--scrub);
 }
 
 .brief h2 {
@@ -182,13 +226,19 @@ a {
 .btn {
   border: 1px solid var(--line);
   background: var(--surface);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 8px 14px;
   cursor: pointer;
+  font-weight: 600;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .btn:hover {
   border-color: var(--scrub);
+  background: color-mix(in srgb, var(--scrub-soft) 55%, var(--surface));
 }
 
 .btn.primary {
@@ -196,6 +246,11 @@ a {
   color: var(--scrub-ink);
   border-color: var(--scrub);
   font-weight: 700;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--scrub) 30%, transparent);
+}
+
+.btn.primary:hover {
+  background: color-mix(in srgb, var(--scrub) 88%, var(--ink));
 }
 
 .site-footer {
@@ -312,7 +367,7 @@ a {
 }
 
 .page-title {
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   margin: 0 0 12px;
 }
 
@@ -457,7 +512,6 @@ a {
 
 .howto {
   padding: 12px 16px;
-  margin-top: 14px;
 }
 
 .howto summary {

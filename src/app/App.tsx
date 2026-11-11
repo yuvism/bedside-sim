@@ -1,10 +1,15 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { checkCase, getCase } from '../content/library.ts';
 import { Bedside } from './Bedside.tsx';
-import { CaseList } from './CaseList.tsx';
+import { caseByCode } from './caseMeta.ts';
 import { getDraft } from './drafts.ts';
 import { Footer } from './Footer.tsx';
-import { caseHref, editorHref, testHref, useRoute } from './router.ts';
+import { HowPage } from './home/HowPage.tsx';
+import { Home } from './home/Home.tsx';
+import { PatientsPage } from './home/PatientsPage.tsx';
+import { TeachPage } from './home/TeachPage.tsx';
+import { TopicsPage } from './home/TopicsPage.tsx';
+import { caseHref, editorHref, patientHref, testHref, useRoute } from './router.ts';
 
 const EditorHome = lazy(() => import('../ui/editor/EditorHome.tsx'));
 const CaseEditor = lazy(() => import('../ui/editor/CaseEditor.tsx'));
@@ -32,7 +37,9 @@ function DraftProblem({ draftId, problem }: { draftId: string; problem: string }
 
 export function App() {
   const route = useRoute();
-  const needsSeed = (route.name === 'case' || route.name === 'test') && route.seed === null;
+  const needsSeed =
+    (route.name === 'case' || route.name === 'test' || route.name === 'patient') &&
+    route.seed === null;
 
   // A case URL without a seed gets a random one, so every run can be replayed from its URL.
   useEffect(() => {
@@ -43,13 +50,23 @@ export function App() {
         ? caseHref(route.caseId, fresh)
         : route.name === 'test'
           ? testHref(route.draftId, fresh)
-          : null;
+          : route.name === 'patient'
+            ? patientHref(route.code, fresh)
+            : null;
     if (!href) return;
     window.history.replaceState(null, '', href);
     window.dispatchEvent(new HashChangeEvent('hashchange'));
   }, [needsSeed, route]);
 
   switch (route.name) {
+    case 'topics':
+      return <TopicsPage />;
+    case 'patients':
+      return <PatientsPage />;
+    case 'how':
+      return <HowPage />;
+    case 'teach':
+      return <TeachPage />;
     case 'learn':
       return (
         <Suspense fallback={loading}>
@@ -103,9 +120,19 @@ export function App() {
         return <Bedside key={`${caseDef.id}:${route.seed}`} caseDef={caseDef} seed={route.seed} />;
       }
       if (caseDef) return null;
-      return <CaseList />;
+      return <TopicsPage />;
+    }
+    case 'patient': {
+      const caseDef = caseByCode(route.code);
+      if (caseDef && route.seed !== null) {
+        return (
+          <Bedside key={`${caseDef.id}:${route.seed}`} caseDef={caseDef} seed={route.seed} blind />
+        );
+      }
+      if (caseDef) return null;
+      return <PatientsPage />;
     }
     default:
-      return <CaseList />;
+      return <Home />;
   }
 }

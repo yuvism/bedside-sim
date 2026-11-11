@@ -5,7 +5,12 @@ import './debrief.css';
 // The debrief (and Recharts) load only when a case ends.
 const Debrief = lazy(() => import('./Debrief.tsx'));
 
-export function EndDialog({ onRestart }: { onRestart: () => void }) {
+export interface BackLink {
+  href: string;
+  label: string;
+}
+
+export function EndDialog({ onRestart, back }: { onRestart: () => void; back: BackLink }) {
   const ref = useRef<HTMLDialogElement>(null);
   const phase = useSim((s) => s.phase);
 
@@ -20,7 +25,7 @@ export function EndDialog({ onRestart }: { onRestart: () => void }) {
     <dialog ref={ref} className="debrief" aria-labelledby="db-title">
       {phase === 'ended' && (
         <Suspense fallback={<p className="dlg">Scoring the case…</p>}>
-          <Debrief onRestart={onRestart} onClose={() => ref.current?.close()} />
+          <Debrief onRestart={onRestart} back={back} onClose={() => ref.current?.close()} />
         </Suspense>
       )}
     </dialog>

@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test';
 
-test('case list shows eleven cases and filters by specialty, difficulty and text', async ({
+test('topics list shows eleven conditions and filters by specialty, difficulty and text', async ({
   page,
 }) => {
-  await page.goto('./');
+  await page.goto('./#/topics');
   const cards = page.locator('.case-card');
   await expect(cards).toHaveCount(11);
   await page.getByLabel('Specialty').selectOption('Trauma');
@@ -12,7 +12,10 @@ test('case list shows eleven cases and filters by specialty, difficulty and text
   await expect(cards).toHaveCount(2);
   await page.getByLabel('Specialty').selectOption('');
   await page.getByLabel('Difficulty').selectOption('');
+  // Topics are named by condition, so the diagnosis is searchable here.
   await page.getByLabel('Search', { exact: true }).fill('ketoacidosis');
+  await expect(cards).toHaveCount(1);
+  await page.getByLabel('Search', { exact: true }).fill('zzz');
   await expect(cards).toHaveCount(0);
   await page.getByLabel('Search', { exact: true }).fill('DKA');
   await expect(cards).toHaveCount(1);

@@ -6,7 +6,8 @@ Bedside sim uses no third-party art, models, textures, sounds or fonts.
 - **Monitor screen in 3D:** drawn at runtime from the live waveform canvas and vitals.
 - **2D patient avatar** (`src/ui/patient/Avatar.tsx`): hand-written inline SVG.
 - **Monitor sounds:** tones generated with the Web Audio API; there are no audio files.
-- **Fonts:** Atkinson Hyperlegible and Barlow Condensed, loaded from Google Fonts under the SIL Open Font License.
+- **Fonts:** Atkinson Hyperlegible (body text), Plus Jakarta Sans (headings) and Barlow Condensed (monitor numbers), loaded from Google Fonts under the SIL Open Font License.
+- **Logo and icons:** the ECG logo mark and the line icons (`src/app/home/icons.tsx`) are drawn in code for this project.
 
 If CC0 assets are added later (for example from Kenney or Quaternius), list each one here with its author, source URL and licence.
 

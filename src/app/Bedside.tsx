@@ -154,11 +154,14 @@ export function Bedside({
   caseDef,
   seed,
   draftId,
+  blind = false,
 }: {
   caseDef: CaseDef;
   seed: number;
   /** Set when test-running an editor draft. */
   draftId?: string;
+  /** "Unknown patient": don't show the specialty, which hints at the diagnosis. */
+  blind?: boolean;
 }) {
   const phase = useSim((s) => s.phase);
   const load = useSim((s) => s.load);
@@ -176,7 +179,7 @@ export function Bedside({
             <a href="#/">Bedside sim</a>
           </h1>
           <p>
-            {caseDef.specialty} · {caseDef.title}
+            {blind ? 'Unknown patient' : caseDef.specialty} · {caseDef.title}
           </p>
         </div>
         {draftId !== undefined && (
@@ -191,16 +194,17 @@ export function Bedside({
       </header>
       <main className="page bedside">
         <div className="col">
-          <Monitor />
-          <ViewToggle />
-          {bayView === '3d' && <BayCard />}
-          <PatientCard hideAvatar={bayView === '3d'} />
           {phase === 'brief' && testRun && (
             <p className="test-run-note" role="note">
               Test run of an editor draft. The result isn’t saved to your progress.
             </p>
           )}
+          {/* The brief comes first so "Start case" is on screen straight away. */}
           {phase === 'brief' && <BriefCard caseDef={caseDef} />}
+          <Monitor />
+          <ViewToggle />
+          {bayView === '3d' && <BayCard />}
+          <PatientCard hideAvatar={bayView === '3d'} />
           {phase === 'brief' && <HowToPlay />}
         </div>
         <div className="col">
@@ -210,7 +214,16 @@ export function Bedside({
           <EventLog />
         </div>
       </main>
-      <EndDialog onRestart={() => load(caseDef, seed, { testRun })} />
+      <EndDialog
+        onRestart={() => load(caseDef, seed, { testRun })}
+        back={
+          blind
+            ? { href: '#/patients', label: 'Back to patients' }
+            : testRun
+              ? { href: '#/', label: 'Back to cases' }
+              : { href: '#/topics', label: 'Back to topics' }
+        }
+      />
       <Footer seed={seed} />
     </>
   );

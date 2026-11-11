@@ -2,8 +2,8 @@ import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
 
 test('the sample reference loads, compares and exports', async ({ page }) => {
-  await page.goto('./#/');
-  await page.getByRole('link', { name: 'Validation' }).click();
+  await page.goto('./#/teach');
+  await page.getByRole('link', { name: /^Video validation/ }).click();
   await expect(page.getByRole('heading', { name: 'Video validation', level: 2 })).toBeVisible();
   await page.getByRole('button', { name: 'Load sample' }).click();
 
