@@ -51,7 +51,7 @@ function HeroMonitor() {
   return (
     <div className="hero-monitor" aria-hidden="true">
       <div className="hm-head">
-        <span>Bay 3 · Monitor</span>
+        <span>Live monitor</span>
         <span className="hm-alarm">SBP LOW</span>
       </div>
       <svg viewBox="0 0 320 90" preserveAspectRatio="none">

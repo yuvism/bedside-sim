@@ -682,7 +682,7 @@
   margin-bottom: 10px;
 }
 
-.bay {
+.bay-badge {
   font-family: var(--font-num);
   font-weight: 600;
   font-size: 0.95rem;
@@ -711,6 +711,87 @@
   font-size: 0.85rem;
   color: #7a3416;
   background: linear-gradient(135deg, #ffe0c2, #f6b383);
+}
+
+/* Arrival observations and NEWS2 on the board */
+.patient-card .obs {
+  display: grid;
+  grid-template-columns: repeat(5, auto);
+  justify-content: space-between;
+  gap: 4px 10px;
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  background: var(--bg);
+  border-radius: 10px;
+}
+
+.obs div {
+  display: grid;
+}
+
+.obs dt {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.obs dd {
+  margin: 0;
+  font-family: var(--font-num);
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.news2 {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 1px 9px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.news2 b {
+  font-family: var(--font-num);
+  font-size: 1.05rem;
+}
+
+.news2-risk {
+  font-weight: 600;
+}
+
+.news2.high {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.news2.medium {
+  color: var(--warn);
+  background: var(--warn-soft);
+}
+
+.news2.low {
+  color: var(--ok);
+  background: color-mix(in srgb, var(--ok) 10%, transparent);
+}
+
+.news2.none {
+  color: var(--muted);
+}
+
+.patient-card .foot {
+  flex-wrap: wrap;
+}
+
+.source-note {
+  margin-top: 18px;
+  max-width: 95ch;
 }
 
 /* ---------- How it works ---------- */

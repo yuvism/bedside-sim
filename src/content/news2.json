@@ -1,0 +1,61 @@
+{
+  "source": "Royal College of Physicians. National Early Warning Score (NEWS) 2: Standardising the assessment of acute-illness severity in the NHS. Updated report of a working party. London: RCP, 2017.",
+  "url": "https://www.rcp.ac.uk/improving-care/resources/national-early-warning-score-news-2/",
+  "minAge": 16,
+  "minAgeNote": "NEWS2 is not validated in people under 16 or in pregnancy, so the board shows no score for them.",
+  "scale": "SpO2 scale 1. Scale 2 (for confirmed hypercapnic respiratory failure) is not used.",
+  "parameters": {
+    "rr": [
+      { "max": 8, "score": 3 },
+      { "max": 11, "score": 1 },
+      { "max": 20, "score": 0 },
+      { "max": 24, "score": 2 },
+      { "score": 3 }
+    ],
+    "spo2": [
+      { "max": 91, "score": 3 },
+      { "max": 93, "score": 2 },
+      { "max": 95, "score": 1 },
+      { "score": 0 }
+    ],
+    "sbp": [
+      { "max": 90, "score": 3 },
+      { "max": 100, "score": 2 },
+      { "max": 110, "score": 1 },
+      { "max": 219, "score": 0 },
+      { "score": 3 }
+    ],
+    "hr": [
+      { "max": 40, "score": 3 },
+      { "max": 50, "score": 1 },
+      { "max": 90, "score": 0 },
+      { "max": 110, "score": 1 },
+      { "max": 130, "score": 2 },
+      { "score": 3 }
+    ],
+    "temp": [
+      { "max": 35, "score": 3 },
+      { "max": 36, "score": 1 },
+      { "max": 38, "score": 0 },
+      { "max": 39, "score": 1 },
+      { "score": 2 }
+    ]
+  },
+  "oxygenScore": 2,
+  "consciousness": {
+    "score": 3,
+    "rule": "A GCS below 15 is counted as new confusion or worse (the C, V, P or U of ACVPU).",
+    "source": "Teaching mapping from the simulator's GCS to NEWS2 consciousness; NEWS2 itself scores ACVPU, not GCS.",
+    "reviewNeeded": true
+  },
+  "bands": [
+    { "min": 7, "risk": "high", "label": "High", "response": "Emergency response" },
+    { "min": 5, "risk": "medium", "label": "Medium", "response": "Urgent response" },
+    {
+      "min": 0,
+      "risk": "low",
+      "label": "Low",
+      "response": "Ward-based response; a single parameter scoring 3 needs an urgent review"
+    }
+  ]
+}

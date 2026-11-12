@@ -8,13 +8,18 @@ An open-source virtual patient simulator that runs in the browser. You talk to t
 
 ![The welcome screen: choose Learn by topic or Unknown patient](docs/images/home.png)
 
-![The bedside: a live monitor with low blood pressure and tachycardia alarms, the ABCDE examination panel, the patient and the event log](docs/images/bedside.png)
+![The bedside: the patient in a resus bed with an oxygen mask and IV access, the docked monitor with alarms, the ABCDE examination panel and the event log](docs/images/bedside.png)
 
 ## Features
 
 - **Two ways to practise:**
   - **Learn by topic:** pick a condition (anaphylaxis, DKA, sepsis…) and practise managing it.
-  - **Unknown patient:** pick a patient from a board of people waiting to be seen, by name, age and presenting complaint only. The specialty, diagnosis and topic tags stay hidden, even in the URL, until the debrief. **Surprise me** picks a random patient you haven't seen.
+  - **Unknown patient:** pick a patient from the department board, which shows bay, name, age, presenting complaint, observations on arrival and a NEWS2 score. The specialty, diagnosis and topic tags stay hidden, even in the URL, until the debrief. **Surprise me** picks a random patient you haven't seen.
+- **The patient in a hospital bed:** the bedside is a one-screen console built around an illustrated resus bay.
+  - The patient's colour, rash, breathing and consciousness change with their physiology.
+  - Oxygen masks, cannulae, drips, monitoring, pads and CPR appear as they're used.
+  - You can click the patient, the monitor, the drip stand, the crash trolley and the oxygen outlet.
+  - The brief opens as a handover and can be reopened.
 - **A live bedside monitor:**
   - ECG that reflects the rhythm, ST elevation, peaked T waves and CPR artifact
   - SpO₂ pleth, capnography and an arterial line

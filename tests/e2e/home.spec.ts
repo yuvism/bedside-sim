@@ -45,7 +45,7 @@ test('surprise me opens a random patient by code', async ({ page }) => {
   await page.goto('./#/patients');
   await page.getByRole('button', { name: 'Surprise me' }).click();
   await expect(page).toHaveURL(/#\/patient\/[0-9a-z]{6}\?seed=\d+$/);
-  await expect(page.getByText(/^Unknown patient · /)).toBeVisible();
+  await expect(page.getByText(/^Bay \d+ · Unknown patient · /)).toBeVisible();
 });
 
 test('the welcome and patient pages fit a 375 px phone', async ({ page }) => {

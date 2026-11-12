@@ -6,7 +6,7 @@ Each item below is a teaching parameter or an uncertain value marked `"reviewNee
 A clinician should check it against its source, then either confirm it (cite the guideline
 and remove the flag) or correct it.
 
-**137 flagged items.**
+**138 flagged items.**
 
 ## src/content/formulary.json
 
@@ -140,6 +140,12 @@ and remove the flag) or correct it.
 | `delays.procedure:chest_drain` | minSec 180; maxSec 300 | Chest drain insertion. Teaching estimate. |
 | `delays.procedure:urinary_catheter` | minSec 120; maxSec 240 | Urinary catheter insertion. Teaching estimate. |
 | `delays.team` | minSec 15; maxSec 30 | Making a referral phone call. Teaching estimate. |
+
+## src/content/news2.json
+
+| Item | Values | Source |
+| --- | --- | --- |
+| `consciousness` | score 3 | Teaching mapping from the simulator's GCS to NEWS2 consciousness; NEWS2 itself scores ACVPU, not GCS. |
 
 ## src/content/cases/anaphylaxis-01.json
 

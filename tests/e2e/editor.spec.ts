@@ -57,7 +57,7 @@ test('a case built only in the editor is playable', async ({ page }) => {
   await page.getByRole('button', { name: '8×' }).click();
   await page.getByRole('button', { name: 'Where does it hurt?' }).click();
   // Severity starts at 50, in the middle band, so the patient gives the second answer.
-  await expect(page.locator('.bubble')).toHaveText('“My chest… it hurts.”');
+  await expect(page.locator('.scene-caption')).toHaveText('“My chest… it hurts.”');
   await page.getByRole('tab', { name: 'Treat' }).click();
   await page.getByRole('button', { name: /^High-flow oxygen/ }).click();
 

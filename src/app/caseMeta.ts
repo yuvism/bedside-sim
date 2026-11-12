@@ -3,8 +3,11 @@
  * topic") and an opaque patient code (for "Unknown patient", so the URL
  * doesn't give the diagnosis away).
  */
-import { CASES } from '../content/library.ts';
+import { CASES, LIBRARY } from '../content/library.ts';
+import { SimpleEngine } from '../engine/engine.ts';
 import type { CaseDef } from '../engine/types.ts';
+import { materialiseCase } from '../engine/variation.ts';
+import { news2, type News2Result, type Obs } from './news2.ts';
 import { getProgress } from './progress.ts';
 import { patientHref } from './router.ts';
 
@@ -50,4 +53,54 @@ export function surpriseHref(random: () => number = Math.random): string {
 export function matchesQuery(fields: string[], q: string): boolean {
   const s = q.trim().toLowerCase();
   return !s || fields.some((x) => x.toLowerCase().includes(s));
+}
+
+/** The department board, in bay order. Ordered by code so it doesn't mirror the topic list. */
+export const BOARD: readonly CaseDef[] = [...CASES].sort((a, b) =>
+  patientCode(a.id).localeCompare(patientCode(b.id)),
+);
+
+/**
+ * The bed space a case's patient is in. The same in both ways to practise:
+ * on the board, above the bed and in the bedside header. Null for drafts.
+ */
+export function bayOf(caseId: string): number | null {
+  const i = BOARD.findIndex((c) => c.id === caseId);
+  return i < 0 ? null : i + 1;
+}
+
+export interface Triage {
+  name: string;
+  age: number;
+  sex: string;
+  obs: Obs;
+  /** Diastolic BP on arrival (NEWS2 doesn't use it, but the board shows it). */
+  dbp: number | null;
+  news2: News2Result | null;
+}
+
+/** The varied patient for this seed and their observations on arrival, with NEWS2. */
+export function triageOf(c: CaseDef, seed: number): Triage {
+  const m = materialiseCase(c, seed).caseDef;
+  const engine = new SimpleEngine(LIBRARY);
+  engine.load(m, seed);
+  const v = engine.vitals();
+  const devices = engine.status().devices;
+  const obs: Obs = {
+    rr: v.rr,
+    spo2: v.spo2,
+    sbp: v.sbp,
+    hr: v.hr,
+    temp: v.temp,
+    gcs: v.gcs,
+    onOxygen: devices.some((d) => d.startsWith('o2_') || d === 'bvm'),
+  };
+  return {
+    name: m.patient.name,
+    age: m.patient.age,
+    sex: m.patient.sex,
+    obs,
+    dbp: v.dbp,
+    news2: news2(obs, m.patient.age),
+  };
 }

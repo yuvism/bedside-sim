@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { checkCase, getCase } from '../content/library.ts';
 import { Bedside } from './Bedside.tsx';
-import { caseByCode } from './caseMeta.ts';
+import { bayOf, caseByCode } from './caseMeta.ts';
 import { getDraft } from './drafts.ts';
 import { Footer } from './Footer.tsx';
 import { HowPage } from './home/HowPage.tsx';
@@ -117,7 +117,14 @@ export function App() {
     case 'case': {
       const caseDef = getCase(route.caseId);
       if (caseDef && route.seed !== null) {
-        return <Bedside key={`${caseDef.id}:${route.seed}`} caseDef={caseDef} seed={route.seed} />;
+        return (
+          <Bedside
+            key={`${caseDef.id}:${route.seed}`}
+            caseDef={caseDef}
+            seed={route.seed}
+            bay={bayOf(caseDef.id)}
+          />
+        );
       }
       if (caseDef) return null;
       return <TopicsPage />;
@@ -126,7 +133,13 @@ export function App() {
       const caseDef = caseByCode(route.code);
       if (caseDef && route.seed !== null) {
         return (
-          <Bedside key={`${caseDef.id}:${route.seed}`} caseDef={caseDef} seed={route.seed} blind />
+          <Bedside
+            key={`${caseDef.id}:${route.seed}`}
+            caseDef={caseDef}
+            seed={route.seed}
+            bay={bayOf(caseDef.id)}
+            blind
+          />
         );
       }
       if (caseDef) return null;

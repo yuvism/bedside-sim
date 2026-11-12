@@ -1,0 +1,206 @@
+/* The bedside console: the patient and the monitor on the left, actions on the right. */
+.page.console {
+  position: relative;
+  max-width: 1640px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+  gap: 14px;
+  padding: 14px 18px 20px;
+}
+
+.console > .side {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  align-content: start;
+}
+
+@media (min-width: 1100px) {
+  .page.console {
+    grid-template-columns: minmax(0, 1.12fr) minmax(400px, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'scene side'
+      'monitor side';
+  }
+
+  .console > .scene-card {
+    grid-area: scene;
+  }
+
+  .console > .monitor-wrap {
+    grid-area: monitor;
+  }
+
+  .console > .side {
+    grid-area: side;
+  }
+}
+
+/* Tall enough: everything on one screen, with panels scrolling inside. */
+@media (min-width: 1100px) and (min-height: 720px) {
+  .page.console {
+    /* Not flex-grown: the console is exactly one screen tall. */
+    flex: none;
+    height: calc(100dvh - 64px - 46px);
+    min-height: 620px;
+  }
+
+  .console .scene-stage {
+    aspect-ratio: auto;
+  }
+
+  .console .trace {
+    height: 168px;
+  }
+
+  /* A compact monitor: the numbers in two columns beside the traces. */
+  .console .monitor {
+    grid-template-columns: minmax(0, 1fr) 290px;
+    padding: 8px;
+  }
+
+  .console .nums {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 6px;
+  }
+
+  .console .num:nth-child(2) {
+    border-top: 0;
+  }
+
+  .console .num-v {
+    font-size: 1.45rem;
+  }
+
+  .console .num.big .num-v {
+    font-size: 2.1rem;
+  }
+
+  .console .monitor-controls .btn {
+    padding: 6px 12px;
+  }
+
+  .console > .side {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .console > .side > .actions {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .console > .side > .actions > .tabs,
+  .console > .side > .actions > .wrapup {
+    flex: none;
+  }
+
+  .console > .side .panel-host {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+  }
+
+  .console > .side > .logwrap {
+    flex: 0 0 auto;
+    height: 24%;
+    min-height: 130px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .console > .side .log {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+  }
+
+  .console > .side > .logwrap .empty {
+    margin: 0;
+    padding: 12px 16px;
+  }
+}
+
+/* The handover: the brief over the dimmed bedside until the case starts. */
+.handover {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  padding: 4vh 16px 24px;
+  background: rgba(6, 18, 22, 0.58);
+  overflow: auto;
+}
+
+.handover-inner {
+  width: min(680px, 100%);
+  display: grid;
+  gap: 12px;
+}
+
+.handover .card {
+  box-shadow: var(--shadow-md);
+}
+
+.handover .brief .btn.primary {
+  padding: 10px 22px;
+  font-size: 1.02rem;
+}
+
+/* Header controls */
+.speed-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.speed-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.sim-bar .brand p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.brief-dialog {
+  max-width: min(620px, 92vw);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px 22px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-md);
+}
+
+.brief-dialog::backdrop {
+  background: rgba(6, 18, 22, 0.5);
+}
+
+.brief-dialog h2 {
+  margin: 0 0 8px;
+  font-size: 1.2rem;
+}
+
+.brief-dialog p {
+  margin: 0 0 12px;
+  line-height: 1.5;
+}
+
+@media (max-width: 1280px) {
+  .speed-label {
+    display: none;
+  }
+}

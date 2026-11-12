@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import type { CaseDef } from '../engine/types.ts';
 import { EndDialog } from '../ui/debrief/EndDialog.tsx';
 import { fmtClock } from '../ui/format.ts';
@@ -8,14 +8,14 @@ import { Monitor } from '../ui/monitor/Monitor.tsx';
 import { ActionPanels } from '../ui/panels/ActionPanels.tsx';
 import { AlsPanel } from '../ui/panels/AlsPanel.tsx';
 import { NursePanel } from '../ui/panels/NursePanel.tsx';
-import { PatientCard } from '../ui/patient/PatientCard.tsx';
 import { Footer } from './Footer.tsx';
 import { editorHref } from './router.ts';
 import { SPEEDS, useSim, type PanelTab } from './store.ts';
-import { BayCard, ViewToggle } from '../ui/bay/BayView.tsx';
 import { HowToPlay } from '../ui/HowToPlay.tsx';
+import { SceneCard } from '../ui/scene/SceneCard.tsx';
 import { SettingsButton } from '../ui/settings/SettingsButton.tsx';
 import { ThemeToggle } from './ThemeToggle.tsx';
+import './bedside.css';
 
 const TICK_MS = 250;
 
@@ -73,12 +73,26 @@ function Controls() {
   const t = useSim((s) => s.view?.t ?? 0);
   return (
     <>
-      <div className="speed" role="group" aria-label="Simulation speed">
-        {SPEEDS.map((s) => (
-          <button key={s} aria-pressed={speed === s} onClick={() => setSpeed(s)}>
-            {s}×
-          </button>
-        ))}
+      <div className="speed-wrap">
+        <span className="speed-label" aria-hidden="true">
+          Speed
+        </span>
+        <div className="speed" role="group" aria-label="Simulation speed">
+          {SPEEDS.map((s) => (
+            <button
+              key={s}
+              aria-pressed={speed === s}
+              title={
+                s === 1
+                  ? 'Real time: one simulated minute takes one minute'
+                  : `${s}× faster: one simulated minute takes ${Math.round(60 / s)} seconds`
+              }
+              onClick={() => setSpeed(s)}
+            >
+              {s}×
+            </button>
+          ))}
+        </div>
       </div>
       <button className="btn" onClick={togglePause} disabled={phase !== 'running'}>
         {paused ? 'Resume' : 'Pause'}
@@ -98,14 +112,19 @@ function ModeBadge() {
   return <span className={`mode-badge ${mode}`}>{mode === 'exam' ? 'Exam' : 'Guided'}</span>;
 }
 
-function BriefCard({ caseDef }: { caseDef: CaseDef }) {
+function useAge(caseDef: CaseDef): number {
+  // The varied patient's age, not the authored one.
+  return useSim((s) => s.session?.caseDef.patient.age ?? caseDef.patient.age);
+}
+
+function BriefCard({ caseDef, bay }: { caseDef: CaseDef; bay: number | null }) {
   const start = useSim((s) => s.start);
   const mode = useSim((s) => s.mode);
   const setMode = useSim((s) => s.setMode);
-  // The varied patient's age, not the authored one.
-  const age = useSim((s) => s.session?.caseDef.patient.age ?? caseDef.patient.age);
+  const age = useAge(caseDef);
   return (
     <section className="card brief" aria-labelledby="brief-h">
+      <p className="eyebrow">Handover{bay ? ` · Bay ${bay}` : ''}</p>
       <h2 id="brief-h">{caseDef.title}</h2>
       {caseDef.brief.map((p) => (
         <p key={p.slice(0, 24)}>{p.replaceAll('{age}', String(age))}</p>
@@ -150,22 +169,53 @@ function BriefCard({ caseDef }: { caseDef: CaseDef }) {
   );
 }
 
+/** Re-read the handover during the case. */
+function BriefButton({ caseDef }: { caseDef: CaseDef }) {
+  const ref = useRef<HTMLDialogElement>(null);
+  const phase = useSim((s) => s.phase);
+  const age = useAge(caseDef);
+  return (
+    <>
+      <button
+        type="button"
+        className="btn"
+        disabled={phase === 'brief'}
+        title="Read the handover again"
+        onClick={() => ref.current?.showModal()}
+      >
+        Brief
+      </button>
+      <dialog ref={ref} className="brief-dialog" aria-labelledby="brief-dlg-h">
+        <h2 id="brief-dlg-h">{caseDef.title}</h2>
+        {caseDef.brief.map((p) => (
+          <p key={p.slice(0, 24)}>{p.replaceAll('{age}', String(age))}</p>
+        ))}
+        <button type="button" className="btn primary" onClick={() => ref.current?.close()}>
+          Back to the patient
+        </button>
+      </dialog>
+    </>
+  );
+}
+
 export function Bedside({
   caseDef,
   seed,
   draftId,
   blind = false,
+  bay = null,
 }: {
   caseDef: CaseDef;
   seed: number;
   /** Set when test-running an editor draft. */
   draftId?: string;
+  /** The bed space, as on the department board. */
+  bay?: number | null;
   /** "Unknown patient": don't show the specialty, which hints at the diagnosis. */
   blind?: boolean;
 }) {
   const phase = useSim((s) => s.phase);
   const load = useSim((s) => s.load);
-  const bayView = useSim((s) => s.bayView);
   const testRun = draftId !== undefined;
   useEffect(() => load(caseDef, seed, { testRun }), [caseDef, seed, load, testRun]);
   useSimLoop();
@@ -173,12 +223,13 @@ export function Bedside({
 
   return (
     <>
-      <header className="bar">
+      <header className="bar sim-bar">
         <div className="brand">
           <h1>
             <a href="#/">Bedside sim</a>
           </h1>
           <p>
+            {bay ? `Bay ${bay} · ` : ''}
             {blind ? 'Unknown patient' : caseDef.specialty} · {caseDef.title}
           </p>
         </div>
@@ -187,32 +238,34 @@ export function Bedside({
             Back to editor
           </a>
         )}
+        <BriefButton caseDef={caseDef} />
         <Controls />
         <ModeBadge />
         <SettingsButton />
         <ThemeToggle />
       </header>
-      <main className="page bedside">
-        <div className="col">
-          {phase === 'brief' && testRun && (
-            <p className="test-run-note" role="note">
-              Test run of an editor draft. The result isn’t saved to your progress.
-            </p>
-          )}
-          {/* The brief comes first so "Start case" is on screen straight away. */}
-          {phase === 'brief' && <BriefCard caseDef={caseDef} />}
-          <Monitor />
-          <ViewToggle />
-          {bayView === '3d' && <BayCard />}
-          <PatientCard hideAvatar={bayView === '3d'} />
-          {phase === 'brief' && <HowToPlay />}
-        </div>
-        <div className="col">
+      <main className="page bedside console">
+        <SceneCard bay={bay} />
+        <Monitor />
+        <div className="side">
           <AlsPanel />
           <NursePanel />
           <ActionPanels />
           <EventLog />
         </div>
+        {phase === 'brief' && (
+          <div className="handover" role="region" aria-label="Handover">
+            <div className="handover-inner">
+              {testRun && (
+                <p className="test-run-note" role="note">
+                  Test run of an editor draft. The result isn’t saved to your progress.
+                </p>
+              )}
+              <BriefCard caseDef={caseDef} bay={bay} />
+              <HowToPlay />
+            </div>
+          </div>
+        )}
       </main>
       <EndDialog
         onRestart={() => load(caseDef, seed, { testRun })}

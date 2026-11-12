@@ -12,11 +12,7 @@ interface Props {
 
 export function Avatar({ signs, rr, arrest, label }: Props) {
   const s = (k: string) => signs[k] ?? 0;
-  const lip = s('lipSwelling');
   const effort = s('effort');
-  const eyesClosed = arrest || s('eyesClosed') > 0.5;
-  const anxious = s('anxiety') > 0.4 && !eyesClosed;
-  const mouthOpen = arrest ? 0 : clamp01((effort - 0.3) / 0.6) * 7;
   const breath: CSSProperties = {
     animationDuration: rr > 0 && !arrest ? `${(60 / rr).toFixed(2)}s` : '0s',
     animationPlayState: rr > 0 && !arrest ? 'running' : 'paused',
@@ -28,6 +24,24 @@ export function Avatar({ signs, rr, arrest, label }: Props) {
         <path d="M18 200 C 24 160, 60 150, 100 150 C 140 150, 176 160, 182 200 Z" fill="#6E9BB8" />
         <path d="M84 150 L100 172 L116 150 Z" fill="#5A86A3" />
       </g>
+      <AvatarFace signs={signs} arrest={arrest} />
+    </svg>
+  );
+}
+
+/**
+ * The head: skin, flush, sweat, cyanosis, hives, eyes, brows, lips and mouth,
+ * drawn around (100, 88) in a 200×200 box. Shared by the avatar and the bed scene.
+ */
+export function AvatarFace({ signs, arrest }: { signs: Signs; arrest: boolean }) {
+  const s = (k: string) => signs[k] ?? 0;
+  const lip = s('lipSwelling');
+  const effort = s('effort');
+  const eyesClosed = arrest || s('eyesClosed') > 0.5;
+  const anxious = s('anxiety') > 0.4 && !eyesClosed;
+  const mouthOpen = arrest ? 0 : clamp01((effort - 0.3) / 0.6) * 7;
+  return (
+    <g className="avatar-face">
       <rect x="86" y="128" width="28" height="26" fill="#BE8762" />
       <ellipse cx="100" cy="88" rx="54" ry="62" fill="#C99169" />
       <ellipse
@@ -98,6 +112,6 @@ export function Avatar({ signs, rr, arrest, label }: Props) {
         fill={s('cyanosis') > 0.3 || arrest ? '#6A6F9A' : '#A9524C'}
       />
       <ellipse cx="100" cy="124" rx="7" ry={mouthOpen} fill="#3A1414" />
-    </svg>
+    </g>
   );
 }

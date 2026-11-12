@@ -262,6 +262,47 @@ These led to the following changes:
   - E2E: 375 px with no sideways scroll on all five pages.
   - The existing tests now go through the new pages.
 
+### A professional bedside: the patient in a bed, a docked monitor and a triage board
+
+Research into how established virtual-patient simulators present a case (Body Interact's help centre and product pages, descriptions of Full Code and Oxford Medical Simulation) found a common pattern:
+
+- the patient in a bed is the centre of the screen;
+- the vital-signs monitor is always visible;
+- actions are grouped around the patient;
+- equipment in the room can be clicked;
+- a handover or briefing comes first and can be reopened as notes.
+
+No designs or assets were copied. The bedside was rebuilt around that pattern:
+
+- **Patient-in-bed scene** (`src/ui/scene/`): an illustrated resus bay seen from the foot of the bed, drawn in SVG from the same state model as the 3D view (`bayModel.ts`).
+  - The patient's skin colour follows flush, pallor and cyanosis, and the face shows hives, lip swelling, sweating and eyes closing as consciousness falls. Breathing runs at the simulated respiratory rate.
+  - The patient lies flat in arrest, with CPR hands and defibrillator pads when they're used.
+  - Equipment appears as it's applied: an oxygen mask with reservoir bag, nasal cannulae or a bag-valve-mask with tubing to the wall outlet; an IV cannula; a fluid bag on the drip stand with its giving set; monitoring (ECG electrodes, BP cuff, SpO₂ probe).
+  - A wall monitor mirrors the live numbers, and the bed number above the bed matches the board.
+  - The patient, monitor, drip stand, crash trolley and oxygen outlet open the matching panel when clicked. Keyboard users get the same objects as buttons, shown when focused.
+  - A face close-up, the patient's speech as a caption (hidden in arrest), the interventions and the 2D/3D toggle sit around the scene.
+- **Console layout** (`src/app/bedside.css`): on a laptop the bedside fits one screen with no page scroll.
+  - The left side holds the patient scene and the docked monitor, compacted with its numbers in two columns.
+  - The right side holds the arrest panel, the nurse, the action tabs (scrolling inside) and the event log.
+  - Smaller screens stack the same parts.
+- **Handover:** the brief opens over the dimmed bedside ("Handover · Bay N") with the mode choice and How to play. **Brief** in the header reopens it during the case.
+- **Meaningful bays and triage:** each case has a fixed bay (`bayOf`), shown on the board, above the bed, in the handover and in the header.
+  - Board cards show the varied patient's arrival observations (HR, BP, SpO₂, RR, temperature) for that visit's seed.
+  - They also show a **NEWS2** score with its risk band in words: low, medium, high, and "red score" for a single parameter scoring 3.
+  - The NEWS2 bands live in `src/content/news2.json`, cited to the RCP's 2017 report. The GCS-to-ACVPU mapping is marked for clinical review, and no score is shown under 16.
+- **Feature check:** every control was reviewed for meaning.
+  - The speed buttons now carry a visible "Speed" label and say what they do ("one simulated minute takes 15 seconds").
+  - "~N min" on the board is explained as simulated case length.
+  - The decorative home monitor no longer shows a meaningless bay number.
+- **Fixed along the way:**
+  - In development the 3D view crashed on its second mount, because a released WebGL context was reused; it now creates a fresh canvas.
+  - The nurse panel's store selector returned a new array on each render.
+  - A `.bay` class name clash on the board leaked badge styles into the 3D view.
+- **Tests (240 unit, 25 e2e):**
+  - Unit: NEWS2 totals, band edges, single red score, under-16s and missing values; unique bays; seeded triage observations.
+  - E2E: board bays, NEWS2 and the source note; handover and bed sign matching the board; clicking the patient and equipment; the keyboard object buttons; oxygen in the scene; reopening the brief; the speed explanations; the bedside fitting one 1440×900 screen.
+  - The 3D test now finds the patient by hovering instead of fixed coordinates.
+
 ## Next
 
 - Every item in the brief's definition of done is met. Ideas for later: clinician review of the items in docs/clinical-review.md, more cases, and porting scoring and the nurse to the Unity pack.

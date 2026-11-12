@@ -31,14 +31,17 @@ interface Tip {
 
 export default function Bay3D() {
   const stageRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [failed] = useState(() => !hasWebGL());
   const [tip, setTip] = useState<Tip | null>(null);
 
   useEffect(() => {
     const stage = stageRef.current;
-    const canvas = canvasRef.current;
-    if (!stage || !canvas) return;
+    if (!stage) return;
+    // A fresh canvas each time: a canvas whose WebGL context was released on
+    // unmount can't be reused (React mounts effects twice in development).
+    const canvas = document.createElement('canvas');
+    canvas.setAttribute('aria-hidden', 'true');
+    stage.prepend(canvas);
     // A failure here reaches the LoadGuard error boundary around this view.
     const bay = new Bay(canvas, {
       dark: isDark(),
@@ -87,6 +90,7 @@ export default function Bay3D() {
       mo.disconnect();
       mq?.removeEventListener('change', onTheme);
       bay.dispose();
+      canvas.remove();
     };
   }, []);
 
@@ -101,7 +105,6 @@ export default function Bay3D() {
   return (
     <>
       <div ref={stageRef} className="bay-stage">
-        <canvas ref={canvasRef} aria-hidden="true" />
         {tip && (
           <div className="bay-tip" style={{ left: tip.x, top: tip.y }} aria-hidden="true">
             {tip.label}

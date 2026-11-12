@@ -5,9 +5,12 @@
 import { useSim } from '../../app/store.ts';
 import { fmtClock } from '../format.ts';
 
+/** A stable empty list, so the store selector doesn't return a new array each time. */
+const NONE: never[] = [];
+
 export function NursePanel() {
-  const tasks = useSim((s) => s.view?.tasks ?? []);
-  const queries = useSim((s) => s.view?.queries ?? []);
+  const tasks = useSim((s) => s.view?.tasks ?? NONE);
+  const queries = useSim((s) => s.view?.queries ?? NONE);
   const t = useSim((s) => s.view?.t ?? 0);
   const answer = useSim((s) => s.answer);
   const phase = useSim((s) => s.phase);

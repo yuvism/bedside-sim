@@ -1,0 +1,300 @@
+/* The patient scene at the centre of the bedside. */
+.scene-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.scene-stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  aspect-ratio: 16 / 9;
+  /* Wall above the floor line (73%), floor below: fills any space around the drawing. */
+  background: linear-gradient(
+    to bottom,
+    var(--room-wall-1) 0%,
+    var(--room-wall-2) 73%,
+    var(--room-floor-1) 73%,
+    var(--room-floor-2) 100%
+  );
+  overflow: hidden;
+  --room-wall-1: #eef3f4;
+  --room-wall-2: #e1e9eb;
+  --room-floor-1: #d3dbde;
+  --room-floor-2: #c3ccd0;
+}
+
+:root[data-theme='dark'] .scene-stage {
+  --room-wall-1: #bec3c4;
+  --room-wall-2: #b4babc;
+  --room-floor-1: #a9afb2;
+  --room-floor-2: #9ca3a6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .scene-stage {
+    --room-wall-1: #bec3c4;
+    --room-wall-2: #b4babc;
+    --room-floor-1: #a9afb2;
+    --room-floor-2: #9ca3a6;
+  }
+}
+
+.bed-scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+:root[data-theme='dark'] .bed-scene {
+  filter: brightness(0.8) contrast(1.05);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .bed-scene {
+    filter: brightness(0.8) contrast(1.05);
+  }
+}
+
+.bed-scene .hot {
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+
+.bed-scene .hot:hover {
+  filter: drop-shadow(0 0 6px rgba(22, 169, 156, 0.95));
+}
+
+.bay-sign {
+  fill: #fff;
+  font: 700 17px var(--font-display);
+  letter-spacing: 0.08em;
+}
+
+.gas-label {
+  fill: #2f7d55;
+  font: 700 12px var(--font-text);
+}
+
+.wm-num {
+  font: 600 30px var(--font-num);
+}
+
+.wm-small {
+  font: 600 16px var(--font-num);
+}
+
+.wm-num.hr {
+  fill: #3ce07a;
+}
+
+.wm-num.spo2 {
+  fill: #3fd0f0;
+}
+
+.wm-small.bp {
+  fill: #ff6b63;
+}
+
+.scene-breath {
+  transform-box: view-box;
+  transform-origin: 400px 316px;
+  animation-name: chest-rise;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes chest-rise {
+  50% {
+    transform: scale(1.025, 1.04);
+  }
+}
+
+.cpr-hands {
+  animation: cpr 0.545s ease-in-out infinite;
+}
+
+@keyframes cpr {
+  50% {
+    transform: translateY(7px);
+  }
+}
+
+.bvm-bag {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: bag-squeeze 6s ease-in-out infinite;
+}
+
+@keyframes bag-squeeze {
+  0%,
+  70%,
+  100% {
+    transform: rotate(-28deg) scale(1);
+  }
+  80% {
+    transform: rotate(-28deg) scale(0.82, 0.7);
+  }
+}
+
+/* Overlays on the scene */
+.scene-who {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  margin: 0;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(10, 30, 36, 0.78);
+  color: #e8f2f1;
+  font-size: 0.86rem;
+}
+
+.scene-who strong {
+  color: #fff;
+}
+
+.scene-closeup {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  width: 92px;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+}
+
+.scene-closeup .avatar {
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  background: #dfe8eb;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
+.scene-closeup span {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #2b3b40;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 0 6px;
+  border-radius: 4px;
+}
+
+.scene-caption {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  max-width: min(78%, 560px);
+  padding: 7px 14px;
+  border-radius: 10px;
+  background: rgba(10, 24, 30, 0.82);
+  color: #fff;
+  font-size: 0.98rem;
+  line-height: 1.4;
+  text-align: center;
+  pointer-events: none;
+}
+
+.scene-caption.empty {
+  display: none;
+}
+
+.scene-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--line);
+}
+
+.scene-strip .chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.scene-strip .view-toggle {
+  flex: none;
+}
+
+/* Keyboard access to the clickable objects; shown when one has focus. */
+.scene-objects {
+  padding: 0 12px 10px;
+}
+
+.scene-objects:not(:focus-within) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.scene-hint {
+  margin: 0 auto 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* The 3D bay fills the same space. */
+.scene-stage.is-3d .card.bay {
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.scene-stage.is-3d .scene-caption {
+  bottom: 84px;
+}
+
+.scene-stage.is-3d .bay-stage {
+  flex: 1 1 auto;
+  height: auto;
+  min-height: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-breath,
+  .cpr-hands,
+  .bvm-bag {
+    animation: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .scene-hint {
+    display: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .scene-closeup {
+    display: none;
+  }
+
+  .scene-caption {
+    font-size: 0.88rem;
+    max-width: 92%;
+  }
+}

@@ -29,9 +29,13 @@ const SKIP = new Set(['source', 'reviewNeeded']);
 
 export function collectContentFiles(root: string = ROOT): ContentFile[] {
   const dir = join(root, 'src', 'content');
-  const library = ['formulary.json', 'devices.json', 'investigations.json', 'team.json'].map((f) =>
-    join(dir, f),
-  );
+  const library = [
+    'formulary.json',
+    'devices.json',
+    'investigations.json',
+    'team.json',
+    'news2.json',
+  ].map((f) => join(dir, f));
   const cases = readdirSync(join(dir, 'cases'))
     .filter((f) => f.endsWith('.json'))
     .sort()
