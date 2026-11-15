@@ -221,27 +221,6 @@
   margin: 6px 0;
 }
 
-.link-btn {
-  border: 0;
-  background: none;
-  padding: 0 2px;
-  color: var(--scrub);
-  font-size: 0.82rem;
-  font-weight: 400;
-  cursor: pointer;
-  text-decoration: underline;
-}
-
-.link-btn:disabled {
-  color: var(--muted);
-  cursor: default;
-  text-decoration: none;
-}
-
-.link-btn.danger {
-  color: var(--danger);
-}
-
 .field-array,
 .field-record {
   display: grid;

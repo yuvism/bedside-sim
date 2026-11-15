@@ -47,6 +47,30 @@ export function Annotator({ rows, onRows, videoUrl, ai, codes }: Props) {
     setEvent('');
   };
 
+  const aiCount = rows.filter((r) => r.ai).length;
+
+  const seek = (sec: number) => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.currentTime = start + sec;
+    v.pause();
+  };
+
+  /** Moves a row back into the form to fix it; adding it again marks it checked. */
+  const edit = (i: number) => {
+    const r = rows[i];
+    if (!r) return;
+    setT(String(r.t));
+    setVals(
+      Object.fromEntries(
+        REF_VITALS.map((v) => [v, r.values[v] === null ? '' : String(r.values[v])]),
+      ) as Record<RefVital, string>,
+    );
+    setEvent(r.event);
+    onRows(rows.filter((_, j) => j !== i));
+    if (videoUrl) seek(r.t);
+  };
+
   const readFrame = async () => {
     const v = videoRef.current;
     if (!v || !v.videoWidth) return;
@@ -161,6 +185,24 @@ export function Annotator({ rows, onRows, videoUrl, ai, codes }: Props) {
         )}
       </fieldset>
 
+      {aiCount > 0 && (
+        <div className="hint ai-check" role="status">
+          <p>
+            {aiCount} row{aiCount === 1 ? ' was' : 's were'} filled in by AI.{' '}
+            {videoUrl
+              ? 'Click a time to jump the video there, compare, then'
+              : 'Compare each with the video, then'}{' '}
+            press <strong>Checked</strong>, or <strong>Edit</strong> to fix it.
+          </p>
+          <button
+            type="button"
+            className="btn small"
+            onClick={() => onRows(rows.map((r) => ({ ...r, ai: false })))}
+          >
+            I’ve checked them all
+          </button>
+        </div>
+      )}
       <div className="table-wrap">
         <table className="anno-table">
           <caption className="sr-only">Annotated timeline</caption>
@@ -174,19 +216,47 @@ export function Annotator({ rows, onRows, videoUrl, ai, codes }: Props) {
               ))}
               <th scope="col">Event</th>
               <th scope="col">
-                <span className="sr-only">Remove</span>
+                <span className="sr-only">Actions</span>
               </th>
             </tr>
           </thead>
           <tbody>
             {rows.map((r, i) => (
-              <tr key={`${r.t}-${i}`}>
-                <td>{fmtT(r.t)}</td>
+              <tr key={`${r.t}-${i}`} className={r.ai ? 'ai-row' : undefined}>
+                <td>
+                  {videoUrl ? (
+                    <button
+                      type="button"
+                      className="link-btn"
+                      title="Show this moment in the video"
+                      onClick={() => seek(r.t)}
+                    >
+                      {fmtT(r.t)}
+                    </button>
+                  ) : (
+                    fmtT(r.t)
+                  )}
+                  {r.ai && <span className="ai-badge">AI · check</span>}
+                </td>
                 {REF_VITALS.map((v) => (
                   <td key={v}>{r.values[v] ?? ''}</td>
                 ))}
                 <td className="anno-ev">{r.event}</td>
-                <td>
+                <td className="anno-actions">
+                  {r.ai && (
+                    <button
+                      type="button"
+                      className="link-btn"
+                      onClick={() =>
+                        onRows(rows.map((x, j) => (j === i ? { ...x, ai: false } : x)))
+                      }
+                    >
+                      Checked
+                    </button>
+                  )}
+                  <button type="button" className="link-btn" onClick={() => edit(i)}>
+                    Edit
+                  </button>
                   <button
                     type="button"
                     className="link-btn danger"

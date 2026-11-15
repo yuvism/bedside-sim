@@ -17,7 +17,6 @@ import {
 } from '../../app/drafts.ts';
 import { Footer } from '../../app/Footer.tsx';
 import { editorHref, testHref } from '../../app/router.ts';
-import { ThemeToggle } from '../../app/ThemeToggle.tsx';
 import { LIBRARY } from '../../content/library.ts';
 import { CaseSchema } from '../../content/schema.ts';
 import { exportDraft } from './exportDraft.ts';
@@ -28,6 +27,8 @@ import { RawJson } from './RawJson.tsx';
 import { RAW_SECTION, SECTIONS, sectionOfKey } from './sections.ts';
 import { buildLists, datalistId, listFor } from './suggestions.ts';
 import { checkDraft } from './validateDraft.ts';
+import { PublishButton } from '../../teacher/PublishButton.tsx';
+import { TeacherHeader } from '../../teacher/TeacherHeader.tsx';
 import './editor.css';
 
 const SHAPE = CaseSchema.shape as unknown as Record<string, z.core.$ZodType>;
@@ -158,18 +159,7 @@ export default function CaseEditor({ draftId }: { draftId: string }) {
 
   return (
     <FormContext.Provider value={ctx}>
-      <header className="bar">
-        <div className="brand">
-          <h1>
-            <a href="#/">Bedside sim</a>
-          </h1>
-          <p>Case editor · {draftTitle(draft)}</p>
-        </div>
-        <a className="btn" href={editorHref()}>
-          All drafts
-        </a>
-        <ThemeToggle />
-      </header>
+      <TeacherHeader current="editor" title={`Case editor · ${draftTitle(draft)}`} />
       <main className="page case-editor">
         <section className="card editor-toolbar" aria-label="Draft">
           <div className="toolbar-title">
@@ -185,6 +175,7 @@ export default function CaseEditor({ draftId }: { draftId: string }) {
             <button type="button" className="btn primary" disabled={!check.ok} onClick={testRun}>
               Test run
             </button>
+            <PublishButton data={draft.data} disabled={!check.ok} />
             <button type="button" className="btn" onClick={() => exportDraft(draft)}>
               Export JSON
             </button>
@@ -194,6 +185,9 @@ export default function CaseEditor({ draftId }: { draftId: string }) {
             <button type="button" className="btn danger" onClick={remove}>
               Delete
             </button>
+            <a className="btn" href={editorHref()}>
+              All drafts
+            </a>
           </span>
           {saveError && (
             <p className="hint warn" role="alert">

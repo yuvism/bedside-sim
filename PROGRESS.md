@@ -303,6 +303,20 @@ No designs or assets were copied. The bedside was rebuilt around that pattern:
   - E2E: board bays, NEWS2 and the source note; handover and bed sign matching the board; clicking the patient and equipment; the keyboard object buttons; oxygen in the scene; reopening the brief; the speed explanations; the bedside fitting one 1440×900 screen.
   - The 3D test now finds the patient by hovering instead of fixed coordinates.
 
+### Two prototypes: student app and teacher console with Autofill with AI
+
+The professor asked for two prototypes: a front end for students and a back end with the improve-from-a-video feature. Teachers upload a video and get an **Autofill with AI** option that uses a free Gemini key.
+
+- **Student app** (`src/app`, GitHub Pages): home, by topic, unknown patient, bedside and debrief. The editor, validation and Learn from a video moved out. "For teachers" now explains the teacher console. With `VITE_API_URL` set, it loads published cases at start-up (2 s timeout; invalid ones skipped) and marks them "From your teacher". The case list moved to `src/content/cases.ts`, because `import.meta.glob` is Vite-only.
+- **Teacher console** (`server/` + `teacher/` + `src/teacher/`): an Express 5 server on 127.0.0.1:8787 that serves its own React app.
+  - Dashboard with server and Gemini status.
+  - **Learn from a video:** upload or YouTube link → consent → **Autofill with AI** → rows marked "AI · check" (click a time to jump the video there; Checked, Edit or Remove) → **Analyse** (now runs on the server, streaming progress as NDJSON) → draft.
+  - Case editor with **Publish to students**, video validation, and a **Published** page (open in student app, edit a copy, unpublish).
+- **Gemini** (`@google/genai` 3.3, Interactions API, `store: false`): uploads via the File API (deleted straight after) or a YouTube URL. Frames at 1 fps. JSON schema output, checked with Zod, out-of-range values dropped, codes validated against the case. Default model `gemini-4-hydrogen` (free tier), set with `GEMINI_MODEL`. The key stays in `.env` on the server. `GEMINI_MOCK=1` answers from the AMAX4 annotation for tests and offline demos.
+- **Safety:** the server listens only on this computer and checks the Host header. Every change needs an `x-bedside-teacher` header. Uploads must be video, up to 500 MB, and are deleted after autofill and on start-up after an hour. Published cases are validated again on the server and in the student app.
+- **Tests (259 unit):** autofill parsing, the server API (mock Gemini, uploads, consent, YouTube, NDJSON analysis, publish validation, host and header checks) and published cases in the student app.
+- **e2e:** two projects. The teacher project runs its server in mock mode with a throwaway data folder, and includes a new spec: upload a tiny video, autofill, check, analyse, draft, publish, unpublish.
+
 ## Next
 
 - Every item in the brief's definition of done is met. Ideas for later: clinician review of the items in docs/clinical-review.md, more cases, and porting scoring and the nurse to the Unity pack.

@@ -20,7 +20,7 @@ import {
 import { chatHistory, resolveQuestion, type Ask } from '../../../src/app/patientChat.ts';
 import { buildPatientPrompt, HISTORY_TURNS, NONE_ID } from '../../../src/app/patientPrompt.ts';
 import { Session } from '../../../src/app/session.ts';
-import { CASES } from '../../../src/content/library.ts';
+import { CASES } from '../../../src/content/cases.ts';
 import { caseById } from '../helpers.ts';
 
 const ANA = caseById('anaphylaxis-01');

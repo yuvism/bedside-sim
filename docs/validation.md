@@ -104,19 +104,20 @@ For each vital, the simulated value is taken at the same second as each referenc
 
 ## Learn from a video
 
-**Learn from a video** (`#/learn`, or **Learn from a video** on the case list) goes one step further than validation. It **updates the case itself** so its vitals follow the video, and it **proposes what's missing**. Nothing is applied directly: every change lands in an editor draft for a person to review.
+**Learn from a video** is in the **teacher console** (`npm run teacher`, then http://localhost:8787 → **Learn from a video**). It goes one step further than validation. It **updates the case itself** so its vitals follow the video, and it **proposes what's missing**. Nothing is applied directly: every change lands in an editor draft for a person to review.
 
 ### The simplest way to update the simulation from a real hospital video
 
-1. **Permission and privacy first.** Use a video only if you have consent and approval to use it for teaching or research. Remove identifiers before annotating. The video never leaves your device; the CSV must contain no names, faces, dates of birth or hospital numbers.
-2. **Open Learn from a video** and choose **Open a video file**. Press **Scenario starts now** at the moment the case should start, for example when the patient arrives on the monitor.
-3. **Annotate as you watch.** Every 10–30 seconds, pause and **Add a reading**: type the monitor values, or press **Read monitor with Claude** to fill them in from the current frame. That option needs your own key in Settings and sends that one frame to Anthropic, so use it only where your approvals allow. Check every value it fills in. Add each action when it happens, using the suggested codes, for example `drug:adrenaline:IM`. Anything else becomes a note.
-4. **Pick the closest case** and press **Analyse the video**. In a few seconds you get:
+1. **Permission and privacy first.** Use a video only if you have consent and approval to use it for teaching or research. Remove identifiers before annotating. The CSV must contain no names, faces, dates of birth or hospital numbers.
+2. **Open Learn from a video** in the teacher console, choose **Open a video file** and pick the **closest case**. Press **Scenario starts now** at the moment the case should start, for example when the patient arrives on the monitor.
+3. **Autofill with AI (optional).** Tick the box confirming the video is public, or de-identified and approved, and press **Autofill with AI**. The video goes to the teacher server and on to Google Gemini (your free key in `.env`), which reads the monitor every 10 seconds and lists the team's actions with times, using the case's action codes. The upload is deleted from the server and from Gemini straight after. A public YouTube link works too, without uploading anything. On Gemini's free tier Google may use what you send to improve its products, so don't send real patient videos on it.
+4. **Check every row.** Rows from the AI are marked **AI · check**. Click a row's time to jump the video there, compare, then press **Checked**, or **Edit** to fix it. Values the AI couldn't read clearly are left blank, never guessed. You can also annotate by hand: every 10–30 seconds, pause and **Add a reading**, and add each action when it happens, using the suggested codes, for example `drug:adrenaline:IM`. Anything else becomes a note.
+5. Press **Analyse the video** (it stays disabled until every AI row is checked). The server runs the fit, and in a few seconds you get:
    - **Update: fitted values.** These are the case's numbers (how severe it starts, how fast it worsens, how strongly treatments work, baseline vitals) that make the simulation track the video. A table shows the error before and after for each vital.
    - **Add what's missing.** This covers scoring for actions the team took that the case doesn't credit yet, prompts and patient lines from your notes, and test results the case can't answer yet.
    - **Needs a library change.** These are drugs, routes, devices or procedures the shared library doesn't have yet. They need a sourced edit to `src/content/` (see CONTRIBUTING.md), and then you analyse again.
-5. **Tick what makes clinical sense**, then choose **Create a draft for review**. The draft is a new case `<case-id>-video`. Every fitted value gets a dated source note and `reviewNeeded`, so it appears in the clinical review list.
-6. **Test-run the draft** at the bedside. Then **Export JSON** from the editor, and open a pull request with the case, the timeline CSV (**Download timeline CSV**) and the update pack (**Download update pack**). A clinician reviews the pull request before it is merged.
+6. **Tick what makes clinical sense**, then choose **Create a draft for review**. The draft is a new case `<case-id>-video`. Every fitted value gets a dated source note and `reviewNeeded`, so it appears in the clinical review list.
+7. **Test-run the draft** at the bedside, then press **Publish to students** in the case editor. The student app shows it when it's connected to the console. To add it to the built-in library for everyone, **Export JSON** and open a pull request with the case, the timeline CSV (**Download timeline CSV**) and the update pack (**Download update pack**). A clinician reviews the pull request before it is merged.
 
 ### How it works
 
@@ -128,6 +129,7 @@ For each vital, the simulated value is taken at the same second as each referenc
   - Notes become guided-mode prompts tied to the case's severity at that moment.
   - Notes that start with "Patient", "Says" or a quotation mark become patient lines.
   - Talking and examining aren't scored automatically.
+- **Autofill** (`server/autofill.ts`, `server/gemini.ts`): Gemini answers in a fixed JSON schema (readings with `MM:SS` times, events with a code or a note). The server drops out-of-range values, keeps only codes that are valid actions for the case and turns everything else into notes. The prompt forbids estimating values, quoting dialogue or describing people. `GEMINI_MOCK=1` returns the AMAX4 annotation in the same format, for tests.
 - **Limits:** one video is one patient. Fitting to a single video can over-fit, so treat the result as a suggestion, compare several seeds, and prefer several videos of the same condition.
 
 ### Worked example: the AMAX4 simulation video

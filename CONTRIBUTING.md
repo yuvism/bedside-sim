@@ -34,7 +34,7 @@ Conventions:
 
 ## Writing a case
 
-The quickest way is the **case editor** (Case editor on the case list): start from **New case** or duplicate a library case, edit it with forms, and **Test run** it at the bedside. Then **Export JSON** into `src/content/cases/<case-id>.json`. The editor validates everything below as you type.
+The quickest way is the **case editor** in the teacher console (`npm run teacher`, then **Case editor**): start from **New case** or duplicate a library case, edit it with forms, and **Test run** it at the bedside. Then **Export JSON** into `src/content/cases/<case-id>.json`. The editor validates everything below as you type.
 
 A case file has these parts (the full schema is `src/content/schema.ts`; types are in `src/engine/caseTypes.ts`):
 

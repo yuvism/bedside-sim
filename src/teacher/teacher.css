@@ -1,0 +1,54 @@
+/* Teacher console: status pills, published list. */
+.console-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 20px;
+  padding: 0;
+  list-style: none;
+}
+
+.status-pill {
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.status-pill.ok {
+  border-color: color-mix(in srgb, var(--scrub) 45%, transparent);
+  background: var(--scrub-soft);
+  color: var(--scrub);
+}
+
+.status-pill.warn {
+  border-color: color-mix(in srgb, var(--warn) 45%, transparent);
+  color: var(--warn);
+}
+
+.published-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.published-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.teacher-bar .bar-tools .btn {
+  white-space: nowrap;
+}
+
+.publish-note {
+  flex-basis: 100%;
+  margin: 0;
+}

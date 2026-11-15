@@ -1,6 +1,6 @@
 /** "Learn by topic": pick a condition. Cases are grouped by specialty and named by diagnosis. */
 import { useMemo, useState } from 'react';
-import { CASES } from '../../content/library.ts';
+import { CASES, isPublished } from '../../content/cases.ts';
 import type { CaseDef } from '../../engine/types.ts';
 import {
   conditionOf,
@@ -48,6 +48,7 @@ function TopicCard({ c }: { c: CaseDef }) {
           {c.specialty}
         </span>
         <DifficultyChip d={c.difficulty} />
+        {isPublished(c.id) && <span className="tag-chip from-teacher">From your teacher</span>}
       </p>
       <h3>
         <a href={caseHref(c.id)}>{conditionOf(c)}</a>

@@ -4,7 +4,23 @@
 
 An open-source virtual patient simulator that runs in the browser. You talk to the patient, examine them, order tests and treat them, and their physiology responds in real time to what you do and to what you don't.
 
-**Live demo:** https://yuvism.github.io/bedside-sim/
+**Live demo (student app):** https://yuvism.github.io/bedside-sim/
+
+It comes as **two prototypes**:
+
+| Prototype                      | For      | What it is                                                                                                                                                            | Runs                                                         |
+| ------------------------------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| **Student app** (front end)    | Students | Pick a topic or an unknown patient, assess and treat them at the bedside, then get a debrief.                                                                         | GitHub Pages (live demo), or `npm run dev`                   |
+| **Teacher console** (back end) | Teachers | A Node server with its own web page: **Learn from a video** with **Autofill with AI** (Google Gemini), the case editor, video validation and **Publish to students**. | Your computer: `npm run teacher`, then http://localhost:8787 |
+
+```mermaid
+flowchart LR
+  video["Treatment video<br/>or YouTube link"] --> console["Teacher console<br/>(server/, port 8787)"]
+  console -- "Autofill with AI" --> gemini["Google Gemini<br/>(your free key)"]
+  gemini -- "readings + actions" --> console
+  console -- "teacher checks, analyses,<br/>reviews, publishes" --> published["Published cases"]
+  published -- "GET /api/published" --> student["Student app<br/>(GitHub Pages or local)"]
+```
 
 ![The welcome screen: choose Learn by topic or Unknown patient](docs/images/home.png)
 
@@ -37,9 +53,10 @@ An open-source virtual patient simulator that runs in the browser. You talk to t
 - **Scoring and debrief:** rule-based scoring with critical fails, and a debrief with a checklist, a vitals timeline with action markers and teaching points. Runs can be exported as JSON or CSV, or replayed from any minute.
 - **Eleven cases written as plain JSON**, each with an automated ideal-run test and a do-nothing test.
 - **Optional 3D bedside view:** a low-poly resus bay that follows the patient's state, with a live monitor screen and clickable objects that open the matching panel. 2D stays the default.
+- **Teacher console (back end):** a small Express server and web app for teachers. It stores uploads only until they're read, runs the fitting on the server, and keeps published cases as JSON files. See [Teacher console](#teacher-console).
 - **Case editor:** build or change a case with forms generated from the case schema, with live validation, a test run at the bedside, and JSON import, export and duplication.
 - **Video validation mode (research):** compare a simulated run with a timeline annotated from a real treatment video (RMSE, MAE, maximum deviation, divergence flags and response lags), with JSON and PNG reports. See [docs/validation.md](docs/validation.md).
-- **Learn from a video:** annotate a treatment video (or let Claude read the monitor in a frame, with your own key). The case then **updates itself**: a deterministic fit of its bounded values makes the vitals follow the video. It also **proposes what's missing**: scoring, prompts, patient lines, test results and library gaps. Every change goes into an editor draft for review first. The AMAX4 simulation video is included as a worked example. See [docs/validation.md](docs/validation.md#learn-from-a-video).
+- **Learn from a video:** annotate a treatment video by hand, or press **Autofill with AI** and let Google Gemini read the monitor every 10 seconds and list the team's actions. Every AI row is marked for a person to check before anything is analysed. The case then **updates itself**: a deterministic fit of its bounded values makes the vitals follow the video. It also **proposes what's missing**: scoring, prompts, patient lines, test results and library gaps. Every change goes into an editor draft for review first. The AMAX4 simulation video is included as a worked example. See [docs/validation.md](docs/validation.md#learn-from-a-video).
 - **Unity port pack:** a C# port of the engine for Unity 2022 LTS or newer, reading the same JSON, with a parity test that requires it to reproduce the TypeScript engine's run. See [unity/README.md](unity/README.md).
 
 | Debrief                                                                                 | Optional 3D view                                                                      |
@@ -66,7 +83,7 @@ An open-source virtual patient simulator that runs in the browser. You talk to t
 
 ## Add a case
 
-1. Open **Case editor** from the case list. Choose **New case** (a playable starter) or duplicate a library case, and edit it section by section. Problems show next to their fields.
+1. Open the **Case editor** in the teacher console (`npm run teacher`). Choose **New case** (a playable starter) or duplicate a library case, and edit it section by section. Problems show next to their fields.
 2. When it's valid, **Test run** plays it at the bedside. Tune it until it behaves the way you want.
 3. **Export JSON** and save the file as `src/content/cases/<case-id>.json`.
 4. Add an ideal-run policy for it in `tests/unit/cases/policies.ts`, then run `npm run review:build` and `npm run unity:sync`, and `npm run test`.
@@ -118,13 +135,49 @@ npm install
 npm run dev
 ```
 
+That starts the student app. For the teacher console, see below.
+
+## Teacher console
+
+```bash
+npm run teacher
+```
+
+This builds the console's web page and starts its server on http://localhost:8787. The server listens only on this computer.
+
+**Autofill with AI (Google Gemini):**
+
+1. Get a free key at https://aistudio.google.com/apikey.
+2. Copy `.env.example` to `.env` and set `GEMINI_API_KEY=` to it. `.env` is ignored by git. The key stays on the server and never reaches the browser.
+3. Restart the server. The dashboard shows "Gemini ready".
+
+`GEMINI_MODEL` picks the model (default `gemini-4-hydrogen`). `GEMINI_MOCK=1` answers from the bundled AMAX4 annotation instead, which is what the tests use, so no key is needed for development.
+
+**Privacy:** on Gemini's free tier, Google may use what you send to improve its products. The console asks you to confirm that a video is public, or de-identified and approved, before autofill runs. Uploaded videos are deleted from the server and from Gemini's file store straight after reading. Real patient videos need your organisation's approval, and a paid tier or a local model.
+
+**Show published cases in the student app:** run the student app with the console's address, for example `npm run dev -- --mode connected` with a `.env.connected` file containing `VITE_API_URL=http://localhost:8787`. Published cases then appear in the case list, marked "From your teacher". The GitHub Pages build has no API address, so it shows only the built-in cases.
+
+| API                                                | What it does                                                         |
+| -------------------------------------------------- | -------------------------------------------------------------------- |
+| `GET /api/health`                                  | Gemini status and model                                              |
+| `POST /api/videos`                                 | Upload a video (multipart `video`, up to 500 MB)                     |
+| `POST /api/autofill`                               | Gemini reads the video or YouTube link and returns timeline rows     |
+| `POST /api/analyse`                                | Fit the case to the timeline and propose additions (NDJSON progress) |
+| `GET /api/published`                               | Published cases (open to any origin)                                 |
+| `POST /api/published`, `DELETE /api/published/:id` | Publish (validated) and unpublish                                    |
+
+Every change needs the `x-bedside-teacher: 1` header, so other websites can't post to the console.
+
 | Command                | What it does                                       |
 | ---------------------- | -------------------------------------------------- |
-| `npm run dev`          | Start the dev server                               |
-| `npm run build`        | Type-check and build to `dist/`                    |
+| `npm run dev`          | Start the student app's dev server                 |
+| `npm run build`        | Type-check and build the student app to `dist/`    |
+| `npm run teacher`      | Build and start the teacher console (port 8787)    |
+| `npm run server`       | Start the teacher console server only              |
+| `npm run dev:teacher`  | Teacher console web page with hot reload (5174)    |
 | `npm run lint`         | ESLint                                             |
 | `npm run test`         | Unit tests (Vitest)                                |
-| `npm run test:e2e`     | End-to-end tests (Playwright, on `dist/`)          |
+| `npm run test:e2e`     | End-to-end tests for both apps (build both first)  |
 | `npm run format`       | Prettier                                           |
 | `npm run review:build` | Rebuild `docs/clinical-review.md` from the content |
 | `npm run unity:sync`   | Copy content and parity fixtures into `unity/`     |

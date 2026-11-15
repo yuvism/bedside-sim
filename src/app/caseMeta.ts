@@ -3,7 +3,8 @@
  * topic") and an opaque patient code (for "Unknown patient", so the URL
  * doesn't give the diagnosis away).
  */
-import { CASES, LIBRARY } from '../content/library.ts';
+import { CASES } from '../content/cases.ts';
+import { LIBRARY } from '../content/library.ts';
 import { SimpleEngine } from '../engine/engine.ts';
 import type { CaseDef } from '../engine/types.ts';
 import { materialiseCase } from '../engine/variation.ts';

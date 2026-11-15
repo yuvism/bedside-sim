@@ -15,6 +15,8 @@ export default defineConfig([
     'reference',
     'unity',
     'node_modules',
+    'dist-teacher',
+    'server/data',
   ]),
   {
     files: ['**/*.{ts,tsx,js}'],

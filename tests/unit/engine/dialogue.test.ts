@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CASES } from '../../../src/content/library.ts';
+import { CASES } from '../../../src/content/cases.ts';
 import { matchQuestion, normalise, stem, unknownAnswer } from '../../../src/engine/dialogue.ts';
 import { SimpleEngine } from '../../../src/engine/engine.ts';
 import { runScript } from '../../../src/engine/replay.ts';

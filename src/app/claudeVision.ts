@@ -8,6 +8,7 @@ import type {
   BetaMessage,
   MessageCreateParamsNonStreaming,
 } from '@anthropic-ai/sdk/resources/beta/messages/messages';
+import { plausibleReading } from '../engine/validation/ranges.ts';
 import { DEFAULT_MODEL, type AiSettings } from './aiSettings.ts';
 import { createClient, errorNotice, FALLBACK_BETA, type PatientClient } from './claudePatient.ts';
 
@@ -61,16 +62,6 @@ export function buildVisionRequest(
   };
 }
 
-/** Plausible ranges; anything outside is treated as a misread. */
-const RANGES: Record<MonitorKey, [number, number]> = {
-  hr: [0, 300],
-  sbp: [0, 300],
-  dbp: [0, 250],
-  spo2: [0, 100],
-  rr: [0, 80],
-  etco2: [0, 150],
-};
-
 export function parseVision(msg: BetaMessage): MonitorReading | null {
   const text = msg.content
     .map((b) => (b.type === 'text' ? b.text : ''))
@@ -79,11 +70,7 @@ export function parseVision(msg: BetaMessage): MonitorReading | null {
   try {
     const v = JSON.parse(text) as Record<string, unknown>;
     const out = { notes: typeof v['notes'] === 'string' ? v['notes'] : '' } as MonitorReading;
-    for (const k of MONITOR_KEYS) {
-      const x = v[k];
-      const [lo, hi] = RANGES[k];
-      out[k] = typeof x === 'number' && Number.isFinite(x) && x >= lo && x <= hi ? x : null;
-    }
+    for (const k of MONITOR_KEYS) out[k] = plausibleReading(k, v[k]);
     return out;
   } catch {
     return null;

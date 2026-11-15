@@ -7,7 +7,7 @@ import {
   surpriseHref,
 } from '../../../src/app/caseMeta.ts';
 import { parseHash, patientHref } from '../../../src/app/router.ts';
-import { CASES } from '../../../src/content/library.ts';
+import { CASES } from '../../../src/content/cases.ts';
 import { caseById } from '../helpers.ts';
 
 describe('case pages', () => {

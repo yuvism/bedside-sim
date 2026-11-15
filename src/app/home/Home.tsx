@@ -2,7 +2,7 @@
  * The welcome screen: one decision, how to practise. Everything else lives
  * on its own page (topics, patients, how it works, for teachers).
  */
-import { CASES } from '../../content/library.ts';
+import { CASES } from '../../content/cases.ts';
 import { surpriseHref } from '../caseMeta.ts';
 import { Footer } from '../Footer.tsx';
 import {

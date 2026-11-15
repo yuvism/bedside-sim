@@ -13,6 +13,7 @@ Thumbs.db
 .idea
 .env
 .env.*
+!.env.example
 .claude/
 
 # Unity parity runner build output
@@ -21,3 +22,10 @@ unity/ParityRunner/**/obj/
 
 # Demo video and handout made for sharing (not part of the app)
 deliverables/
+
+# Teacher console: uploads and published cases, and its web build
+server/data/
+dist-teacher/
+
+# Office lock files (a document open in Word or PowerPoint)
+~$*

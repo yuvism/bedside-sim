@@ -11,6 +11,8 @@ export interface Row {
   t: number;
   values: Record<RefVital, number | null>;
   event: string;
+  /** Filled in by AI and not yet checked by a person. */
+  ai?: boolean;
 }
 
 export const emptyValues = (): Record<RefVital, number | null> =>

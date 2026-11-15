@@ -4,7 +4,6 @@
  */
 import { useMemo, useRef, useState, type ChangeEvent } from 'react';
 import { Footer } from '../../app/Footer.tsx';
-import { ThemeToggle } from '../../app/ThemeToggle.tsx';
 import { LIBRARY } from '../../content/library.ts';
 import { caseOptions } from '../caseOptions.ts';
 import sampleCsv from '../../content/validation/anaphylaxis-01-sample.csv?raw';
@@ -28,6 +27,7 @@ import { buildReport } from './report.ts';
 import { DivergenceList, EventsTable, MetricsTable } from './ResultTables.tsx';
 import { TransitionsEditor } from './TransitionsEditor.tsx';
 import { VITAL_INFO } from './vitals.ts';
+import { TeacherHeader } from '../../teacher/TeacherHeader.tsx';
 import './validation.css';
 
 const DOCS = 'https://github.com/yuvism/bedside-sim/blob/main/docs/validation.md';
@@ -131,18 +131,7 @@ export default function ValidationPage() {
 
   return (
     <>
-      <header className="bar">
-        <div className="brand">
-          <h1>
-            <a href="#/">Bedside sim</a>
-          </h1>
-          <p>Video validation</p>
-        </div>
-        <a className="btn" href="#/">
-          Cases
-        </a>
-        <ThemeToggle />
-      </header>
+      <TeacherHeader current="validate" />
       <main className="page validation">
         <h2 className="page-title">Video validation</h2>
         <p className="muted">

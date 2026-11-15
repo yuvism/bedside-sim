@@ -3,7 +3,8 @@
  * outcome and a do-nothing run that reaches a bad one, across seeds.
  */
 import { describe, expect, it } from 'vitest';
-import { CASES, LIBRARY } from '../../../src/content/library.ts';
+import { CASES } from '../../../src/content/cases.ts';
+import { LIBRARY } from '../../../src/content/library.ts';
 import { runPolicy, runScript } from '../../../src/engine/replay.ts';
 import { lastDiagnosis, scoreRun } from '../../../src/engine/scoring.ts';
 import { IDEAL } from './policies.ts';

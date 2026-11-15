@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { BOARD, bayOf, triageOf } from '../../../src/app/caseMeta.ts';
 import { news2, type Obs } from '../../../src/app/news2.ts';
-import { CASES } from '../../../src/content/library.ts';
+import { CASES } from '../../../src/content/cases.ts';
 import { caseById } from '../helpers.ts';
 
 const NORMAL: Obs = { rr: 16, spo2: 98, sbp: 125, hr: 75, temp: 36.8, gcs: 15, onOxygen: false };

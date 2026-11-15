@@ -933,6 +933,7 @@ a.how-way:hover {
   gap: 6px;
   color: var(--scrub);
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .add-steps {
@@ -1049,4 +1050,12 @@ a.how-way:hover {
   a.how-way {
     transition: none;
   }
+}
+
+/* A case published from the teacher console. */
+.tag-chip.from-teacher {
+  background: var(--scrub-soft);
+  color: var(--scrub);
+  font-weight: 700;
+  white-space: nowrap;
 }

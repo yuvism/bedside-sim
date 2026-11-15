@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { CASES, checkCase, LIBRARY } from '../../../src/content/library.ts';
+import { CASES } from '../../../src/content/cases.ts';
+import { checkCase, LIBRARY } from '../../../src/content/library.ts';
 import { buildClinicalReview, collectContentFiles } from '../../../scripts/clinical-review.ts';
 
 const anaphylaxis = () => structuredClone(CASES.find((c) => c.id === 'anaphylaxis-01')!);

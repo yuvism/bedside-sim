@@ -5,7 +5,7 @@
  * diagnosis and topic tags stay hidden until the debrief.
  */
 import { useMemo, useState } from 'react';
-import { CASES } from '../../content/library.ts';
+import { CASES } from '../../content/cases.ts';
 import type { CaseDef } from '../../engine/types.ts';
 import {
   BOARD,

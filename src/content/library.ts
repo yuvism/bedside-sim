@@ -1,4 +1,7 @@
-/** Loads and validates the shared library and the bundled cases. */
+/**
+ * Loads and validates the shared library (drugs, devices, tests, team) and
+ * checks cases against it. The case list itself lives in cases.ts.
+ */
 import type { TeamConfig } from '../engine/team.ts';
 import type { CaseDef, EngineLibrary } from '../engine/types.ts';
 import devicesJson from './devices.json';
@@ -63,15 +66,4 @@ export function parseCase(raw: unknown, lib: EngineLibrary = LIBRARY): CaseDef {
   const r = checkCase(raw, lib);
   if (!r.ok) throw new ContentError('Invalid case file', r.issues);
   return r.value;
-}
-
-const modules = import.meta.glob<unknown>('./cases/*.json', { eager: true, import: 'default' });
-
-/** All bundled cases, sorted by id. */
-export const CASES: CaseDef[] = Object.values(modules)
-  .map((raw) => parseCase(raw))
-  .sort((a, b) => a.id.localeCompare(b.id));
-
-export function getCase(id: string): CaseDef | undefined {
-  return CASES.find((c) => c.id === id);
 }

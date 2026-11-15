@@ -10,7 +10,8 @@ import {
 } from '../../../src/app/drafts.ts';
 import { templateCase } from '../../../src/ui/editor/template.ts';
 import { parseHash } from '../../../src/app/router.ts';
-import { CASES, LIBRARY } from '../../../src/content/library.ts';
+import { CASES } from '../../../src/content/cases.ts';
+import { LIBRARY } from '../../../src/content/library.ts';
 import { CaseSchema, ConditionSchema, RuleTestSchema } from '../../../src/content/schema.ts';
 import { indexIssues } from '../../../src/ui/editor/form/context.ts';
 import {

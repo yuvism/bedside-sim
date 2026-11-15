@@ -12,10 +12,11 @@ import {
 } from '../../app/drafts.ts';
 import { Footer } from '../../app/Footer.tsx';
 import { editorHref, testHref } from '../../app/router.ts';
-import { ThemeToggle } from '../../app/ThemeToggle.tsx';
-import { CASES, checkCase } from '../../content/library.ts';
+import { CASES } from '../../content/cases.ts';
+import { checkCase } from '../../content/library.ts';
 import { exportDraft } from './exportDraft.ts';
 import { templateCase } from './template.ts';
+import { TeacherHeader } from '../../teacher/TeacherHeader.tsx';
 import './editor.css';
 
 const when = (t: number) =>
@@ -56,18 +57,7 @@ export default function EditorHome() {
 
   return (
     <>
-      <header className="bar">
-        <div className="brand">
-          <h1>
-            <a href="#/">Bedside sim</a>
-          </h1>
-          <p>Case editor</p>
-        </div>
-        <a className="btn" href="#/">
-          Cases
-        </a>
-        <ThemeToggle />
-      </header>
+      <TeacherHeader current="editor" />
       <main className="page editor-home">
         <h2 className="page-title">Case editor</h2>
         <p className="muted">

@@ -1,4 +1,5 @@
-import { getCase, LIBRARY } from '../../src/content/library.ts';
+import { getCase } from '../../src/content/cases.ts';
+import { LIBRARY } from '../../src/content/library.ts';
 import type { ScriptStep } from '../../src/engine/replay.ts';
 import type { CaseDef, Route } from '../../src/engine/types.ts';
 

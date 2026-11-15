@@ -1,5 +1,6 @@
 import { draftTitle, listDrafts } from '../app/drafts.ts';
-import { CASES, checkCase } from '../content/library.ts';
+import { CASES } from '../content/cases.ts';
+import { checkCase } from '../content/library.ts';
 import type { CaseDef } from '../engine/types.ts';
 
 export interface CaseOption {
