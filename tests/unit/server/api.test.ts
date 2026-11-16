@@ -157,7 +157,8 @@ describe('teacher server', () => {
 describe('Gemini client', () => {
   it('explains a missing key without calling Google', async () => {
     const cfg = geminiConfig({});
-    expect(cfg.model).toBe('gemini-4-hydrogen');
+    expect(cfg.model).toBe('gemini-3.6-flash');
+    expect(cfg.fallbackModel).toBe('gemini-4-hydrogen');
     await expect(
       askGemini({ kind: 'youtube', url: 'https://youtu.be/abcdefg' }, 'p', {}, cfg),
     ).rejects.toBeInstanceOf(AutofillError);

@@ -18,12 +18,14 @@ interface Props {
   caseDef: CaseDef | undefined;
   /** Rows the teacher already has (they'd be replaced). */
   rowCount: number;
+  /** The teacher's scenario start in video seconds (0 = let the AI find it). */
+  start: number;
   onFilled(reply: AutofillReply): void;
 }
 
 const YOUTUBE = /^https:\/\/(www\.|m\.)?(youtube\.com\/(watch\?v=|shorts\/)|youtu\.be\/)[\w-]{6,}/;
 
-export function AutofillPanel({ file, caseDef, rowCount, onFilled }: Props) {
+export function AutofillPanel({ file, caseDef, rowCount, start, onFilled }: Props) {
   const [health, setHealth] = useState<Health | null>(null);
   const [healthError, setHealthError] = useState<string | null>(null);
   const [youtube, setYoutube] = useState('');
@@ -60,13 +62,21 @@ export function AutofillPanel({ file, caseDef, rowCount, onFilled }: Props) {
         youtubeUrl: file ? undefined : youtube.trim(),
         caseJson: caseDef,
         consent,
+        startSec: start > 0 ? start : undefined,
       });
       onFilled(reply);
       const skipped = reply.unmatched
         ? ` ${reply.unmatched} action${reply.unmatched === 1 ? '' : 's'} didn’t match this case and became notes.`
         : '';
+      const at = `${Math.floor(reply.start / 60)}:${String(reply.start % 60).padStart(2, '0')}`;
+      const where =
+        reply.startFrom === 'ai'
+          ? ` The AI found that the scenario starts at ${at} in the video; if that’s wrong, go to the right moment and press Scenario starts now.`
+          : reply.startFrom === 'teacher'
+            ? ` Times count from your scenario start (${at} in the video).`
+            : '';
       setNote({
-        text: `Filled ${reply.rows.length} rows (${reply.model}). Check each one against the video before analysing.${skipped} ${reply.notes}`,
+        text: `Filled ${reply.rows.length} rows (${reply.model}).${where} Check each row against the video before analysing.${skipped} ${reply.notes}`,
         warn: false,
       });
     } catch (e) {

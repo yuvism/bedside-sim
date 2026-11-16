@@ -132,6 +132,27 @@ For each vital, the simulated value is taken at the same second as each referenc
 - **Autofill** (`server/autofill.ts`, `server/gemini.ts`): Gemini answers in a fixed JSON schema (readings with `MM:SS` times, events with a code or a note). The server drops out-of-range values, keeps only codes that are valid actions for the case and turns everything else into notes. The prompt forbids estimating values, quoting dialogue or describing people. `GEMINI_MOCK=1` returns the AMAX4 annotation in the same format, for tests.
 - **Limits:** one video is one patient. Fitting to a single video can over-fit, so treat the result as a suggestion, compare several seeds, and prefer several videos of the same condition.
 
+### How accurate is Autofill with AI?
+
+Checked on 16 November 2026 with a free key, `gemini-3.6-flash`, on the public AMAX4 YouTube video (case `asthma-02`). It went through the teacher server exactly as the page does. The AI's rows were compared with our hand annotation at the same moments (within 6 s).
+
+- **Scenario start:** the video opens with about 14 minutes of interviews. Gemini put the start at 14:14, so its times lined up with ours without any manual shift.
+- **Readings:**
+
+  | Vital        | Hand readings | AI found | Average error | RMSE |
+  | ------------ | ------------- | -------- | ------------- | ---- |
+  | Heart rate   | 28            | 28       | 2.1 /min      | 2.9  |
+  | Systolic BP  | 12            | 11       | 1.7 mmHg      | 3.1  |
+  | Diastolic BP | 12            | 11       | 0.5 mmHg      | 1.1  |
+  | SpO₂         | 11            | 11       | 0.3 %         | 0.5  |
+
+- **Actions:**
+  - Magnesium (4:01) and IV salbutamol (4:10) landed within 1 second of ours. The surgical airway was put at 2:00, when it was decided; we noted 2:30.
+  - It also listed actions our notes left out, such as adrenaline boluses, a failed intubation attempt and sedation.
+  - It missed the call for help (made before the patient arrived) and IV access (which we had assumed, not seen).
+- **Effect on the update:** analysing the original asthma case with the AI timeline changed the same 6 values as with the hand timeline. The systolic BP error went from 33.6 to 8.3 (from 35.0 to 7.5 by hand). It proposed more additions (25 against 14) because it noted more actions.
+- **Speed:** 43–100 s for the 20-minute video. Answers vary a little from run to run, so a person still checks every row.
+
 ### Worked example: the AMAX4 simulation video
 
 [`src/content/validation/amax4-simulation-annotation.csv`](../src/content/validation/amax4-simulation-annotation.csv) is an annotation of the publicly available **"AMAX4 Simulation MASTER"** video (Live to the MAX!, YouTube, https://www.youtube.com/watch?v=o3NDS3snnxc). That video is a **manikin simulation, not a real patient**.

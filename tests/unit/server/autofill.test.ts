@@ -87,6 +87,51 @@ describe('replyToRows', () => {
   });
 });
 
+describe('scenario start', () => {
+  const reply = {
+    scenario_start: '14:09',
+    readings: [
+      reading('13:50', { hr: 70 }),
+      reading('14:19', { hr: 142 }),
+      reading('17:00', { hr: 60 }),
+    ],
+    events: [
+      { time: '11:15', code: 'drug:adrenaline:IV', description: 'Prepared before arrival' },
+      { time: '16:15', code: 'procedure:front_of_neck_access', description: 'Neck airway' },
+    ],
+    notes: '',
+  };
+
+  it('counts from the start the AI found and drops anything before it', () => {
+    const r = replyToRows(reply, asthma, LIBRARY);
+    expect(r).toMatchObject({ start: 849, startFrom: 'ai' });
+    expect(r.rows.map((x) => x.t)).toEqual([10, 126, 171]);
+    expect(r.rows.find((x) => x.t === 171)?.values.hr).toBe(60);
+    expect(r.rows.some((x) => x.event.includes('Prepared before arrival'))).toBe(false);
+  });
+
+  it('uses the teacher’s start when given', () => {
+    const r = replyToRows(reply, asthma, LIBRARY, { start: 855 });
+    expect(r).toMatchObject({ start: 855, startFrom: 'teacher' });
+    expect(r.rows[0]?.t).toBe(4);
+  });
+
+  it('falls back to the start of the video', () => {
+    const r = replyToRows({ ...reply, scenario_start: null }, asthma, LIBRARY);
+    expect(r).toMatchObject({ start: 0, startFrom: 'none' });
+    expect(r.rows.map((x) => x.t)).toEqual([675, 830, 859, 975, 1020]);
+  });
+
+  it('mock answers line up with a teacher-set start', () => {
+    const csv = readFileSync('src/content/validation/amax4-simulation-annotation.csv', 'utf8');
+    const plain = replyToRows(mockReply(csv, asthma, LIBRARY), asthma, LIBRARY);
+    const shifted = replyToRows(mockReply(csv, asthma, LIBRARY, 30), asthma, LIBRARY, {
+      start: 30,
+    });
+    expect(shifted.rows).toEqual(plain.rows);
+  });
+});
+
 describe('prompt and codes', () => {
   it('lists real drug routes instead of wildcards', () => {
     const codes = actionCodes(asthma, LIBRARY);
@@ -97,6 +142,7 @@ describe('prompt and codes', () => {
     expect(prompt).toContain('procedure:front_of_neck_access');
     expect(prompt).toMatch(/Never estimate/);
     expect(prompt).toMatch(/Do not quote dialogue/);
+    expect(prompt).toMatch(/scenario_start/);
   });
 });
 

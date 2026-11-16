@@ -151,7 +151,7 @@ This builds the console's web page and starts its server on http://localhost:878
 2. Copy `.env.example` to `.env` and set `GEMINI_API_KEY=` to it. `.env` is ignored by git. The key stays on the server and never reaches the browser.
 3. Restart the server. The dashboard shows "Gemini ready".
 
-`GEMINI_MODEL` picks the model (default `gemini-4-hydrogen`). `GEMINI_MOCK=1` answers from the bundled AMAX4 annotation instead, which is what the tests use, so no key is needed for development.
+`GEMINI_MODEL` picks the model (default `gemini-3.6-flash`, which was tested on the AMAX4 video). If it's busy, the console tries `GEMINI_FALLBACK_MODEL` (default `gemini-4-hydrogen`). `GEMINI_MOCK=1` answers from the bundled AMAX4 annotation instead, which is what the tests use, so no key is needed for development.
 
 **Privacy:** on Gemini's free tier, Google may use what you send to improve its products. The console asks you to confirm that a video is public, or de-identified and approved, before autofill runs. Uploaded videos are deleted from the server and from Gemini's file store straight after reading. Real patient videos need your organisation's approval, and a paid tier or a local model.
 

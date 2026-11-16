@@ -13,6 +13,9 @@ interface Props {
   rows: Row[];
   onRows(rows: Row[]): void;
   videoUrl: string | null;
+  /** Where scenario time 0 is in the video, in seconds. */
+  start: number;
+  onStart(sec: number): void;
   ai: AiSettings;
   /** Action codes offered while typing an event. */
   codes: string[];
@@ -24,9 +27,8 @@ const num = (s: string): number | null => {
   return Number.isFinite(n) ? n : null;
 };
 
-export function Annotator({ rows, onRows, videoUrl, ai, codes }: Props) {
+export function Annotator({ rows, onRows, videoUrl, start, onStart, ai, codes }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [start, setStart] = useState(0);
   const [t, setT] = useState('0');
   const [vals, setVals] = useState<Record<RefVital, string>>(
     Object.fromEntries(REF_VITALS.map((v) => [v, ''])) as Record<RefVital, string>,
@@ -107,7 +109,7 @@ export function Annotator({ rows, onRows, videoUrl, ai, codes }: Props) {
             <button
               type="button"
               className="btn small"
-              onClick={() => setStart(videoRef.current?.currentTime ?? 0)}
+              onClick={() => onStart(Math.round(videoRef.current?.currentTime ?? 0))}
             >
               Scenario starts now
             </button>

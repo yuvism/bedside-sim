@@ -312,9 +312,12 @@ The professor asked for two prototypes: a front end for students and a back end 
   - Dashboard with server and Gemini status.
   - **Learn from a video:** upload or YouTube link → consent → **Autofill with AI** → rows marked "AI · check" (click a time to jump the video there; Checked, Edit or Remove) → **Analyse** (now runs on the server, streaming progress as NDJSON) → draft.
   - Case editor with **Publish to students**, video validation, and a **Published** page (open in student app, edit a copy, unpublish).
-- **Gemini** (`@google/genai` 3.3, Interactions API, `store: false`): uploads via the File API (deleted straight after) or a YouTube URL. Frames at 1 fps. JSON schema output, checked with Zod, out-of-range values dropped, codes validated against the case. Default model `gemini-4-hydrogen` (free tier), set with `GEMINI_MODEL`. The key stays in `.env` on the server. `GEMINI_MOCK=1` answers from the AMAX4 annotation for tests and offline demos.
+- **Gemini** (`@google/genai` 3.3, Interactions API, `store: false`): uploads via the File API (deleted straight after) or a YouTube URL. Frames at 1 fps. JSON schema output, checked with Zod, out-of-range values dropped, codes validated against the case. Default model `gemini-3.6-flash` (free tier), with `gemini-4-hydrogen` as the fallback when it's busy. Set them with `GEMINI_MODEL` and `GEMINI_FALLBACK_MODEL`. The key stays in `.env` on the server. `GEMINI_MOCK=1` answers from the AMAX4 annotation for tests and offline demos.
 - **Safety:** the server listens only on this computer and checks the Host header. Every change needs an `x-bedside-teacher` header. Uploads must be video, up to 500 MB, and are deleted after autofill and on start-up after an hour. Published cases are validated again on the server and in the student app.
-- **Tests (259 unit):** autofill parsing, the server API (mock Gemini, uploads, consent, YouTube, NDJSON analysis, publish validation, host and header checks) and published cases in the student app.
+- **Real check with a free key (2026-11-16):**
+  - Two fixes came out of it. The stable Interactions API wants the video and prompt inside one `user_input` step. Gemini also now reports `scenario_start`, so videos with an intro are counted from the scenario (here 14:14 into the video). A teacher's "Scenario starts now" overrides it and moves all rows.
+  - Accuracy against our hand annotation, through the real server: see docs/validation.md.
+- **Tests (263 unit):** autofill parsing, the server API (mock Gemini, uploads, consent, YouTube, NDJSON analysis, publish validation, host and header checks) and published cases in the student app.
 - **e2e:** two projects. The teacher project runs its server in mock mode with a throwaway data folder, and includes a new spec: upload a tiny video, autofill, check, analyse, draft, publish, unpublish.
 
 ## Next

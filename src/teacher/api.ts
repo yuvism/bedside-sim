@@ -20,10 +20,14 @@ export interface AutofillRow {
 }
 
 export interface AutofillReply {
+  /** In scenario time (seconds after the scenario starts in the video). */
   rows: AutofillRow[];
   notes: string;
   unmatched: number;
   model: string;
+  /** Where the scenario starts in the video, in seconds, and who decided. */
+  start: number;
+  startFrom: 'teacher' | 'ai' | 'none';
 }
 
 export interface Analysis {
@@ -69,6 +73,8 @@ export async function uploadVideo(file: File): Promise<{ id: string }> {
 export async function autofill(body: {
   videoId?: string;
   youtubeUrl?: string;
+  /** The teacher's "Scenario starts now", in video seconds. */
+  startSec?: number;
   caseJson: unknown;
   consent: boolean;
 }): Promise<AutofillReply> {

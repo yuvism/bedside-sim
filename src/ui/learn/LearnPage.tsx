@@ -37,6 +37,8 @@ export default function LearnPage() {
   const [rows, setRows] = useState<Row[]>([]);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
+  /** Where scenario time 0 is in the video, in seconds. */
+  const [start, setStart] = useState(0);
   const [progress, setProgress] = useState<FitProgress | null>(null);
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [changeOn, setChangeOn] = useState<Set<string>>(new Set());
@@ -75,6 +77,7 @@ export default function LearnPage() {
     if (videoUrl) URL.revokeObjectURL(videoUrl);
     setVideoUrl(URL.createObjectURL(f));
     setVideoFile(f);
+    setStart(0);
     setName(f.name.replace(/\.[^.]+$/, ''));
   };
 
@@ -86,7 +89,16 @@ export default function LearnPage() {
 
   const aiRows = rows.filter((r) => r.ai).length;
 
+  /** A new scenario start moves every row, so each stays on its moment in the video. */
+  const changeStart = (sec: number) => {
+    const delta = sec - start;
+    setStart(sec);
+    if (delta === 0 || rows.length === 0) return;
+    setRows(rows.map((r) => ({ ...r, t: r.t - delta })).filter((r) => r.t >= 0));
+  };
+
   const onFilled = (reply: AutofillReply) => {
+    setStart(reply.start);
     setRows(reply.rows.map((r) => ({ ...r, ai: true })));
     setMeta((m) => ({ ...m, autofill: `${reply.model}, checked by a person` }));
     setAnalysis(null);
@@ -241,6 +253,7 @@ export default function LearnPage() {
           file={videoFile}
           caseDef={chosen?.caseDef}
           rowCount={rows.length}
+          start={start}
           onFilled={onFilled}
         />
 
@@ -251,7 +264,15 @@ export default function LearnPage() {
             you can’t read blank. Action ids match the engine’s log (see docs/validation.md);
             anything else becomes a note.
           </p>
-          <Annotator rows={rows} onRows={setRows} videoUrl={videoUrl} ai={ai} codes={codes} />
+          <Annotator
+            rows={rows}
+            onRows={setRows}
+            videoUrl={videoUrl}
+            start={start}
+            onStart={changeStart}
+            ai={ai}
+            codes={codes}
+          />
           {rows.length > 0 && (
             <button
               type="button"

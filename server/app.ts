@@ -139,11 +139,14 @@ export function createApp(o: AppOptions) {
       } else {
         throw new AutofillError('Upload a video or paste a public YouTube link.', 400);
       }
-      const reply = gemini.mock
-        ? mockReply(o.mockCsv, c, LIBRARY)
+      // The teacher's "Scenario starts now", in video seconds, if they set one.
+      const startSec = Number(body['startSec']);
+      const start = Number.isFinite(startSec) && startSec > 0 ? Math.round(startSec) : null;
+      const answer = gemini.mock
+        ? { reply: mockReply(o.mockCsv, c, LIBRARY, start ?? 0), model: 'mock' }
         : await askGemini(source, buildPrompt(actionCodes(c, LIBRARY)), REPLY_SCHEMA, gemini);
-      const result = replyToRows(reply, c, LIBRARY);
-      res.json({ ...result, model: gemini.mock ? 'mock' : gemini.model });
+      const result = replyToRows(answer.reply, c, LIBRARY, { start });
+      res.json({ ...result, model: answer.model });
     } catch (err) {
       next(err);
     } finally {
