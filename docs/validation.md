@@ -153,6 +153,8 @@ Checked on 16 November 2026 with a free key, `gemini-3.6-flash`, on the public A
 - **Effect on the update:** analysing the original asthma case with the AI timeline changed the same 6 values as with the hand timeline. The systolic BP error went from 33.6 to 8.3 (from 35.0 to 7.5 by hand). It proposed more additions (25 against 14) because it noted more actions.
 - **Speed:** 43–100 s for the 20-minute video. Answers vary a little from run to run, so a person still checks every row.
 
+**On the most-watched UK ABCDE videos:** see [abcde-video-tests.md](abcde-video-tests.md). Actions and their timing were found reliably; readings depend on whether the video shows a monitor.
+
 ### Worked example: the AMAX4 simulation video
 
 [`src/content/validation/amax4-simulation-annotation.csv`](../src/content/validation/amax4-simulation-annotation.csv) is an annotation of the publicly available **"AMAX4 Simulation MASTER"** video (Live to the MAX!, YouTube, https://www.youtube.com/watch?v=o3NDS3snnxc). That video is a **manikin simulation, not a real patient**.

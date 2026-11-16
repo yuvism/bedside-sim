@@ -320,6 +320,17 @@ The professor asked for two prototypes: a front end for students and a back end 
 - **Tests (263 unit):** autofill parsing, the server API (mock Gemini, uploads, consent, YouTube, NDJSON analysis, publish validation, host and header checks) and published cases in the student app.
 - **e2e:** two projects. The teacher project runs its server in mock mode with a throwaway data folder, and includes a new spec: upload a tiny video, autofill, check, analyse, draft, publish, unpublish.
 
+## ABCDE video tests and the live demo (2026-11-17)
+
+- **Tests:** Autofill with AI and Analyse ran on the three most-watched UK ABCDE simulation videos (Geeky Medics sepsis and asthma, Resuscitation Council UK demo). The results are in docs/abcde-video-tests.md. Actions and their timing were found reliably (within 1–8 s of the videos' chapter markers or frames). Readings depend on whether a monitor is shown.
+- **Free-tier fixes:**
+  - The Gemini SDK's hidden retries (up to 4 per request, each resending the video and counting against the 20-a-day limit) are off.
+  - The console now falls back through `gemini-3.8-flash`, `gemini-4-hydrogen` and `gemini-3.5-flash-lite` on busy (5xx), limit (429) or timeout (5 min per model).
+  - When none can answer, one message says which were busy, which were used up and when the limit resets.
+- **Prompt:** observations said aloud are used when no monitor is shown, once at the moment they are said.
+- **`npm run demo`** starts the teacher console and a student app connected to it (port 5175), for live demos.
+- **Deliverables (not in the repo):** a 7-slide presentation with the narrated how-to video embedded, and a folder ready for Google Drive (code archive, slides, videos, test report).
+
 ## Next
 
 - Every item in the brief's definition of done is met. Ideas for later: clinician review of the items in docs/clinical-review.md, more cases, and porting scoring and the nurse to the Unity pack.

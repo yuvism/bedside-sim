@@ -86,6 +86,7 @@ export function buildPrompt(codes: readonly string[]): string {
     'READINGS. Every 10 seconds of video time from the scenario start, read the patient monitor or on-screen vital-signs overlay and report:',
     'hr (heart rate per minute), sbp and dbp (blood pressure, mmHg), spo2 (oxygen saturation, %), rr (respiratory rate per minute), etco2 (end-tidal CO2 in mmHg; multiply kPa by 7.5).',
     'Use null for any value that is not shown, unreadable, changing mid-frame or shown as dashes. Never estimate a value from the clinical picture. Leave out a time if nothing is readable.',
+    'When no monitor or overlay shows a vital sign, you may use a value that is clearly said aloud (for example a nurse reading out the observations): report it once, at the time it is said, and do not repeat it at later times.',
     '',
     'EVENTS. List each clinical action the team performs or clearly orders (drugs, fluids, oxygen and airway devices, procedures, tests, calling for help, CPR, shocks) at the time it happens.',
     `Set code to one of these when it matches: ${codes.join(', ')}.`,

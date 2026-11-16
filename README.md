@@ -151,11 +151,13 @@ This builds the console's web page and starts its server on http://localhost:878
 2. Copy `.env.example` to `.env` and set `GEMINI_API_KEY=` to it. `.env` is ignored by git. The key stays on the server and never reaches the browser.
 3. Restart the server. The dashboard shows "Gemini ready".
 
-`GEMINI_MODEL` picks the model (default `gemini-3.6-flash`, which was tested on the AMAX4 video). If it's busy, the console tries `GEMINI_FALLBACK_MODEL` (default `gemini-4-hydrogen`). `GEMINI_MOCK=1` answers from the bundled AMAX4 annotation instead, which is what the tests use, so no key is needed for development.
+`GEMINI_MODEL` picks the model (default `gemini-3.6-flash`, which was tested on the AMAX4 video). If a model is busy or has used its free requests, the console tries the next one in `GEMINI_FALLBACK_MODEL` (default `gemini-3.8-flash,gemini-4-hydrogen,gemini-3.5-flash-lite`). `GEMINI_MOCK=1` answers from the bundled AMAX4 annotation instead, which is what the tests use, so no key is needed for development.
+
+**Free-tier limits:** each Gemini model family allows about 20 requests a day, and "busy" answers count too. They reset at midnight Pacific time (1:30 pm in India). Before a demo, don't use them up testing. The tests on the three most-watched UK ABCDE videos are in [docs/abcde-video-tests.md](docs/abcde-video-tests.md).
 
 **Privacy:** on Gemini's free tier, Google may use what you send to improve its products. The console asks you to confirm that a video is public, or de-identified and approved, before autofill runs. Uploaded videos are deleted from the server and from Gemini's file store straight after reading. Real patient videos need your organisation's approval, and a paid tier or a local model.
 
-**Show published cases in the student app:** run the student app with the console's address, for example `npm run dev -- --mode connected` with a `.env.connected` file containing `VITE_API_URL=http://localhost:8787`. Published cases then appear in the case list, marked "From your teacher". The GitHub Pages build has no API address, so it shows only the built-in cases.
+**Show published cases in the student app:** `npm run demo` starts both prototypes, connected: the teacher console on http://localhost:8787 and the student app on http://localhost:5175/bedside-sim/. Published cases appear in the student app's case list, marked "From your teacher". (Or run the student app yourself with `VITE_API_URL=http://localhost:8787`.) The GitHub Pages build has no API address, so it shows only the built-in cases.
 
 | API                                                | What it does                                                         |
 | -------------------------------------------------- | -------------------------------------------------------------------- |
@@ -173,6 +175,7 @@ Every change needs the `x-bedside-teacher: 1` header, so other websites can't po
 | `npm run dev`          | Start the student app's dev server                 |
 | `npm run build`        | Type-check and build the student app to `dist/`    |
 | `npm run teacher`      | Build and start the teacher console (port 8787)    |
+| `npm run demo`         | Teacher console and a connected student app (5175) |
 | `npm run server`       | Start the teacher console server only              |
 | `npm run dev:teacher`  | Teacher console web page with hot reload (5174)    |
 | `npm run lint`         | ESLint                                             |

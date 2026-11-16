@@ -4,7 +4,8 @@
  *
  * Settings come from .env in the project folder (see .env.example):
  *   GEMINI_API_KEY  your free key from https://aistudio.google.com/apikey
- *   GEMINI_MODEL    optional, defaults to gemini-4-hydrogen
+ *   GEMINI_MODEL    optional, defaults to gemini-3.6-flash
+ *   GEMINI_FALLBACK_MODEL  optional, models tried next (comma-separated)
  *   GEMINI_MOCK=1   answer autofill from the bundled AMAX4 annotation (tests, demos)
  *   PORT, HOST      default 8787 on 127.0.0.1 (this computer only)
  *   DATA_DIR        where uploads and published cases live (default server/data)

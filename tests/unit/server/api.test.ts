@@ -6,7 +6,13 @@ import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createApp } from '../../../server/app.ts';
 import { loadBundledCases } from '../../../server/content.ts';
-import { askGemini, AutofillError, geminiConfig } from '../../../server/gemini.ts';
+import {
+  askGemini,
+  AutofillError,
+  geminiConfig,
+  noModelLeft,
+  retryWait,
+} from '../../../server/gemini.ts';
 import { openStore, type Store } from '../../../server/store.ts';
 import { getCase } from '../../../src/content/cases.ts';
 
@@ -158,9 +164,36 @@ describe('Gemini client', () => {
   it('explains a missing key without calling Google', async () => {
     const cfg = geminiConfig({});
     expect(cfg.model).toBe('gemini-3.6-flash');
-    expect(cfg.fallbackModel).toBe('gemini-4-hydrogen');
+    expect(cfg.fallbackModels[0]).toBe('gemini-3.8-flash');
+    expect(geminiConfig({ GEMINI_FALLBACK_MODEL: ' a , b,' }).fallbackModels).toEqual(['a', 'b']);
+    expect(geminiConfig({ GEMINI_FALLBACK_MODEL: '' }).fallbackModels).toEqual([]);
     await expect(
       askGemini({ kind: 'youtube', url: 'https://youtu.be/abcdefg' }, 'p', {}, cfg),
     ).rejects.toBeInstanceOf(AutofillError);
+  });
+
+  it('reads how long to wait from a rate-limit message', () => {
+    expect(retryWait('Please retry in 13h20m12s or upgrade')).toBe('13h 20m');
+    expect(retryWait('Please retry in 41.2s.')).toBe('a minute');
+    expect(retryWait('Please retry in 3m5s')).toBe('3 min');
+    expect(retryWait('busy')).toBeNull();
+  });
+
+  it('explains why no model could take the video', () => {
+    const day = 'limit: 20 requests per day on Free Tier). Please retry in 13h20m12s';
+    const busy = noModelLeft([
+      { model: 'a', status: 503, message: 'high demand' },
+      { model: 'b', status: 503, message: 'high demand' },
+    ]);
+    expect(busy.status).toBe(503);
+    expect(busy.message).toMatch(/All 2 Gemini models are busy/);
+    const used = noModelLeft([{ model: 'a', status: 429, message: day }]);
+    expect(used.status).toBe(429);
+    expect(used.message).toMatch(/used up on Gemini \(a\).*13h 20m/);
+    const mixed = noModelLeft([
+      { model: 'a', status: 429, message: day },
+      { model: 'b', status: 503, message: 'high demand' },
+    ]);
+    expect(mixed.message).toMatch(/1 is busy and 1 has used its free requests/);
   });
 });

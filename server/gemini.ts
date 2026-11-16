@@ -10,8 +10,14 @@ import { GoogleGenAI } from '@google/genai';
 
 /** Tested on the AMAX4 video (free tier). */
 export const DEFAULT_GEMINI_MODEL = 'gemini-3.6-flash';
-/** Tried when the main model is busy (HTTP 500/503). */
-export const DEFAULT_FALLBACK_MODEL = 'gemini-4-hydrogen';
+/**
+ * Tried in order when the model before is busy (HTTP 500/503) or has used its
+ * free requests (429). On the free tier each model family has its own daily
+ * allowance (20 requests a day in November 2026; busy answers count too), so a
+ * list keeps autofill working. Models that share an allowance are left out
+ * (gemini-3.7-flash shares gemini-3.8-flash's, gemini-3.5-flash 3.6's).
+ */
+export const DEFAULT_FALLBACK_MODELS = 'gemini-3.8-flash,gemini-4-hydrogen,gemini-3.5-flash-lite';
 
 export type VideoSource =
   { kind: 'file'; path: string; mime: string } | { kind: 'youtube'; url: string };
@@ -21,8 +27,8 @@ export type GeminiStatus = 'ready' | 'missing-key' | 'mock';
 export interface GeminiConfig {
   apiKey: string;
   model: string;
-  /** Second model for when the first is overloaded ('' for none). */
-  fallbackModel: string;
+  /** Models to try next, in order, when one is busy or out of free requests. */
+  fallbackModels: string[];
   mock: boolean;
 }
 
@@ -30,7 +36,11 @@ export function geminiConfig(env: Record<string, string | undefined>): GeminiCon
   return {
     apiKey: (env['GEMINI_API_KEY'] ?? '').trim(),
     model: (env['GEMINI_MODEL'] ?? '').trim() || DEFAULT_GEMINI_MODEL,
-    fallbackModel: (env['GEMINI_FALLBACK_MODEL'] ?? DEFAULT_FALLBACK_MODEL).trim(),
+    // A comma-separated list; set it to nothing to use the main model only.
+    fallbackModels: (env['GEMINI_FALLBACK_MODEL'] ?? DEFAULT_FALLBACK_MODELS)
+      .split(',')
+      .map((m) => m.trim())
+      .filter(Boolean),
     mock: env['GEMINI_MOCK'] === '1',
   };
 }
@@ -55,23 +65,68 @@ export const isYoutubeUrl = (s: string) => YOUTUBE.test(s.trim());
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const statusOf = (err: unknown) => (err as { status?: unknown }).status;
+const messageOf = (err: unknown) => (err instanceof Error ? err.message : String(err));
 /** Google's "high demand, try later" answers. */
 const isBusy = (err: unknown) => statusOf(err) === 503 || statusOf(err) === 500;
+/** No answer within MODEL_TIMEOUT_MS. */
+const timedOut = (err: unknown) =>
+  /timeout/i.test((err as { name?: string }).name ?? '') || /timed out/i.test(messageOf(err));
+/** Busy, slow, or out of free requests: another model may still answer. */
+const tryNext = (err: unknown) => isBusy(err) || statusOf(err) === 429 || timedOut(err);
+/** How long one model may take to answer before the next is tried. */
+const MODEL_TIMEOUT_MS = 5 * 60_000;
+
+/** "Please retry in 13h20m12s" → "13h 20m" (or null). */
+export function retryWait(msg: string): string | null {
+  const m = /retry in (?:(\d+)h)?(?:(\d+)m)?(?:([\d.]+)s)?/i.exec(msg);
+  if (!m || (!m[1] && !m[2] && !m[3])) return null;
+  if (m[1]) return `${m[1]}h ${m[2] ?? '0'}m`;
+  if (m[2]) return `${m[2]} min`;
+  return 'a minute';
+}
+
+export interface ModelFailure {
+  model: string;
+  status: number;
+  message: string;
+}
+
+/** One plain message for when every model was busy or out of free requests. */
+export function noModelLeft(fails: readonly ModelFailure[]): AutofillError {
+  const n = fails.length;
+  const busy = fails.filter((f) => f.status >= 500).length;
+  const limited = fails.filter((f) => f.status === 429);
+  const daily = limited.filter((f) => /per day/i.test(f.message));
+  const wait = daily.map((f) => retryWait(f.message)).find(Boolean);
+  const resets = wait ? ` (it resets in about ${wait})` : '';
+  const models = n === 1 ? `Gemini (${fails[0]?.model ?? ''})` : `all ${n} Gemini models`;
+  if (busy === n)
+    return new AutofillError(
+      `${n === 1 ? 'Gemini is' : `All ${n} Gemini models are`} busy right now (high demand). Try again in a minute or two.`,
+      503,
+    );
+  if (daily.length === n)
+    return new AutofillError(
+      `Today’s free Gemini requests are used up on ${models}${resets}. Try again then, or use another free key.`,
+      429,
+    );
+  if (busy === 0)
+    return new AutofillError(
+      `Gemini’s free-tier limit was reached on ${models}. Wait ${retryWait(limited[0]?.message ?? '') ?? 'a minute'} and try again.`,
+      429,
+    );
+  return new AutofillError(
+    `No free Gemini model could take the video just now: ${busy} ${busy === 1 ? 'is' : 'are'} busy and ${limited.length} ${limited.length === 1 ? 'has' : 'have'} used ${limited.length === 1 ? 'its' : 'their'} free requests${resets}. Try again in a few minutes.`,
+    503,
+  );
+}
 
 function friendly(err: unknown, model: string): AutofillError {
   if (err instanceof AutofillError) return err;
   const status = statusOf(err);
-  const msg = err instanceof Error ? err.message : String(err);
-  if (isBusy(err))
-    return new AutofillError(
-      'Gemini is busy right now (high demand). Try again in a minute or two.',
-      503,
-    );
-  if (status === 429)
-    return new AutofillError(
-      'Gemini’s free-tier limit was reached. Wait a minute (or until tomorrow for the daily limit) and try again.',
-      429,
-    );
+  const msg = messageOf(err);
+  if (isBusy(err) || status === 429)
+    return noModelLeft([{ model, status: Number(status), message: msg }]);
   if (status === 401 || status === 403 || /api key/i.test(msg))
     return new AutofillError(
       'Gemini didn’t accept the API key. Check GEMINI_API_KEY in .env.',
@@ -87,7 +142,7 @@ function friendly(err: unknown, model: string): AutofillError {
 
 /**
  * Asks Gemini about a video and returns its parsed JSON answer and the model
- * that gave it. When the main model is overloaded, the fallback is tried.
+ * that gave it. When a model is busy or out of free requests, the next is tried.
  */
 export async function askGemini(
   source: VideoSource,
@@ -125,31 +180,43 @@ export async function askGemini(
       video = { type: 'video', uri: source.url.trim() };
     }
 
-    const models = [...new Set([cfg.model, cfg.fallbackModel].filter(Boolean))];
+    const models = [...new Set([cfg.model, ...cfg.fallbackModels].filter(Boolean))];
+    const fails: ModelFailure[] = [];
     for (let i = 0; ; i++) {
       const model = models[i] ?? cfg.model;
       let text: string;
       try {
-        const interaction = await ai.interactions.create({
-          model,
-          store: false,
-          // The stable (v1) Interactions API takes one user-input step holding
-          // the video and the instructions, the video first.
-          input: [
-            {
-              type: 'user_input',
-              content: [
-                { ...video, processing: { type: 'static', fps: 1 } },
-                { type: 'text', text: prompt },
-              ],
-            },
-          ],
-          response_format: { type: 'text', mime_type: 'application/json', schema },
-        });
+        const interaction = await ai.interactions.create(
+          {
+            model,
+            store: false,
+            // The stable (v1) Interactions API takes one user-input step holding
+            // the video and the instructions, the video first.
+            input: [
+              {
+                type: 'user_input',
+                content: [
+                  { ...video, processing: { type: 'static', fps: 1 } },
+                  { type: 'text', text: prompt },
+                ],
+              },
+            ],
+            response_format: { type: 'text', mime_type: 'application/json', schema },
+          },
+          // No silent retries: each one resends the whole video and counts
+          // against the free daily limit. We move to the next model instead.
+          { retries: { strategy: 'none' }, timeout_ms: MODEL_TIMEOUT_MS },
+        );
         text = interaction.output_text ?? '';
       } catch (err) {
-        if (isBusy(err) && i + 1 < models.length) continue;
-        throw friendly(err, model);
+        if (!tryNext(err)) throw friendly(err, model);
+        const status = timedOut(err) ? 504 : Number(statusOf(err));
+        fails.push({ model, status, message: messageOf(err) });
+        if (i + 1 < models.length) {
+          console.warn(`Gemini ${model}: HTTP ${status}, trying ${models[i + 1]}`);
+          continue;
+        }
+        throw noModelLeft(fails);
       }
       try {
         return { reply: JSON.parse(text) as unknown, model };
