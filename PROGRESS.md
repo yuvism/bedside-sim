@@ -322,10 +322,10 @@ The professor asked for two prototypes: a front end for students and a back end 
 
 ## ABCDE video tests and the live demo (2026-11-17)
 
-- **Tests:** Autofill with AI and Analyse ran on the three most-watched UK ABCDE simulation videos (Geeky Medics sepsis and asthma, Resuscitation Council UK demo). The results are in docs/abcde-video-tests.md. Actions and their timing were found reliably (within 1–8 s of the videos' chapter markers or frames). Readings depend on whether a monitor is shown.
+- **Tests:** Autofill with AI and Analyse ran on the three most-watched UK ABCDE simulation videos (Geeky Medics sepsis and asthma, Resuscitation Council UK demo). The results are in docs/abcde-video-tests.md. With Gemini 4 Hydrogen, the A–E steps landed within 0–3 s of the videos' chapter markers and monitor close-ups were read exactly. Readings depend on whether a monitor is shown.
 - **Free-tier fixes:**
   - The Gemini SDK's hidden retries (up to 4 per request, each resending the video and counting against the 20-a-day limit) are off.
-  - The console now falls back through `gemini-3.8-flash`, `gemini-4-hydrogen` and `gemini-3.5-flash-lite` on busy (5xx), limit (429) or timeout (3 min per model).
+  - The console now falls back through `gemini-3.8-flash`, `gemini-4-hydrogen` and `gemini-3.5-flash-lite` on busy (5xx), limit (429) or timeout (6 min per model).
   - When none can answer, one message says which were busy, which were used up and when the limit resets.
 - **Prompt:** observations said aloud are used when no monitor is shown, once at the moment they are said.
 - **`npm run demo`** starts the teacher console and a student app connected to it (port 5175), for live demos.

@@ -73,8 +73,12 @@ const timedOut = (err: unknown) =>
   /timeout/i.test((err as { name?: string }).name ?? '') || /timed out/i.test(messageOf(err));
 /** Busy, slow, or out of free requests: another model may still answer. */
 const tryNext = (err: unknown) => isBusy(err) || statusOf(err) === 429 || timedOut(err);
-/** How long one model may take to answer before the next is tried. */
-const MODEL_TIMEOUT_MS = 3 * 60_000;
+/**
+ * How long one model may take to answer before the next is tried. Gemini 4
+ * Hydrogen took up to 4 minutes for a 14-minute video; one that hasn't
+ * answered in 6 is stuck.
+ */
+const MODEL_TIMEOUT_MS = 6 * 60_000;
 
 /** "Please retry in 13h20m12s" → "13h 20m" (or null). */
 export function retryWait(msg: string): string | null {
