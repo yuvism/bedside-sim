@@ -74,7 +74,7 @@ const timedOut = (err: unknown) =>
 /** Busy, slow, or out of free requests: another model may still answer. */
 const tryNext = (err: unknown) => isBusy(err) || statusOf(err) === 429 || timedOut(err);
 /** How long one model may take to answer before the next is tried. */
-const MODEL_TIMEOUT_MS = 5 * 60_000;
+const MODEL_TIMEOUT_MS = 3 * 60_000;
 
 /** "Please retry in 13h20m12s" → "13h 20m" (or null). */
 export function retryWait(msg: string): string | null {

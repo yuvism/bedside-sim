@@ -51,7 +51,7 @@ All three famous videos were read by **Gemini 3.5 Flash-Lite**: on this day the 
 - **Hidden retries removed.** The Gemini SDK retried a failed request up to 4 times, resending the whole video each time, and every retry counted towards the free limit. One busy moment could use half a day's requests. Retries are now off, and the console moves on to the next model instead.
 - **More models to fall back on.** Each free model family has its own allowance of about 20 requests a day, and busy answers count too. The console now tries `gemini-3.6-flash`, then `gemini-3.8-flash`, `gemini-4-hydrogen` and `gemini-3.5-flash-lite`. Models that share an allowance (`gemini-3.7-flash` shares 3.8's) are left out.
 - **Clear messages.** When no model can take the video, the console says which were busy and which were out of free requests, and when the limit resets.
-- **A time limit per model** (5 minutes), so a stuck request moves on instead of hanging.
+- **A time limit per model** (3 minutes), so a stuck request moves on instead of hanging.
 - **Observations said aloud** are now used when no monitor is shown, reported once at the moment they are said.
 
 ## Repeat it
