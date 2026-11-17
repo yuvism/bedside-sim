@@ -24,7 +24,12 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      # With the repository variable TEACHER_API_URL set (the online teacher
+      # console), the student app also shows the cases teachers publish.
       - run: npm run build
+        env:
+          VITE_API_URL: ${{ vars.TEACHER_API_URL }}
+          VITE_TEACHER_URL: ${{ vars.TEACHER_API_URL }}
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:

@@ -4,7 +4,7 @@ import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { createApp } from '../../../server/app.ts';
+import { createApp, hasPassword } from '../../../server/app.ts';
 import { loadBundledCases } from '../../../server/content.ts';
 import {
   askGemini,
@@ -195,5 +195,73 @@ describe('Gemini client', () => {
       { model: 'b', status: 503, message: 'high demand' },
     ]);
     expect(mixed.message).toMatch(/1 is busy and 1 has used its free requests/);
+  });
+});
+
+describe('online mode (TEACHER_PASSWORD)', () => {
+  let online: Server;
+  let url: string;
+  let onlineDir: string;
+  const auth = (pw: string) => ({
+    authorization: `Basic ${Buffer.from(`teacher:${pw}`).toString('base64')}`,
+  });
+
+  beforeAll(async () => {
+    onlineDir = mkdtempSync(join(tmpdir(), 'bedside-online-'));
+    const app = createApp({
+      store: openStore(onlineDir),
+      env: {
+        GEMINI_MOCK: '1',
+        TEACHER_PASSWORD: 's3cret',
+        RENDER_EXTERNAL_HOSTNAME: 'bedside-teacher.example',
+      },
+      distDir: null,
+      bundled: loadBundledCases(),
+      mockCsv: CSV,
+    });
+    online = app.listen(0, '127.0.0.1');
+    await new Promise((r) => online.once('listening', r));
+    url = `http://localhost:${(online.address() as AddressInfo).port}`;
+  });
+
+  afterAll(() => {
+    online.close();
+    rmSync(onlineDir, { recursive: true, force: true });
+  });
+
+  it('asks for the password, and accepts it with any user name', async () => {
+    const none = await fetch(`${url}/api/health`);
+    expect(none.status).toBe(401);
+    expect(none.headers.get('www-authenticate')).toMatch(/^Basic /);
+    expect((await fetch(`${url}/api/health`, { headers: auth('wrong') })).status).toBe(401);
+    expect((await fetch(`${url}/api/health`, { headers: auth('s3cret') })).status).toBe(200);
+    expect((await fetch(`${url}/`, { headers: auth('s3cret') })).status).toBe(200);
+  });
+
+  it('keeps the published list and the health check open', async () => {
+    const list = await fetch(`${url}/api/published`);
+    expect(list.status).toBe(200);
+    expect(list.headers.get('access-control-allow-origin')).toBe('*');
+    expect(await (await fetch(`${url}/healthz`)).text()).toBe('ok');
+  });
+
+  it('accepts its own Render host name', async () => {
+    const status = await new Promise<number>((resolve, reject) => {
+      const req = httpRequest(
+        `${url}/api/health`,
+        { headers: { host: 'bedside-teacher.example', ...auth('s3cret') } },
+        (res) => resolve(res.statusCode ?? 0),
+      );
+      req.on('error', reject);
+      req.end();
+    });
+    expect(status).toBe(200);
+  });
+
+  it('checks Basic credentials safely', () => {
+    expect(hasPassword(undefined, 'x')).toBe(false);
+    expect(hasPassword('Bearer abc', 'x')).toBe(false);
+    expect(hasPassword(`Basic ${Buffer.from('a:b:c').toString('base64')}`, 'b:c')).toBe(true);
+    expect(hasPassword(`Basic ${Buffer.from('a:').toString('base64')}`, '')).toBe(false);
   });
 });

@@ -9,6 +9,8 @@
  *   GEMINI_MOCK=1   answer autofill from the bundled AMAX4 annotation (tests, demos)
  *   PORT, HOST      default 8787 on 127.0.0.1 (this computer only)
  *   DATA_DIR        where uploads and published cases live (default server/data)
+ *   TEACHER_PASSWORD  sign-in password; required when HOST isn't this computer
+ *   TEACHER_HOSTS   extra host names to accept (comma-separated)
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -23,6 +25,13 @@ if (existsSync(envFile)) process.loadEnvFile(envFile);
 const env = process.env;
 const port = Number(env['PORT'] ?? 8787);
 const host = env['HOST'] ?? '127.0.0.1';
+const local = ['127.0.0.1', 'localhost', '::1'].includes(host);
+if (!local && !(env['TEACHER_PASSWORD'] ?? '').trim()) {
+  console.error(
+    `HOST is ${host}, so anyone on the network could reach the console. Set TEACHER_PASSWORD first.`,
+  );
+  process.exit(1);
+}
 const store = openStore(env['DATA_DIR'] ?? join(ROOT, 'server', 'data'));
 sweepUploads(store);
 
@@ -39,7 +48,7 @@ const app = createApp({
 
 const status = geminiStatus(geminiConfig(env));
 app.listen(port, host, () => {
-  console.log(`Teacher console: http://localhost:${port}`);
+  console.log(`Teacher console: ${env['RENDER_EXTERNAL_URL'] ?? `http://localhost:${port}`}`);
   console.log(
     status === 'ready'
       ? `Autofill with AI: ready (${geminiConfig(env).model})`

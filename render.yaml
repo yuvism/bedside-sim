@@ -1,0 +1,26 @@
+# Render blueprint: the teacher console online, on Render's free plan.
+# Create it at https://render.com/deploy?repo=https://github.com/yuvism/bedside-sim
+# Render asks for GEMINI_API_KEY (your free Gemini key) and TEACHER_PASSWORD
+# (what teachers type to sign in). Neither is stored in this repository.
+#
+# Free plan: the service sleeps after 15 minutes without visitors and takes
+# 30–60 s to wake. Its disk is temporary, so published cases last until it
+# restarts or redeploys.
+services:
+  - type: web
+    name: bedside-sim-teacher
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm ci --include=dev && npm run build:teacher
+    startCommand: npm run server
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_VERSION
+        value: '24'
+      - key: HOST
+        value: 0.0.0.0
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: TEACHER_PASSWORD
+        sync: false

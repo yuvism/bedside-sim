@@ -159,6 +159,15 @@ This builds the console's web page and starts its server on http://localhost:878
 
 **Show published cases in the student app:** `npm run demo` starts both prototypes, connected: the teacher console on http://localhost:8787 and the student app on http://localhost:5175/bedside-sim/. Published cases appear in the student app's case list, marked "From your teacher". (Or run the student app yourself with `VITE_API_URL=http://localhost:8787`.) The GitHub Pages build has no API address, so it shows only the built-in cases.
 
+**Put the teacher console online (free, on Render):**
+
+1. Open https://render.com/deploy?repo=https://github.com/yuvism/bedside-sim and sign in with GitHub. Render reads [`render.yaml`](render.yaml).
+2. Enter `GEMINI_API_KEY` (your free key) and `TEACHER_PASSWORD` (what teachers type to sign in), then press **Apply**. Neither is stored in the repository.
+3. A few minutes later the console is at `https://bedside-sim-teacher.onrender.com` (Render adds a suffix if that name is taken). Sign in with any user name and the password.
+4. To show published cases in the public student app, set the repository variable `TEACHER_API_URL` to that address and re-run **Deploy to GitHub Pages**.
+
+On the free plan the console sleeps after 15 minutes without visitors and takes 30–60 s to wake, and published cases last until it restarts. Online, it always asks for the password: the server won't start on a public address without `TEACHER_PASSWORD`. The published list and `/healthz` stay open, so student apps can read them.
+
 | API                                                | What it does                                                         |
 | -------------------------------------------------- | -------------------------------------------------------------------- |
 | `GET /api/health`                                  | Gemini status and model                                              |

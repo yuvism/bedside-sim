@@ -9,7 +9,12 @@
  *   GET    /api/published        cases published to students (public)
  *   POST   /api/published        publish a case (validated)
  *   DELETE /api/published/:id    unpublish
+ *   GET    /healthz              "ok" (for the host's health check)
+ *
+ * With TEACHER_PASSWORD set (needed online), everything except the published
+ * list and the health check asks for that password (HTTP Basic sign-in).
  */
+import { createHash, timingSafeEqual } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import express, { type NextFunction, type Request, type Response } from 'express';
@@ -52,11 +57,29 @@ export interface AppOptions {
 
 const MAX_UPLOAD_MB = 500;
 
+const sha256 = (s: string) => createHash('sha256').update(s, 'utf8').digest();
+
+/** True when an "Authorization: Basic …" header carries the password (any user name). */
+export function hasPassword(header: string | undefined, password: string): boolean {
+  const m = /^Basic\s+(.+)$/i.exec(header ?? '');
+  if (!m?.[1] || !password) return false;
+  const decoded = Buffer.from(m[1], 'base64').toString('utf8');
+  const given = decoded.slice(decoded.indexOf(':') + 1);
+  return timingSafeEqual(sha256(given), sha256(password));
+}
+
 export function createApp(o: AppOptions) {
   const app = express();
   app.disable('x-powered-by');
   const gemini = geminiConfig(o.env);
-  const hosts = (o.env['TEACHER_HOSTS'] ?? 'localhost,127.0.0.1,[::1]').split(',');
+  const hosts = [
+    ...(o.env['TEACHER_HOSTS'] ?? 'localhost,127.0.0.1,[::1]').split(','),
+    // Render sets this to the service's own address (name.onrender.com).
+    o.env['RENDER_EXTERNAL_HOSTNAME'] ?? '',
+  ]
+    .map((h) => h.trim())
+    .filter(Boolean);
+  const password = (o.env['TEACHER_PASSWORD'] ?? '').trim();
 
   const published = () =>
     listPublished(o.store).flatMap((raw) => {
@@ -77,6 +100,20 @@ export function createApp(o: AppOptions) {
     if (!c) throw new AutofillError(`Unknown case "${id}".`, 400);
     return c;
   }
+
+  app.get('/healthz', (_req, res) => {
+    res.type('text').send('ok');
+  });
+
+  // Online, only teachers with the password get in. Students' apps still read
+  // the published list without it.
+  if (password)
+    app.use((req, res, next) => {
+      if (req.method === 'GET' && req.path === '/api/published') return next();
+      if (hasPassword(req.get('authorization'), password)) return next();
+      res.set('WWW-Authenticate', 'Basic realm="Bedside sim teacher console", charset="UTF-8"');
+      res.status(401).type('text').send('Teacher console: sign in with the teacher password.');
+    });
 
   // Only this computer's names (guards against DNS rebinding), and a custom
   // header on every change so another website can't post to the console.
