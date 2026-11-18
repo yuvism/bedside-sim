@@ -331,6 +331,7 @@ The professor asked for two prototypes: a front end for students and a back end 
 - **`npm run demo`** starts the teacher console and a student app connected to it (port 5175), for live demos.
 - **Online (2026-11-18):** the teacher console runs on Render's free plan at https://bedside-sim-teacher.onrender.com, behind `TEACHER_PASSWORD` (blueprint in `render.yaml`). The Pages build reads the repository variable `TEACHER_API_URL`, so the public student app shows published cases.
 - **Deliverables (not in the repo):** a 7-slide presentation with the narrated how-to video embedded, and a folder ready for Google Drive (code archive, slides, videos, test report).
+- **Project report (2026-11-18):** [docs/project-report.md](docs/project-report.md) covers the whole project (aims, both prototypes, engine, cases, learning from video, tests and results, safety, limitations, future work). A 10-page PDF of it is in the Drive folder.
 
 ## Next
 

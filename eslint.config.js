@@ -17,6 +17,7 @@ export default defineConfig([
     'node_modules',
     'dist-teacher',
     'server/data',
+    'deliverables',
   ]),
   {
     files: ['**/*.{ts,tsx,js}'],

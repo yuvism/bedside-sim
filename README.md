@@ -6,6 +6,8 @@ An open-source virtual patient simulator that runs in the browser. You talk to t
 
 **Live demo (student app):** https://yuvism.github.io/bedside-sim/
 
+**Project report:** [docs/project-report.md](docs/project-report.md), the whole project on about ten pages.
+
 It comes as **two prototypes**:
 
 | Prototype                      | For      | What it is                                                                                                                                                            | Runs                                                                              |
