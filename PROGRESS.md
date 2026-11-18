@@ -329,6 +329,7 @@ The professor asked for two prototypes: a front end for students and a back end 
   - When none can answer, one message says which were busy, which were used up and when the limit resets.
 - **Prompt:** observations said aloud are used when no monitor is shown, once at the moment they are said.
 - **`npm run demo`** starts the teacher console and a student app connected to it (port 5175), for live demos.
+- **Online (2026-11-18):** the teacher console runs on Render's free plan at https://bedside-sim-teacher.onrender.com, behind `TEACHER_PASSWORD` (blueprint in `render.yaml`). The Pages build reads the repository variable `TEACHER_API_URL`, so the public student app shows published cases.
 - **Deliverables (not in the repo):** a 7-slide presentation with the narrated how-to video embedded, and a folder ready for Google Drive (code archive, slides, videos, test report).
 
 ## Next

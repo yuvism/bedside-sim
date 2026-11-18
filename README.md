@@ -8,10 +8,10 @@ An open-source virtual patient simulator that runs in the browser. You talk to t
 
 It comes as **two prototypes**:
 
-| Prototype                      | For      | What it is                                                                                                                                                            | Runs                                                         |
-| ------------------------------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| **Student app** (front end)    | Students | Pick a topic or an unknown patient, assess and treat them at the bedside, then get a debrief.                                                                         | GitHub Pages (live demo), or `npm run dev`                   |
-| **Teacher console** (back end) | Teachers | A Node server with its own web page: **Learn from a video** with **Autofill with AI** (Google Gemini), the case editor, video validation and **Publish to students**. | Your computer: `npm run teacher`, then http://localhost:8787 |
+| Prototype                      | For      | What it is                                                                                                                                                            | Runs                                                                              |
+| ------------------------------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| **Student app** (front end)    | Students | Pick a topic or an unknown patient, assess and treat them at the bedside, then get a debrief.                                                                         | https://yuvism.github.io/bedside-sim/, or `npm run dev`                           |
+| **Teacher console** (back end) | Teachers | A Node server with its own web page: **Learn from a video** with **Autofill with AI** (Google Gemini), the case editor, video validation and **Publish to students**. | https://bedside-sim-teacher.onrender.com (teacher password), or `npm run teacher` |
 
 ```mermaid
 flowchart LR
@@ -163,8 +163,8 @@ This builds the console's web page and starts its server on http://localhost:878
 
 1. Open https://render.com/deploy?repo=https://github.com/yuvism/bedside-sim and sign in with GitHub. Render reads [`render.yaml`](render.yaml).
 2. Enter `GEMINI_API_KEY` (your free key) and `TEACHER_PASSWORD` (what teachers type to sign in), then press **Apply**. Neither is stored in the repository.
-3. A few minutes later the console is at `https://bedside-sim-teacher.onrender.com` (Render adds a suffix if that name is taken). Sign in with any user name and the password.
-4. To show published cases in the public student app, set the repository variable `TEACHER_API_URL` to that address and re-run **Deploy to GitHub Pages**.
+3. A few minutes later the console is at `https://bedside-sim-teacher.onrender.com` (Render adds a suffix if that name is taken). Sign in with any user name and the password. This project's console is live there.
+4. To show published cases in the public student app, set the repository variable `TEACHER_API_URL` to that address and re-run **Deploy to GitHub Pages**. (Done for this project: the live student app reads published cases from the online console.)
 
 On the free plan the console sleeps after 15 minutes without visitors and takes 30–60 s to wake, and published cases last until it restarts. Online, it always asks for the password: the server won't start on a public address without `TEACHER_PASSWORD`. The published list and `/healthz` stay open, so student apps can read them.
 
