@@ -87,9 +87,9 @@ export function Dashboard() {
           eyebrow="Teacher console · backend prototype"
           title="Make, check and improve cases"
         >
-          This console runs on a small server on your computer. It turns treatment videos into case
-          updates with <strong>Autofill with AI</strong> (Google Gemini), runs the fitting, and
-          publishes approved cases to the student app.
+          This console runs on a small server, online or on your own computer. It turns treatment
+          videos into case updates with <strong>Autofill with AI</strong> (Google Gemini), runs the
+          fitting, and publishes approved cases to the student app.
         </PageIntro>
         <Status health={health} error={error} published={published} />
         <div className="tool-grid">
