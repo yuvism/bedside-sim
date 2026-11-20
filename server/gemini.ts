@@ -66,6 +66,26 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const statusOf = (err: unknown) => (err as { status?: unknown }).status;
 const messageOf = (err: unknown) => (err instanceof Error ? err.message : String(err));
+/**
+ * The reason Gemini gave. Some answers (an invalid API key, for one) come in
+ * Google's older error format, `[{"error":{…}}]`, which the SDK can't read: its
+ * message is then just "API error occurred: {"httpMeta":…}". The raw body
+ * still holds the reason.
+ */
+export function reasonOf(err: unknown): string {
+  const raw = (err as { body?: unknown } | null)?.body;
+  if (typeof raw === 'string' && raw.trim()) {
+    try {
+      const j = JSON.parse(raw) as unknown;
+      const first: unknown = Array.isArray(j) ? j[0] : j;
+      const m = (first as { error?: { message?: unknown } } | null)?.error?.message;
+      if (typeof m === 'string' && m) return m;
+    } catch {
+      // Not JSON: fall back to the SDK's message.
+    }
+  }
+  return messageOf(err);
+}
 /** Google's "high demand, try later" answers. */
 const isBusy = (err: unknown) => statusOf(err) === 503 || statusOf(err) === 500;
 /** No answer within MODEL_TIMEOUT_MS. */
@@ -125,15 +145,15 @@ export function noModelLeft(fails: readonly ModelFailure[]): AutofillError {
   );
 }
 
-function friendly(err: unknown, model: string): AutofillError {
+export function friendly(err: unknown, model: string): AutofillError {
   if (err instanceof AutofillError) return err;
   const status = statusOf(err);
-  const msg = messageOf(err);
+  const msg = reasonOf(err);
   if (isBusy(err) || status === 429)
     return noModelLeft([{ model, status: Number(status), message: msg }]);
   if (status === 401 || status === 403 || /api key/i.test(msg))
     return new AutofillError(
-      'Gemini didn’t accept the API key. Check GEMINI_API_KEY in .env.',
+      `Gemini didn’t accept the API key (“${msg.slice(0, 120)}”). Check GEMINI_API_KEY: in the .env file on your computer, or in the Environment settings on Render for the online console.`,
       401,
     );
   if (status === 404)
@@ -215,7 +235,7 @@ export async function askGemini(
       } catch (err) {
         if (!tryNext(err)) throw friendly(err, model);
         const status = timedOut(err) ? 504 : Number(statusOf(err));
-        fails.push({ model, status, message: messageOf(err) });
+        fails.push({ model, status, message: reasonOf(err) });
         if (i + 1 < models.length) {
           console.warn(`Gemini ${model}: HTTP ${status}, trying ${models[i + 1]}`);
           continue;

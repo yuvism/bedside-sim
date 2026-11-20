@@ -9,8 +9,10 @@ import { loadBundledCases } from '../../../server/content.ts';
 import {
   askGemini,
   AutofillError,
+  friendly,
   geminiConfig,
   noModelLeft,
+  reasonOf,
   retryWait,
 } from '../../../server/gemini.ts';
 import { openStore, type Store } from '../../../server/store.ts';
@@ -195,6 +197,26 @@ describe('Gemini client', () => {
       { model: 'b', status: 503, message: 'high demand' },
     ]);
     expect(mixed.message).toMatch(/1 is busy and 1 has used its free requests/);
+  });
+
+  it('finds the reason in an error format the SDK cannot read (invalid key)', () => {
+    // What the SDK threw for an invalid key on 2026-11-20: a bare message, the
+    // reason only in the raw body, in Google's older array format.
+    const sdkError = Object.assign(
+      new Error('400 API error occurred: {"httpMeta":{"response":{},"request":{}}}'),
+      {
+        status: 400,
+        body: '[{"error":{"code":400,"message":"API key not valid. Please pass a valid API key.","status":"INVALID_ARGUMENT"}}]',
+      },
+    );
+    expect(reasonOf(sdkError)).toBe('API key not valid. Please pass a valid API key.');
+    const e = friendly(sdkError, 'gemini-3.6-flash');
+    expect(e.status).toBe(401);
+    expect(e.message).toMatch(/didn’t accept the API key.*API key not valid.*Render/);
+    // The newer format and a plain error still work.
+    expect(reasonOf({ body: '{"error":{"message":"high demand"}}' })).toBe('high demand');
+    expect(reasonOf(new Error('socket hang up'))).toBe('socket hang up');
+    expect(reasonOf(Object.assign(new Error('x'), { body: '<html>' }))).toBe('x');
   });
 });
 
