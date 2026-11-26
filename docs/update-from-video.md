@@ -21,7 +21,7 @@ flowchart LR
 1. Open **Learn from a video**, upload the video (or paste a public YouTube link) and pick the closest case.
 2. Tick that the video is public, or de-identified and approved, and press **Autofill with AI**.
 3. Check every row (rows from the AI are marked **AI · check**), then press **Analyse the video**.
-4. Tick the changes that make clinical sense and press **Create a draft for review**. The draft is a new case, `<case>-video`.
+4. Tick the changes that make clinical sense and press **Create a draft for review**. The draft is a new case, `<case>-video`. A short clip can't show how fast a condition worsens or how fast treatment works, so for a clip of under a few minutes, untick the "rate" changes. Otherwise the fit can over-shoot, and the case fails its tests in step 2b.
 5. In the case editor, **Test run** it at the bedside.
 
 ## 2a. Publish it (instant)
