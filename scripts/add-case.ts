@@ -13,7 +13,7 @@
  * draft) is tested with its original's ideal run. After a push, GitHub
  * Actions rebuilds the student app, so the case is live in about 2 minutes.
  */
-import { execFileSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -51,9 +51,19 @@ export async function addCase(raw: unknown, opts: { replace?: boolean } = {}): P
   return { id, title, file, replaced, testedAs };
 }
 
+/** One command line for a shell, quoting each argument that needs it. */
+export function commandLine(cmd: string, args: readonly string[]): string {
+  const quote = (a: string) => (/^[\w./:=@-]+$/.test(a) ? a : `"${a.replace(/"/g, '\\"')}"`);
+  return [cmd, ...args].map(quote).join(' ');
+}
+
 /** Runs an npm script or other command in the repo, showing its output. */
 export function run(cmd: string, args: string[]): void {
-  execFileSync(cmd, args, { cwd: ROOT, stdio: 'inherit', shell: process.platform === 'win32' });
+  // On Windows npm and npx are .cmd scripts, which need a shell. A shell gets
+  // one quoted command line: Node warns about passing it an argument list.
+  if (process.platform === 'win32')
+    execSync(commandLine(cmd, args), { cwd: ROOT, stdio: 'inherit' });
+  else execFileSync(cmd, args, { cwd: ROOT, stdio: 'inherit' });
 }
 
 /** Regenerates what depends on the case files (the review list and the Unity copies). */

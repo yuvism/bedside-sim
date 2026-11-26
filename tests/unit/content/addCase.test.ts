@@ -1,7 +1,7 @@
 /** add-case and import-published: checks that run without writing any file. */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { addCase } from '../../../scripts/add-case.ts';
+import { addCase, commandLine } from '../../../scripts/add-case.ts';
 import { importCases } from '../../../scripts/import-published.ts';
 import { baseCaseId, policyFor } from '../cases/policies.ts';
 
@@ -24,6 +24,15 @@ describe('a case added from the teacher console', () => {
 
   it('never overwrites a library case unless asked to', async () => {
     await expect(addCase(anaphylaxis)).rejects.toThrow(/already in the library.*--replace/);
+  });
+
+  it('quotes the arguments it passes to a shell', () => {
+    expect(commandLine('npm', ['run', '--silent', 'review:build'])).toBe(
+      'npm run --silent review:build',
+    );
+    expect(commandLine('git', ['commit', '-m', 'feat(cases): add x'])).toBe(
+      'git commit -m "feat(cases): add x"',
+    );
   });
 
   it('import skips cases already in the library and rejects odd ids', async () => {
