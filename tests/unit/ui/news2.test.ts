@@ -56,7 +56,7 @@ describe('NEWS2 (RCP 2017)', () => {
 });
 
 describe('the department board', () => {
-  it('puts every case in its own bay, 1 to 11', () => {
+  it('puts every case in its own bay, 1 to the number of cases', () => {
     const bays = CASES.map((c) => bayOf(c.id));
     expect(new Set(bays).size).toBe(CASES.length);
     expect(Math.min(...(bays as number[]))).toBe(1);

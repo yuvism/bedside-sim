@@ -7,16 +7,18 @@ import { CASES } from '../../../src/content/cases.ts';
 import { LIBRARY } from '../../../src/content/library.ts';
 import { runPolicy, runScript } from '../../../src/engine/replay.ts';
 import { lastDiagnosis, scoreRun } from '../../../src/engine/scoring.ts';
-import { IDEAL } from './policies.ts';
+import { policyFor } from './policies.ts';
 
 const SEEDS = [1, 2, 3, 4, 5, 6, 7, 8];
 const MAX = 120 * 60;
 const IDLE_MAX = 180 * 60;
 
 describe('case library', () => {
-  it('has eleven cases, each with an ideal-run policy', () => {
-    expect(CASES.length).toBe(11);
-    for (const c of CASES) expect(IDEAL[c.id], c.id).toBeDefined();
+  // Eleven built in; cases added from the teacher console (npm run add-case)
+  // come on top, tested with the policy of the case they were made from.
+  it('has at least the eleven built-in cases, each with an ideal-run policy', () => {
+    expect(CASES.length).toBeGreaterThanOrEqual(11);
+    for (const c of CASES) expect(policyFor(c.id), c.id).toBeDefined();
   });
 
   for (const c of CASES) {
@@ -25,7 +27,7 @@ describe('case library', () => {
         const scores: number[] = [];
         let stable = 0;
         for (const seed of SEEDS) {
-          const r = runPolicy(LIBRARY, c, seed, IDEAL[c.id]!(), { maxSec: MAX });
+          const r = runPolicy(LIBRARY, c, seed, policyFor(c.id)!(), { maxSec: MAX });
           if (r.outcome === 'stabilised') stable++;
           const s = scoreRun(c, {
             events: r.events,

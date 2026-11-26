@@ -1,0 +1,65 @@
+name: Import published cases
+
+# Copies the cases teachers published in the online teacher console into the
+# built-in library, runs the tests, and opens a pull request. Merging it puts
+# the cases in the student app for good (Deploy to GitHub Pages runs on main).
+#
+# Start it from Actions → Import published cases → Run workflow, or remove the
+# # in front of `schedule` to run it every night.
+#
+# Needs: the repository variable TEACHER_API_URL (the console's address), and
+# Settings → Actions → General → "Allow GitHub Actions to create and approve
+# pull requests". Without that setting it pushes a branch and prints a link.
+
+on:
+  workflow_dispatch:
+    inputs:
+      console:
+        description: Teacher console address (empty = the TEACHER_API_URL variable)
+        required: false
+  # schedule:
+  #   - cron: '30 2 * * *' # every night at 02:30 UTC (8:00 am in India)
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: import-published
+  cancel-in-progress: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - id: import
+        run: npm run import-published -- "$CONSOLE"
+        env:
+          CONSOLE: ${{ inputs.console || vars.TEACHER_API_URL }}
+      # Pull requests opened with the workflow's own token don't start CI, so
+      # the checks run here, before the pull request is opened.
+      - if: steps.import.outputs.added != '0'
+        run: npm run lint && npm run typecheck && npm test
+      - if: steps.import.outputs.added != '0'
+        name: Open a pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ADDED: ${{ steps.import.outputs.added }}
+        run: |
+          branch="import/published-$(date -u +%Y%m%d-%H%M)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add src/content/cases docs/clinical-review.md unity
+          git commit -m "feat(cases): import $ADDED case(s) published in the teacher console"
+          git push origin "$branch"
+          gh pr create --base main --head "$branch" \
+            --title "Import $ADDED case(s) published in the teacher console" \
+            --body "Cases published in the teacher console, checked and tested by the Import published cases workflow. A clinician should review them before merging. Educational simulation. Simplified physiology. Not clinical guidance." \
+            || echo "::notice::Pushed $branch. Open the pull request: https://github.com/${{ github.repository }}/compare/$branch"

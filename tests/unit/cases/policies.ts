@@ -309,3 +309,18 @@ export const IDEAL: Record<string, () => Policy> = {
     ],
   ),
 };
+
+/**
+ * The case a copy was made from: "asthma-02-video" (Learn from a video) and
+ * "asthma-02-copy" (the editor's Duplicate) come from "asthma-02".
+ */
+export const baseCaseId = (id: string) => id.replace(/(-(video|copy)(-\d+)?)+$/, '');
+
+/**
+ * The ideal-run policy for a case. A case made from another one (for example
+ * from a video) is treated the way its original is, so a case added from the
+ * teacher console is tested without writing a new policy.
+ */
+export function policyFor(id: string): (() => Policy) | undefined {
+  return IDEAL[id] ?? IDEAL[baseCaseId(id)];
+}

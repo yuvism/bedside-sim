@@ -25,7 +25,9 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "review:build": "tsx scripts/clinical-review.ts",
-    "unity:sync": "tsx scripts/unity-sync.ts"
+    "unity:sync": "tsx scripts/unity-sync.ts",
+    "add-case": "tsx scripts/add-case.ts",
+    "import-published": "tsx scripts/import-published.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "1.7.0",

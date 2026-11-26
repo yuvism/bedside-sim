@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { CASE_COUNT } from './caseCount.ts';
 
 test('the welcome screen offers learning by topic or an unknown patient', async ({ page }) => {
   await page.goto('./');
@@ -9,7 +10,7 @@ test('the welcome screen offers learning by topic or an unknown patient', async 
   await page.getByRole('link', { name: /Learn by topic/ }).click();
   await expect(page).toHaveURL(/#\/topics$/);
   await expect(page.getByRole('heading', { name: 'Choose a condition to practise' })).toBeVisible();
-  await expect(page.locator('.case-card')).toHaveCount(11);
+  await expect(page.locator('.case-card')).toHaveCount(CASE_COUNT);
   await expect(page.getByRole('link', { name: 'Anaphylaxis', exact: true })).toBeVisible();
 
   await nav.getByRole('link', { name: 'Unknown patient' }).click();
@@ -23,7 +24,7 @@ test('the welcome screen offers learning by topic or an unknown patient', async 
 test('an unknown patient hides the specialty and diagnosis until the debrief', async ({ page }) => {
   await page.goto('./#/patients');
   const board = page.locator('ol.board');
-  await expect(board.locator('.patient-card')).toHaveCount(11);
+  await expect(board.locator('.patient-card')).toHaveCount(CASE_COUNT);
   // Only what a triage nurse would know: no specialties, topic tags or diagnoses.
   for (const hidden of ['Emergency medicine', 'Endocrinology', 'Anaphylaxis', 'DKA']) {
     await expect(board.getByText(hidden, { exact: true })).toHaveCount(0);

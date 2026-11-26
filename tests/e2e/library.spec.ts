@@ -1,11 +1,12 @@
 import { expect, test } from '@playwright/test';
+import { CASE_COUNT } from './caseCount.ts';
 
-test('topics list shows eleven conditions and filters by specialty, difficulty and text', async ({
+test('topics list shows every condition and filters by specialty, difficulty and text', async ({
   page,
 }) => {
   await page.goto('./#/topics');
   const cards = page.locator('.case-card');
-  await expect(cards).toHaveCount(11);
+  await expect(cards).toHaveCount(CASE_COUNT);
   await page.getByLabel('Specialty').selectOption('Trauma');
   await expect(cards).toHaveCount(2);
   await page.getByLabel('Difficulty').selectOption('advanced');

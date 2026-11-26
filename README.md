@@ -87,8 +87,10 @@ flowchart LR
 
 1. Open the **Case editor** in the teacher console (`npm run teacher`). Choose **New case** (a playable starter) or duplicate a library case, and edit it section by section. Problems show next to their fields.
 2. When it's valid, **Test run** plays it at the bedside. Tune it until it behaves the way you want.
-3. **Export JSON** and save the file as `src/content/cases/<case-id>.json`.
-4. Add an ideal-run policy for it in `tests/unit/cases/policies.ts`, then run `npm run review:build` and `npm run unity:sync`, and `npm run test`.
+3. **Export JSON**, then run `npm run add-case -- <the file>.json` (add `--push` to commit and push too). It checks the case, saves it in `src/content/cases/`, refreshes the clinical review list and the Unity copies, and runs the tests. After the push, GitHub rebuilds the student app in about 2 minutes.
+4. A brand-new case also needs an ideal-run policy in `tests/unit/cases/policies.ts`. A case made from another one (a video draft or a duplicate) is tested with its original's.
+
+The whole route from a training video to the student app, and how to automate it with the **Import published cases** workflow, is in [docs/update-from-video.md](docs/update-from-video.md).
 
 Every medical number needs a `source`. Anything not taken directly from a named guideline gets `"reviewNeeded": true` so it appears in [docs/clinical-review.md](docs/clinical-review.md). [CONTRIBUTING.md](CONTRIBUTING.md) explains the case format, the condition language and how to test a case.
 
@@ -181,20 +183,22 @@ On the free plan the console sleeps after 15 minutes without visitors and takes 
 
 Every change needs the `x-bedside-teacher: 1` header, so other websites can't post to the console.
 
-| Command                | What it does                                       |
-| ---------------------- | -------------------------------------------------- |
-| `npm run dev`          | Start the student app's dev server                 |
-| `npm run build`        | Type-check and build the student app to `dist/`    |
-| `npm run teacher`      | Build and start the teacher console (port 8787)    |
-| `npm run demo`         | Teacher console and a connected student app (5175) |
-| `npm run server`       | Start the teacher console server only              |
-| `npm run dev:teacher`  | Teacher console web page with hot reload (5174)    |
-| `npm run lint`         | ESLint                                             |
-| `npm run test`         | Unit tests (Vitest)                                |
-| `npm run test:e2e`     | End-to-end tests for both apps (build both first)  |
-| `npm run format`       | Prettier                                           |
-| `npm run review:build` | Rebuild `docs/clinical-review.md` from the content |
-| `npm run unity:sync`   | Copy content and parity fixtures into `unity/`     |
+| Command                             | What it does                                                   |
+| ----------------------------------- | -------------------------------------------------------------- |
+| `npm run dev`                       | Start the student app's dev server                             |
+| `npm run build`                     | Type-check and build the student app to `dist/`                |
+| `npm run teacher`                   | Build and start the teacher console (port 8787)                |
+| `npm run demo`                      | Teacher console and a connected student app (5175)             |
+| `npm run server`                    | Start the teacher console server only                          |
+| `npm run dev:teacher`               | Teacher console web page with hot reload (5174)                |
+| `npm run lint`                      | ESLint                                                         |
+| `npm run test`                      | Unit tests (Vitest)                                            |
+| `npm run test:e2e`                  | End-to-end tests for both apps (build both first)              |
+| `npm run format`                    | Prettier                                                       |
+| `npm run add-case -- <file>.json`   | Add a case exported from the console to the library (`--push`) |
+| `npm run import-published -- <url>` | Add every case a teacher console has published                 |
+| `npm run review:build`              | Rebuild `docs/clinical-review.md` from the content             |
+| `npm run unity:sync`                | Copy content and parity fixtures into `unity/`                 |
 
 For the first e2e run, install the Playwright browser once with `npx playwright install chromium`.
 

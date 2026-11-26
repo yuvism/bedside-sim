@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test';
+import { CASE_COUNT } from './caseCount.ts';
 
 test('the board shows bays, triage observations and NEWS2', async ({ page }) => {
   await page.goto('./#/patients');
   const cards = page.locator('ol.board .patient-card');
-  await expect(cards).toHaveCount(11);
+  await expect(cards).toHaveCount(CASE_COUNT);
   await expect(cards.first().locator('.bay-badge')).toHaveText('Bay 1');
   await expect(cards.first().getByLabel('Observations on arrival')).toContainText('HR');
   // Every adult patient has a NEWS2 score with a risk label, not colour alone.
